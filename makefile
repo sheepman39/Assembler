@@ -5,7 +5,7 @@ run: Main.class
 	java Main
 
 clean:
-	rm *.class *.jar
+	rm *.class
 
 debug: Main.jar
 	jdb Main.jar
