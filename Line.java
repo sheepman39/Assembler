@@ -13,4 +13,9 @@ public class Line {
         this.keyword = keyword;
         this.argument = argument;
     }
+
+    // add a method that allows this object to be printed
+    public String toString(){
+        return "Label: " + this.label + " Keyword: " + this.keyword + " Argument: " + this.argument;
+    }
 }
