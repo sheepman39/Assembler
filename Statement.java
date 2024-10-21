@@ -33,7 +33,7 @@ public class Statement {
 
     // this will be overridden by the subclasses
     // to assemble based on different formats
-    public HexNum assemble(){
-        return this.opcode;
+    public String assemble(){
+        return this.opcode.toString();
     }
 }
