@@ -139,7 +139,8 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (this.formatTable.get(mnemonic) == Format.THREE) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
         } else {
-            System.out.println("Error: Unexpected format in instructions.txt");
+            System.out.println("Error: Format not found");
+            System.out.println("Mnemonic: " + mnemonic);
             newStatement = new Statement();
         }
         this.locctr = this.locctr.add(newStatement.getSize());
@@ -160,8 +161,9 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // find both of the registers in parts[1]
         String[] registers = args.split(",");
-        if (registers.length >= 2 || registers.length < 0) {
+        if (registers.length > 2 || registers.length <= 0) {
             System.out.println("Error: Invalid number of registers for format 2");
+            
         }
 
         // find each of the registers in the registerTable
