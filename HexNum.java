@@ -50,10 +50,11 @@ public class HexNum {
         return this.value;
     }
 
+    // returns a HexNum with a new value
     // assume int input is in decimal
-    public void add(int value){
+    public HexNum add(int value){
         int newVal = this.convertToDec(this.value, NumSystem.HEX) + value;
-        this.value = this.convertToHex(Integer.toString(newVal), NumSystem.DEC);
+        return new HexNum(newVal);
     }
 
     // convert hex values to decimal, then back to hex
