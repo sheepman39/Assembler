@@ -74,6 +74,9 @@ public class StatementFactory implements StatementFactoryInterface{
     public Statement processStatement(String statement){
         // define return statement
         Statement newStatement;
+
+        // flag for format 4
+        boolean eFlag = false;
         // First strip any unnecessary whitespace
         statement = statement.strip();
 
@@ -99,19 +102,19 @@ public class StatementFactory implements StatementFactoryInterface{
             // throw an exception
             System.out.println("Error: Invalid number of arguments");
         }
-        
-        // ensure that the mnemonic is in the symbol table
-        if(!this.symbolTable.containsKey(mnemonic)){
-            System.out.println("Error: Mnemonic: " + mnemonic + " not found in instructions.txt");
-        }
 
+        // since some mnemonics may contain '+' at the beginning, we want to remove it for comparisons sake
+        if(mnemonic.charAt(0) == '+'){
+            eFlag = true;
+            mnemonic = mnemonic.substring(1);
+        }
         // generate a new statement based on its format
         if(this.formatTable.get(mnemonic) == Format.ONE){
-            newStatement = createStatement(parts);
+            newStatement = createStatement(mnemonic, parts);
         } else if(this.formatTable.get(mnemonic) == Format.TWO){
-            newStatement = createRegStatement(parts);
+            newStatement = createRegStatement(mnemonic, parts);
         } else if(this.formatTable.get(mnemonic) == Format.THREE){
-            newStatement = createExtStatement(parts);
+            newStatement = createExtStatement(mnemonic, parts, eFlag);
         } else {
             System.out.println("Error: Unexpected format in instructions.txt");
             newStatement = new Statement();
@@ -120,7 +123,7 @@ public class StatementFactory implements StatementFactoryInterface{
         return newStatement;
     }
 
-    private Statement createStatement(String[] parts){
+    private Statement createStatement(String mnemonic, String[] parts){
 
         // check to make sure that there is only one element in parts
         if(parts.length != 1){
@@ -130,7 +133,7 @@ public class StatementFactory implements StatementFactoryInterface{
         return new Statement(this.locctr, opcode);
     }
 
-    private Statement createRegStatement(String[] parts){
+    private Statement createRegStatement(String mnemonic, String[] parts){
         // Statement to return
         Statement returnVal = new Statement();
         // check to make sure that there are two elements in parts
@@ -161,7 +164,19 @@ public class StatementFactory implements StatementFactoryInterface{
         return returnVal;
     }
 
-    private Statement createExtStatement(String[] parts){
-        return new Statement();
+    private Statement createExtStatement(String mnemonic, String[] parts, boolean eFlag){
+        
+        // find the opcode of the mnemonic
+        HexNum opcode = this.symbolTable.get(mnemonic);
+
+        // create the ExtendedStatement
+        ExtendedStatement returnVal = new ExtendedStatement(this.locctr, opcode, parts[1]);
+        
+        // if there is an eFlag, set it
+        if(eFlag){
+            returnVal.setEFlag();
+        }
+
+        return returnVal;
     }
 }

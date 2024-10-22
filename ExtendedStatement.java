@@ -19,6 +19,7 @@ public class ExtendedStatement extends Statement{
     public ExtendedStatement(HexNum location, HexNum opcode, String args){
         super(location, opcode);
         this.args = args;
+        
     }
 
     // flag managers
@@ -50,8 +51,15 @@ public class ExtendedStatement extends Statement{
     public void setArgs(String args){
         this.args = args;
     }
+    
+    // since the size can be 3 or 4, we will add 1 to the size if the e flag is set
+    @Override
+    public HexNum getSize(){
+        return this.eFlag ? this.size.add(1) : this.size;
+    }
 
     // assemble
+    @Override
     public String assemble(){
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
