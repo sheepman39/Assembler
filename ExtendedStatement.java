@@ -61,12 +61,12 @@ public class ExtendedStatement extends Statement{
         int e = this.eFlag ? 1 : 0;
 
         // sicne n and i are part of the opcode bit, we will add them here
-        this.opcode.add(n + i);
+        HexNum first = this.opcode.add(n + i);
 
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
 
-        String returnVal = this.opcode.toString() + third.toString() + this.args;
+        String returnVal = first.toString() + third.toString() + this.args;
         return returnVal;
     }
 
