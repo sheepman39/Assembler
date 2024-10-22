@@ -8,7 +8,7 @@ public class RegisterStatement extends Statement {
     public RegisterStatement() {
         super();
         this.format = 2;
-        this.size = this.size.set(this.format);
+        this.size.set(this.format);
         this.reg1 = new HexNum(0);
         this.reg2 = new HexNum(0);
     }
@@ -16,7 +16,7 @@ public class RegisterStatement extends Statement {
     public RegisterStatement(HexNum location, HexNum opcode, HexNum reg1) {
         super(location, opcode);
         this.format = 2;
-        this.size = this.size.set(this.format);
+        this.size.set(this.format);
         this.reg1 = reg1;
         this.reg2 = new HexNum(0);
     }
@@ -24,7 +24,7 @@ public class RegisterStatement extends Statement {
     public RegisterStatement(HexNum location, HexNum opcode, HexNum reg1, HexNum reg2) {
         super(location, opcode);
         this.format = 2;
-        this.size = this.size.set(this.format);
+        this.size.set(this.format);
         this.reg1 = reg1;
         this.reg2 = reg2;
     }
