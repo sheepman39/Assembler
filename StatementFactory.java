@@ -55,9 +55,10 @@ public class StatementFactory implements StatementFactoryInterface{
     // create a statement from a string
     public Statement processStatement(String statement){
         // define return statement
-        Statement curLine = new Statement();
+        Statement newStatement;
         // First strip any unnecessary whitespace
         statement = statement.strip();
+
         // find the comment character
         // since there is the possibility of no comment existing, check if the comment character exists
         // if not, then set it to the length of the string
@@ -68,7 +69,35 @@ public class StatementFactory implements StatementFactoryInterface{
         String[] parts = statement.split("\\s+");
         
         // the number of arguments determines the position of each part
+        String mnemonic = "";
+
+        if(parts.length == 1){
+            mnemonic = parts[0];
+        } else if(parts.length == 2){
+            mnemonic = parts[0];
+        } else if(parts.length == 3){
+            mnemonic = parts[1];
+        } else {
+            // throw an exception
+            System.out.println("Error: Invalid number of arguments");
+        }
         
+        // ensure that the mnemonic is in the symbol table
+        if(!this.symbolTable.containsKey(mnemonic)){
+            System.out.println("Error: Mnemonic not found in instructions.txt");
+        }
+
+        // generate a new statement based on its format
+        if(this.formatTable.get(mnemonic) == Format.ONE){
+            newStatement = createStatement(parts);
+        } else if(this.formatTable.get(mnemonic) == Format.TWO){
+            newStatement = createRegStatement(parts);
+        } else if(this.formatTable.get(mnemonic) == Format.THREE){
+            newStatement = createExtStatement(parts);
+        } else {
+            System.out.println("Error: Unexpected format in instructions.txt");
+            newStatement = new Statement();
+        }
 
         return new Statement();
     }
