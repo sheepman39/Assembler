@@ -42,7 +42,9 @@ public class StatementFactory implements StatementFactoryInterface {
                     newFormat = Format.TWO;
                 } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
-                } else {
+                } else if (parts[1].equals("ASM")){
+                    newFormat = Format.ASM;
+                }else {
                     System.out.println("Error: Unexpected format in instructions.txt");
                 }
 
@@ -138,7 +140,10 @@ public class StatementFactory implements StatementFactoryInterface {
             newStatement = createRegStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.THREE) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
-        } else {
+        } else if (this.formatTable.get(mnemonic) == Format.ASM){
+            handleAsmStatement(mnemonic, args);
+            return null;
+        }else {
             System.out.println("Error: Format not found");
             System.out.println("Mnemonic: " + mnemonic);
             newStatement = new Statement();
@@ -146,7 +151,26 @@ public class StatementFactory implements StatementFactoryInterface {
         this.locctr = this.locctr.add(newStatement.getSize());
         return newStatement;
     }
-
+    private void handleAsmStatement(String mnemonic, String args){
+        if(mnemonic.equals("START")){
+            this.locctr = new HexNum(args, NumSystem.HEX);
+        } else if(mnemonic.equals("END")){
+            // do nothing
+        } else if(mnemonic.equals("BYTE")){
+            // add the size of the byte to the locctr
+        } else if(mnemonic.equals("WORD")){
+            // add 3 to the locctr
+            this.locctr = this.locctr.add(3);
+        } else if(mnemonic.equals("RESB")){
+            // add args to the locctr
+            this.locctr = this.locctr.add(Integer.parseInt(args));
+        } else if(mnemonic.equals("RESW")){
+            // add 3 * args to the locctr
+            this.locctr = this.locctr.add(3 * Integer.parseInt(args));
+        } else {
+            System.out.println("Error: Invalid ASM mnemonic");
+        }
+    }
     private Statement createStatement(String mnemonic, String args) {
 
         // check to make sure that there is only one element in parts

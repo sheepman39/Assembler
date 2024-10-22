@@ -29,7 +29,9 @@ class Main {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 Statement statement = factory.processStatement(line);
-                list.add(statement);
+                if (statement != null) {
+                    list.add(statement);
+                }
             }
             sc.close();
         } catch (Exception e) {
