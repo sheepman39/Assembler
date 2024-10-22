@@ -6,17 +6,17 @@ import java.util.Scanner;
 class Main {
     public static void main(String[] args) {
         System.out.println("Hello World");
-        ArrayList<Line> list = fileInput("input.asm");
+        ArrayList<Statement> list = fileInput("input.asm");
         // print out every item in list
-        for (Line l : list) {
+        for (Statement l : list) {
             System.out.println(l.toString());
         }
     }
 
-    public static ArrayList<Line> fileInput(String filename) {
+    public static ArrayList<Statement> fileInput(String filename) {
 
         // create the ArrayList that will be returned
-        ArrayList<Line> list = new ArrayList<Line>();
+        ArrayList<Statement> list = new ArrayList<Statement>();
 
         // open up a new file and read the string
         // parse the string and create a list of lines
@@ -42,8 +42,9 @@ class Main {
 
                 // now we are going to split the string up into the different parts based on space or tabs
                 String[] parts = line.split("\\s+");
-                Line curLine = new Line();
-
+                Statement curLine = new Statement();
+                
+                // TODO: Fix this from the restructure.  Should be a part of factory now
                 // the number of arguments determines the position of each part
                 if(parts.length == 3){
                     curLine.label = parts[0];
