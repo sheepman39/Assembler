@@ -58,10 +58,10 @@ public class HexNum {
     }
 
     // convert hex values to decimal, then back to hex
-    public void add(HexNum value){
+    public HexNum add(HexNum value){
         int newVal = this.convertToDec(value.toString(), NumSystem.HEX);
         newVal += this.convertToDec(this.value, NumSystem.HEX);
-        this.value = this.convertToHex(Integer.toString(newVal), NumSystem.DEC);
+        return new HexNum(newVal);
     }
 
     public void set(int value){
