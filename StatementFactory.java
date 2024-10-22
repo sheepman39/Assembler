@@ -100,13 +100,26 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // the number of arguments determines the position of each part
         String mnemonic = "";
-
+        String args = "";
         if (parts.length == 1) {
             mnemonic = parts[0];
         } else if (parts.length == 2) {
             mnemonic = parts[0];
+            args = parts[1];
         } else if (parts.length == 3) {
+            
+            // if there are 3 parts, the 0 index is the label
+            String label = parts[0];
+            
+            // add the label with the to the symbol table
+            if(!Main.symbolTable.containsKey(label)){
+                Main.symbolTable.put(label, this.locctr);
+            } else {
+                System.out.println("Error: Duplicate label: " + label);
+            }
+
             mnemonic = parts[1];
+            args = parts[2];
         } else {
             // throw an exception
             System.out.println("Error: Invalid number of arguments");
@@ -120,11 +133,11 @@ public class StatementFactory implements StatementFactoryInterface {
         }
         // generate a new statement based on its format
         if (this.formatTable.get(mnemonic) == Format.ONE) {
-            newStatement = createStatement(mnemonic, parts);
+            newStatement = createStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.TWO) {
-            newStatement = createRegStatement(mnemonic, parts);
+            newStatement = createRegStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.THREE) {
-            newStatement = createExtStatement(mnemonic, parts, eFlag);
+            newStatement = createExtStatement(mnemonic, args, eFlag);
         } else {
             System.out.println("Error: Unexpected format in instructions.txt");
             newStatement = new Statement();
@@ -133,28 +146,21 @@ public class StatementFactory implements StatementFactoryInterface {
         return newStatement;
     }
 
-    private Statement createStatement(String mnemonic, String[] parts) {
+    private Statement createStatement(String mnemonic, String args) {
 
         // check to make sure that there is only one element in parts
-        if (parts.length != 1) {
-            System.out.println("Error: Invalid number of arguments for format 1");
-        }
-        HexNum opcode = this.symbolTable.get(parts[0]);
+        HexNum opcode = this.symbolTable.get(mnemonic);
         return new Statement(this.locctr, opcode);
     }
 
-    private Statement createRegStatement(String mnemonic, String[] parts) {
+    private Statement createRegStatement(String mnemonic, String args) {
         // Statement to return
         Statement returnVal = new Statement();
-        // check to make sure that there are two elements in parts
-        if (parts.length != 2) {
-            System.out.println("Error: Invalid number of arguments for format 2");
-        }
-        HexNum opcode = this.symbolTable.get(parts[0]);
+        HexNum opcode = this.symbolTable.get(mnemonic);
 
         // find both of the registers in parts[1]
-        String[] registers = parts[1].split(",");
-        if (registers.length >= 2 && registers.length > 0) {
+        String[] registers = args.split(",");
+        if (registers.length >= 2 || registers.length < 0) {
             System.out.println("Error: Invalid number of registers for format 2");
         }
 
@@ -174,13 +180,13 @@ public class StatementFactory implements StatementFactoryInterface {
         return returnVal;
     }
 
-    private Statement createExtStatement(String mnemonic, String[] parts, boolean eFlag) {
+    private Statement createExtStatement(String mnemonic, String args, boolean eFlag) {
 
         // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
 
         // create the ExtendedStatement
-        ExtendedStatement returnVal = new ExtendedStatement(this.locctr, opcode, parts[1]);
+        ExtendedStatement returnVal = new ExtendedStatement(this.locctr, opcode, args);
 
         // if there is an eFlag, set it
         if (eFlag) {
