@@ -1,7 +1,7 @@
 // Class: ExtendedStatement
 // Extends: Statement
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
-public class ExtendedStatement extends Statement{
+public class ExtendedStatement extends Statement {
     String args;
     boolean nFlag = false;
     boolean iFlag = false;
@@ -11,48 +11,57 @@ public class ExtendedStatement extends Statement{
     boolean eFlag = false;
 
     // constructors
-    public ExtendedStatement(){
+    public ExtendedStatement() {
         super();
         this.args = "";
     }
 
-    public ExtendedStatement(HexNum location, HexNum opcode, String args){
+    public ExtendedStatement(HexNum location, HexNum opcode, String args) {
         super(location, opcode);
         this.args = args;
+
     }
 
     // flag managers
-    public void setNFlag(){
+    public void setNFlag() {
         this.nFlag = true;
     }
 
-    public void setIFlag(){
+    public void setIFlag() {
         this.iFlag = true;
     }
 
-    public void setXFlag(){
+    public void setXFlag() {
         this.xFlag = true;
     }
 
-    public void setBFlag(){
+    public void setBFlag() {
         this.bFlag = true;
     }
 
-    public void setPFlag(){
+    public void setPFlag() {
         this.pFlag = true;
     }
 
-    public void setEFlag(){
+    public void setEFlag() {
         this.eFlag = true;
     }
 
-    // this will be used by the factory to clean up the args. It will also handle setting the flags
-    public void setArgs(String args){
+    // this will be used by the factory to clean up the args. It will also handle
+    // setting the flags
+    public void setArgs(String args) {
         this.args = args;
     }
 
+    // since the size can be 3 or 4, we will add 1 to the size if the e flag is set
+    @Override
+    public HexNum getSize() {
+        return this.eFlag ? this.size.add(1) : this.size;
+    }
+
     // assemble
-    public String assemble(){
+    @Override
+    public String assemble() {
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
         int x = this.xFlag ? 8 : 0;

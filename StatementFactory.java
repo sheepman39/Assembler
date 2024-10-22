@@ -1,24 +1,27 @@
 import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
+
 // Class: StatementFactory
 // Implements: StatementFactoryInterfac e
 // This class will handle all of the statement parsing and statement creation, including setting flags and defining labels
-public class StatementFactory implements StatementFactoryInterface{
+public class StatementFactory implements StatementFactoryInterface {
 
     // locctr keeps track of the current location of each statement
     protected HexNum locctr;
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
+    protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
 
-    // constructor 
-    public StatementFactory(){
+    // constructor
+    public StatementFactory() {
         this.locctr = new HexNum(0);
-        
-        // add all of the opcodes to the table
-        try{
 
-            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient txt file
+        // add all of the opcodes to the table
+        try {
+
+            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient
+            // txt file
             // Format is: Mnemonic, Format, Opcode
             File file = new File("instructions.txt");
 
@@ -33,11 +36,11 @@ public class StatementFactory implements StatementFactoryInterface{
 
                 // add the format to the format table
                 Format newFormat = Format.ONE;
-                if(parts[1].equals("1")){
+                if (parts[1].equals("1")) {
                     newFormat = Format.ONE;
-                } else if(parts[1].equals("2")){
+                } else if (parts[1].equals("2")) {
                     newFormat = Format.TWO;
-                } else if(parts[1].equals("3")){
+                } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
                 } else {
                     System.out.println("Error: Unexpected format in instructions.txt");
@@ -46,70 +49,144 @@ public class StatementFactory implements StatementFactoryInterface{
                 this.formatTable.put(parts[0], newFormat);
 
             }
-        }catch (Exception e){
+            // close the scanner
+            sc.close();
+        } catch (Exception e) {
             System.out.println("Error: Could not find instructions.txt");
+            System.err.println(e);
+        }
+
+        // add all of the registers to the table
+        try {
+            File file = new File("registers.txt");
+
+            // read the file
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] parts = line.split("\\s+");
+                HexNum reg = new HexNum(parts[1], NumSystem.HEX);
+                // add the register to the table
+                this.registerTable.put(parts[0], reg);
+            }
+            // close the scanner
+            sc.close();
+        } catch (Exception e) {
+            System.out.println("Error: Could not find registers.txt");
             System.err.println(e);
         }
     }
 
     // create a statement from a string
-    public Statement processStatement(String statement){
+    public Statement processStatement(String statement) {
         // define return statement
         Statement newStatement;
+
+        // flag for format 4
+        boolean eFlag = false;
         // First strip any unnecessary whitespace
         statement = statement.strip();
 
         // find the comment character
-        // since there is the possibility of no comment existing, check if the comment character exists
+        // since there is the possibility of no comment existing, check if the comment
+        // character exists
         // if not, then set it to the length of the string
         int period = statement.indexOf('.') == -1 ? statement.length() : statement.indexOf('.');
         statement = statement.substring(0, period).strip();
 
-        // now we are going to split the string up into the different parts based on space or tabs
+        // now we are going to split the string up into the different parts based on
+        // space or tabs
         String[] parts = statement.split("\\s+");
-        
+
         // the number of arguments determines the position of each part
         String mnemonic = "";
 
-        if(parts.length == 1){
+        if (parts.length == 1) {
             mnemonic = parts[0];
-        } else if(parts.length == 2){
+        } else if (parts.length == 2) {
             mnemonic = parts[0];
-        } else if(parts.length == 3){
+        } else if (parts.length == 3) {
             mnemonic = parts[1];
         } else {
             // throw an exception
             System.out.println("Error: Invalid number of arguments");
         }
-        
-        // ensure that the mnemonic is in the symbol table
-        if(!this.symbolTable.containsKey(mnemonic)){
-            System.out.println("Error: Mnemonic not found in instructions.txt");
-        }
 
+        // since some mnemonics may contain '+' at the beginning, we want to remove it
+        // for comparisons sake
+        if (mnemonic.charAt(0) == '+') {
+            eFlag = true;
+            mnemonic = mnemonic.substring(1);
+        }
         // generate a new statement based on its format
-        if(this.formatTable.get(mnemonic) == Format.ONE){
-            newStatement = createStatement(parts);
-        } else if(this.formatTable.get(mnemonic) == Format.TWO){
-            newStatement = createRegStatement(parts);
-        } else if(this.formatTable.get(mnemonic) == Format.THREE){
-            newStatement = createExtStatement(parts);
+        if (this.formatTable.get(mnemonic) == Format.ONE) {
+            newStatement = createStatement(mnemonic, parts);
+        } else if (this.formatTable.get(mnemonic) == Format.TWO) {
+            newStatement = createRegStatement(mnemonic, parts);
+        } else if (this.formatTable.get(mnemonic) == Format.THREE) {
+            newStatement = createExtStatement(mnemonic, parts, eFlag);
         } else {
             System.out.println("Error: Unexpected format in instructions.txt");
             newStatement = new Statement();
         }
-
-        return new Statement();
+        this.locctr = this.locctr.add(newStatement.getSize());
+        return newStatement;
     }
 
-    private Statement createStatement(String[] parts){
-        return new Statement();
+    private Statement createStatement(String mnemonic, String[] parts) {
+
+        // check to make sure that there is only one element in parts
+        if (parts.length != 1) {
+            System.out.println("Error: Invalid number of arguments for format 1");
+        }
+        HexNum opcode = this.symbolTable.get(parts[0]);
+        return new Statement(this.locctr, opcode);
     }
 
-    private Statement createRegStatement(String[] parts){
-        return new Statement();
+    private Statement createRegStatement(String mnemonic, String[] parts) {
+        // Statement to return
+        Statement returnVal = new Statement();
+        // check to make sure that there are two elements in parts
+        if (parts.length != 2) {
+            System.out.println("Error: Invalid number of arguments for format 2");
+        }
+        HexNum opcode = this.symbolTable.get(parts[0]);
+
+        // find both of the registers in parts[1]
+        String[] registers = parts[1].split(",");
+        if (registers.length >= 2 && registers.length > 0) {
+            System.out.println("Error: Invalid number of registers for format 2");
+        }
+
+        // find each of the registers in the registerTable
+        HexNum reg1 = this.registerTable.get(registers[0]);
+        HexNum reg2 = this.registerTable.get(registers[1]);
+
+        // TODO: This is a bit of a hack, but it works for now
+        if (reg1 == null) {
+            System.out.println("Error: Register: " + registers[0] + " is invalid");
+        } else if (reg2 == null && reg1 != null) {
+            returnVal = new RegisterStatement(this.locctr, opcode, reg1);
+        } else {
+            returnVal = new RegisterStatement(this.locctr, opcode, reg1, reg2);
+        }
+
+        return returnVal;
     }
-    private Statement createExtStatement(String[] parts){
-        return new Statement();
+
+    private Statement createExtStatement(String mnemonic, String[] parts, boolean eFlag) {
+
+        // find the opcode of the mnemonic
+        HexNum opcode = this.symbolTable.get(mnemonic);
+
+        // create the ExtendedStatement
+        ExtendedStatement returnVal = new ExtendedStatement(this.locctr, opcode, parts[1]);
+
+        // if there is an eFlag, set it
+        if (eFlag) {
+            returnVal.setEFlag();
+        }
+
+        return returnVal;
     }
 }

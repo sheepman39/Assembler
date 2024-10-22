@@ -6,16 +6,16 @@ public class Statement {
     protected HexNum location;
     protected HexNum size;
     protected int format;
-    
 
     // constructors
-    public Statement(){
+    public Statement() {
         this.location = new HexNum();
         this.opcode = new HexNum();
         this.format = 1;
         this.size = new HexNum(this.format);
     }
-    public Statement(HexNum location, HexNum opcode){
+
+    public Statement(HexNum location, HexNum opcode) {
         this.location = location;
         this.opcode = opcode;
         this.format = 1;
@@ -23,17 +23,17 @@ public class Statement {
     }
 
     // getters
-    public HexNum getSize(){
+    public HexNum getSize() {
         return this.size;
     }
 
-    public HexNum getLocation(){
+    public HexNum getLocation() {
         return this.location;
     }
 
     // this will be overridden by the subclasses
     // to assemble based on different formats
-    public String assemble(){
+    public String assemble() {
         return this.opcode.toString();
     }
 }
