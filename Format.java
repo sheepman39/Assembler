@@ -1,3 +1,3 @@
 public enum Format {
-    ONE, TWO, THREE
+    ONE, TWO, THREE, ASM
 }
