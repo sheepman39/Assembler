@@ -14,12 +14,15 @@ public class ExtendedStatement extends Statement {
     public ExtendedStatement() {
         super();
         this.args = "";
+        this.format = 3;
+        this.size = this.size.set(this.format);
     }
 
     public ExtendedStatement(HexNum location, HexNum opcode, String args) {
         super(location, opcode);
         this.args = args;
-
+        this.format = 3;
+        this.size = this.size.set(this.format);
     }
 
     // flag managers
