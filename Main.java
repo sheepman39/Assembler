@@ -1,4 +1,3 @@
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.io.File;
 import java.util.Scanner;
@@ -33,6 +32,7 @@ class Main {
             while (sc.hasNextLine()) {
 
             }
+            sc.close();
         } catch (Exception e) {
             System.out.println("File not found");
             System.err.println(e);

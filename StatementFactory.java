@@ -49,6 +49,8 @@ public class StatementFactory implements StatementFactoryInterface {
                 this.formatTable.put(parts[0], newFormat);
 
             }
+            // close the scanner
+            sc.close();
         } catch (Exception e) {
             System.out.println("Error: Could not find instructions.txt");
             System.err.println(e);
@@ -67,6 +69,8 @@ public class StatementFactory implements StatementFactoryInterface {
                 // add the register to the table
                 this.registerTable.put(parts[0], reg);
             }
+            // close the scanner
+            sc.close();
         } catch (Exception e) {
             System.out.println("Error: Could not find registers.txt");
             System.err.println(e);
