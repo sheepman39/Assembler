@@ -10,7 +10,7 @@ public class StatementFactory implements StatementFactoryInterface{
     protected HexNum locctr;
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
-
+    protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
     // constructor 
     public StatementFactory(){
         this.locctr = new HexNum(0);
@@ -50,6 +50,24 @@ public class StatementFactory implements StatementFactoryInterface{
             System.out.println("Error: Could not find instructions.txt");
             System.err.println(e);
         }
+
+        // add all of the registers to the table
+        try{
+            File file = new File("registers.txt");
+
+            // read the file
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] parts = line.split("\\s+");
+                HexNum reg = new HexNum(parts[1], NumSystem.HEX);
+                // add the register to the table
+                this.registerTable.put(parts[0], reg);
+            }
+        } catch(Exception e){
+            System.out.println("Error: Could not find registers.txt");
+            System.err.println(e);
+        }
     }
 
     // create a statement from a string
@@ -84,7 +102,7 @@ public class StatementFactory implements StatementFactoryInterface{
         
         // ensure that the mnemonic is in the symbol table
         if(!this.symbolTable.containsKey(mnemonic)){
-            System.out.println("Error: Mnemonic not found in instructions.txt");
+            System.out.println("Error: Mnemonic: " + mnemonic + " not found in instructions.txt");
         }
 
         // generate a new statement based on its format
@@ -98,17 +116,51 @@ public class StatementFactory implements StatementFactoryInterface{
             System.out.println("Error: Unexpected format in instructions.txt");
             newStatement = new Statement();
         }
-
-        return new Statement();
+        this.locctr = this.locctr.add(newStatement.getSize());
+        return newStatement;
     }
 
     private Statement createStatement(String[] parts){
-        return new Statement();
+
+        // check to make sure that there is only one element in parts
+        if(parts.length != 1){
+            System.out.println("Error: Invalid number of arguments for format 1");
+        }
+        HexNum opcode = this.symbolTable.get(parts[0]);
+        return new Statement(this.locctr, opcode);
     }
 
     private Statement createRegStatement(String[] parts){
-        return new Statement();
+        // Statement to return
+        Statement returnVal = new Statement();
+        // check to make sure that there are two elements in parts
+        if(parts.length != 2){
+            System.out.println("Error: Invalid number of arguments for format 2");
+        }
+        HexNum opcode = this.symbolTable.get(parts[0]);
+
+        // find both of the registers in parts[1]
+        String[] registers = parts[1].split(",");
+        if(registers.length >= 2 && registers.length > 0){
+            System.out.println("Error: Invalid number of registers for format 2");
+        }
+
+        // find each of the registers in the registerTable
+        HexNum reg1 = this.registerTable.get(registers[0]);
+        HexNum reg2 = this.registerTable.get(registers[1]);
+
+        // TODO: This is a bit of a hack, but it works for now
+        if(reg1 == null){
+            System.out.println("Error: Register: " + registers[0] + " is invalid");
+        } else if(reg2 == null && reg1 != null){
+            returnVal = new RegisterStatement(this.locctr, opcode, reg1); 
+        } else {
+            returnVal = new RegisterStatement(this.locctr, opcode, reg1, reg2);
+        }
+
+        return returnVal;
     }
+
     private Statement createExtStatement(String[] parts){
         return new Statement();
     }
