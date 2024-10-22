@@ -2,8 +2,11 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.io.File;
 import java.util.Scanner;
+import java.util.HashMap;
 
 class Main {
+    public static final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
+
     public static void main(String[] args) {
         System.out.println("Hello World");
         ArrayList<Statement> list = fileInput("input.asm");
