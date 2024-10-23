@@ -1,6 +1,7 @@
 // Class: HexNum
 // Purpose: This will be a wrapper for all of the logic needed
 // for hex numbers.
+package edu.iu.jrsalata;
 public class HexNum {
 
     // value holds the hex number

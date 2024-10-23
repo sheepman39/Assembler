@@ -1,6 +1,7 @@
 // Class: Statement
 // Represents a given line in the program that needs to be assembled
 // Handles storing its location, its OP code, and its size
+package edu.iu.jrsalata;
 public class Statement {
     protected HexNum opcode;
     protected HexNum location;
