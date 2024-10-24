@@ -67,6 +67,14 @@ public class ExtendedStatement extends Statement {
     @Override
     public String assemble() {
 
+
+        // check for the X flag
+        // if the X flag exists, remove it from the args
+        if(this.args.toUpperCase().contains(",X")){
+            this.setXFlag();
+            this.args = this.args.replace(",X", "");
+        }
+
         // check the addressing mode of the args
         // '#' means immediate addressing
         // '@' means indirect addressing
@@ -83,6 +91,8 @@ public class ExtendedStatement extends Statement {
             this.setIFlag();
             this.setNFlag();
         }
+      
+        // Get the values of each individual flag
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
         int x = this.xFlag ? 8 : 0;
@@ -96,6 +106,12 @@ public class ExtendedStatement extends Statement {
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
 
+        // look up if args is in the symbolTable
+        if(Main.symbolTable.containsKey(this.args)) {
+            HexNum argValue = Main.symbolTable.get(this.args);
+            return first.toString() + third.toString() + argValue.toString();
+        }
+        
         String returnVal = first.toString() + third.toString() + this.args;
         return returnVal;
     }
