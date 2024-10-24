@@ -1,3 +1,5 @@
+package edu.iu.jrsalata;
+
 import java.util.ArrayList;
 import java.io.File;
 import java.util.Scanner;
