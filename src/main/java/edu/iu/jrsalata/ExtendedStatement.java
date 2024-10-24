@@ -66,6 +66,23 @@ public class ExtendedStatement extends Statement {
     // assemble
     @Override
     public String assemble() {
+
+        // check the addressing mode of the args
+        // '#' means immediate addressing
+        // '@' means indirect addressing
+        // if neither, assume direct addressing
+        // NOTE: if n=0, i=0, it is an SIC instruction
+        if (this.args.charAt(0) == '#') {
+            this.setIFlag();
+            this.args = this.args.substring(1);
+        } else if (this.args.charAt(0) == '@') {
+            this.setNFlag();
+            this.args = this.args.substring(1);
+        } else {
+            // NOTE: include SIC compatibility
+            this.setIFlag();
+            this.setNFlag();
+        }
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
         int x = this.xFlag ? 8 : 0;
