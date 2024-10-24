@@ -3,7 +3,7 @@ package edu.iu.jrsalata;
 import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
-
+import java.io.InputStream;
 // Class: StatementFactory
 // Implements: StatementFactoryInterfac e
 // This class will handle all of the statement parsing and statement creation, including setting flags and defining labels
@@ -22,10 +22,11 @@ public class StatementFactory implements StatementFactoryInterface {
         // add all of the opcodes to the table
         try {
 
-            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient
-            // txt file
+            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient txt file
             // Format is: Mnemonic, Format, Opcode
-            File file = new File("instructions.txt");
+            // Credit to https://stackoverflow.com/questions/20389255/reading-a-resource-file-from-within-jar
+            // for reading files within a jar
+            InputStream file = getClass().getResourceAsStream("/instructions.txt");
 
             // read the file
             Scanner sc = new Scanner(file);
@@ -62,7 +63,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // add all of the registers to the table
         try {
-            File file = new File("registers.txt");
+            InputStream file = getClass().getResourceAsStream("/registers.txt");
 
             // read the file
             Scanner sc = new Scanner(file);
