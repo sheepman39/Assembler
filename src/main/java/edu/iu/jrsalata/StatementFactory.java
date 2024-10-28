@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
 import java.io.InputStream;
+
 // Class: StatementFactory
 // Implements: StatementFactoryInterfac e
 // This class will handle all of the statement parsing and statement creation, including setting flags and defining labels
@@ -22,9 +23,11 @@ public class StatementFactory implements StatementFactoryInterface {
         // add all of the opcodes to the table
         try {
 
-            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient txt file
+            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient
+            // txt file
             // Format is: Mnemonic, Format, Opcode
-            // Credit to https://stackoverflow.com/questions/20389255/reading-a-resource-file-from-within-jar
+            // Credit to
+            // https://stackoverflow.com/questions/20389255/reading-a-resource-file-from-within-jar
             // for reading files within a jar
             InputStream file = getClass().getResourceAsStream("/instructions.txt");
 
@@ -45,9 +48,9 @@ public class StatementFactory implements StatementFactoryInterface {
                     newFormat = Format.TWO;
                 } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
-                } else if (parts[1].equals("ASM")){
+                } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
-                }else {
+                } else {
                     System.out.println("Error: Unexpected format in instructions.txt");
                 }
 
@@ -112,12 +115,12 @@ public class StatementFactory implements StatementFactoryInterface {
             mnemonic = parts[0];
             args = parts[1];
         } else if (parts.length == 3) {
-            
+
             // if there are 3 parts, the 0 index is the label
             String label = parts[0];
-            
+
             // add the label with the to the symbol table
-            if(!Main.symbolTable.containsKey(label)){
+            if (!Main.symbolTable.containsKey(label)) {
                 Main.symbolTable.put(label, this.locctr);
             } else {
                 System.out.println("Error: Duplicate label: " + label);
@@ -143,10 +146,10 @@ public class StatementFactory implements StatementFactoryInterface {
             newStatement = createRegStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.THREE) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
-        } else if (this.formatTable.get(mnemonic) == Format.ASM){
+        } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             handleAsmStatement(mnemonic, args);
             return null;
-        }else {
+        } else {
             System.out.println("Error: Format not found");
             System.out.println("Mnemonic: " + mnemonic);
             newStatement = new Statement();
@@ -154,26 +157,28 @@ public class StatementFactory implements StatementFactoryInterface {
         this.locctr = this.locctr.add(newStatement.getSize());
         return newStatement;
     }
-    private void handleAsmStatement(String mnemonic, String args){
-        if(mnemonic.equals("START")){
+
+    private void handleAsmStatement(String mnemonic, String args) {
+        if (mnemonic.equals("START")) {
             this.locctr = new HexNum(args, NumSystem.HEX);
-        } else if(mnemonic.equals("END")){
+        } else if (mnemonic.equals("END")) {
             // do nothing
-        } else if(mnemonic.equals("BYTE")){
+        } else if (mnemonic.equals("BYTE")) {
             // add the size of the byte to the locctr
-        } else if(mnemonic.equals("WORD")){
+        } else if (mnemonic.equals("WORD")) {
             // add 3 to the locctr
             this.locctr = this.locctr.add(3);
-        } else if(mnemonic.equals("RESB")){
+        } else if (mnemonic.equals("RESB")) {
             // add args to the locctr
             this.locctr = this.locctr.add(Integer.parseInt(args));
-        } else if(mnemonic.equals("RESW")){
+        } else if (mnemonic.equals("RESW")) {
             // add 3 * args to the locctr
             this.locctr = this.locctr.add(3 * Integer.parseInt(args));
         } else {
             System.out.println("Error: Invalid ASM mnemonic");
         }
     }
+
     private Statement createStatement(String mnemonic, String args) {
 
         // check to make sure that there is only one element in parts
@@ -190,7 +195,7 @@ public class StatementFactory implements StatementFactoryInterface {
         String[] registers = args.split(",");
         if (registers.length > 2 || registers.length <= 0) {
             System.out.println("Error: Invalid number of registers for format 2");
-            
+
         }
 
         // find each of the registers in the registerTable

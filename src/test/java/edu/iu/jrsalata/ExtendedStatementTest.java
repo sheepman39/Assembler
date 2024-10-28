@@ -5,9 +5,9 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class ExtendedStatementTest {
-    
+
     @Test
-    public void testDefaultConstructor(){
+    public void testDefaultConstructor() {
         ExtendedStatement extendedStatement = new ExtendedStatement();
         assertTrue(extendedStatement.getLocation().getDec() == 0);
         assertTrue(extendedStatement.getSize().getDec() == 3);
@@ -15,8 +15,8 @@ public class ExtendedStatementTest {
         assertTrue(extendedStatement.assemble().equals("030000"));
     }
 
-    @Test 
-    public void testAddInstruction(){
+    @Test
+    public void testAddInstruction() {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222");
@@ -24,9 +24,9 @@ public class ExtendedStatementTest {
         assertTrue(extendedStatement.getSize().getDec() == 3);
         assertTrue(extendedStatement.assemble().equals("1b0222"));
     }
-    
+
     @Test
-    public void testImmediateAddressing(){
+    public void testImmediateAddressing() {
         // use ADD instruction with indirect addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -35,8 +35,9 @@ public class ExtendedStatementTest {
         assertTrue(extendedStatement.getSize().getDec() == 3);
         assertTrue(extendedStatement.assemble().equals("190222"));
     }
+
     @Test
-    public void testIndirectAddressing(){
+    public void testIndirectAddressing() {
         // use ADD instruction with indirect addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -47,7 +48,7 @@ public class ExtendedStatementTest {
     }
 
     @Test
-    public void testBaseRelative(){
+    public void testBaseRelative() {
         // use ADD instruction with base relative addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -59,7 +60,7 @@ public class ExtendedStatementTest {
     }
 
     @Test
-    public void testPCRelative(){
+    public void testPCRelative() {
         // use ADD instruction with base relative addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -71,7 +72,7 @@ public class ExtendedStatementTest {
     }
 
     @Test
-    public void testXAddressing(){
+    public void testXAddressing() {
         // use ADD instruction with base relative addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -82,7 +83,7 @@ public class ExtendedStatementTest {
     }
 
     @Test
-    public void testXAndBaseAddressing(){
+    public void testXAndBaseAddressing() {
         // use ADD instruction with base relative addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -94,7 +95,7 @@ public class ExtendedStatementTest {
     }
 
     @Test
-    public void testExtendedAddressing(){
+    public void testExtendedAddressing() {
         // use ADD instruction with base relative addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
@@ -106,7 +107,7 @@ public class ExtendedStatementTest {
     }
 
     @Test
-    public void testExtendedAndXbaseAddressing(){
+    public void testExtendedAndXbaseAddressing() {
         // use ADD instruction with base relative addressing
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);

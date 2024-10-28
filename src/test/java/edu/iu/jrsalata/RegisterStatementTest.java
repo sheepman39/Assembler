@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class RegisterStatementTest {
-    
+
     @Test
     public void testDefaultConstructor() {
         RegisterStatement registerStatement = new RegisterStatement();

@@ -2,6 +2,7 @@
 // Purpose: This will be a wrapper for all of the logic needed
 // for hex numbers.
 package edu.iu.jrsalata;
+
 public class HexNum {
 
     // value holds the hex number
@@ -52,9 +53,9 @@ public class HexNum {
     }
 
     public String toString(int digits) {
-        if(this.value.length() < digits) {
+        if (this.value.length() < digits) {
             StringBuilder sb = new StringBuilder();
-            for(int i = 0; i < digits - this.value.length(); i++) {
+            for (int i = 0; i < digits - this.value.length(); i++) {
                 sb.append("0");
             }
             sb.append(this.value);

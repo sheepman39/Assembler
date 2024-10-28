@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class StatementTest {
-    
+
     @Test
     public void testDefaultConstructor() {
         Statement statement = new Statement();
@@ -15,7 +15,7 @@ public class StatementTest {
     }
 
     @Test
-    public void testFIXInstruction(){
+    public void testFIXInstruction() {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("C4", NumSystem.HEX);
         Statement statement = new Statement(location, opcode);
@@ -25,7 +25,7 @@ public class StatementTest {
     }
 
     @Test
-    public void testTIOInstruction(){
+    public void testTIOInstruction() {
         HexNum location = new HexNum(100);
         HexNum opcode = new HexNum("D8", NumSystem.HEX);
         Statement statement = new Statement(location, opcode);
