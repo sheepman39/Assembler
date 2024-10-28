@@ -2,7 +2,9 @@
 // Extends: Statement
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
+
 public class ExtendedStatement extends Statement {
+
     String args;
     boolean nFlag = false;
     boolean iFlag = false;
@@ -14,7 +16,7 @@ public class ExtendedStatement extends Statement {
     // constructors
     public ExtendedStatement() {
         super();
-        this.args = "";
+        this.args = "000";
         this.format = 3;
         this.size.set(this.format);
     }
@@ -27,15 +29,15 @@ public class ExtendedStatement extends Statement {
     }
 
     // flag managers
-    public void setNFlag() {
+    private void setNFlag() {
         this.nFlag = true;
     }
 
-    public void setIFlag() {
+    private void setIFlag() {
         this.iFlag = true;
     }
 
-    public void setXFlag() {
+    private void setXFlag() {
         this.xFlag = true;
     }
 
@@ -67,12 +69,11 @@ public class ExtendedStatement extends Statement {
     @Override
     public String assemble() {
 
-
         // check for the X flag
         // if the X flag exists, remove it from the args
-        if(this.args.toUpperCase().contains(",X")){
+        if (this.args.toUpperCase().replace(" ", "").contains(",X")) {
             this.setXFlag();
-            this.args = this.args.replace(",X", "");
+            this.args = this.args.toUpperCase().replace(" ", "").replace(",X", "");
         }
 
         // check the addressing mode of the args
@@ -91,7 +92,7 @@ public class ExtendedStatement extends Statement {
             this.setIFlag();
             this.setNFlag();
         }
-      
+
         // Get the values of each individual flag
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
@@ -107,12 +108,12 @@ public class ExtendedStatement extends Statement {
         HexNum third = new HexNum(x + b + p + e);
 
         // look up if args is in the symbolTable
-        if(Main.symbolTable.containsKey(this.args)) {
+        if (Main.symbolTable.containsKey(this.args)) {
             HexNum argValue = Main.symbolTable.get(this.args);
-            return first.toString() + third.toString() + argValue.toString();
+            return first.toString(2) + third.toString() + argValue.toString(this.size.getDec());
         }
-        
-        String returnVal = first.toString() + third.toString() + this.args;
+
+        String returnVal = first.toString(2) + third.toString() + this.args;
         return returnVal;
     }
 

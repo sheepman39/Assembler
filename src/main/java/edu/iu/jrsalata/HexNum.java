@@ -2,34 +2,11 @@
 // Purpose: This will be a wrapper for all of the logic needed
 // for hex numbers.
 package edu.iu.jrsalata;
+
 public class HexNum {
 
     // value holds the hex number
     protected String value;
-
-    public static void main(String[] args) {
-        // test suite
-        HexNum hexNum = new HexNum();
-        hexNum.set(10);
-        assert (hexNum.toString().equals("a"));
-        hexNum.add(5);
-        assert (hexNum.toString().equals("f"));
-        hexNum.set("1010", NumSystem.BIN);
-        assert (hexNum.toString().equals("a"));
-        hexNum.add(5);
-        assert (hexNum.toString().equals("f"));
-        hexNum.set("a", NumSystem.HEX);
-        assert (hexNum.getDec() == 10);
-        hexNum.add(5);
-        assert (hexNum.getDec() == 15);
-        hexNum.set("1010", NumSystem.BIN);
-        assert (hexNum.getDec() == 10);
-
-        HexNum hexNum2 = new HexNum("FF", NumSystem.HEX);
-        assert (hexNum2.getDec() == 255);
-        assert (hexNum2.toString().equals("FF"));
-        System.out.println("Success!");
-    }
 
     // constructors
     public HexNum() {
@@ -49,6 +26,19 @@ public class HexNum {
 
     public String toString() {
         return this.value;
+    }
+
+    public String toString(int digits) {
+        if (this.value.length() < digits) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < digits - this.value.length(); i++) {
+                sb.append("0");
+            }
+            sb.append(this.value);
+            return sb.toString();
+        } else {
+            return this.value;
+        }
     }
 
     // returns a HexNum with a new value

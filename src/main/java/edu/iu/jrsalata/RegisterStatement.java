@@ -2,6 +2,7 @@
 // Extends: Statement
 // Handles a statement in Format 2, which contains 1 or 2 registers
 package edu.iu.jrsalata;
+
 public class RegisterStatement extends Statement {
     HexNum reg1, reg2;
 
