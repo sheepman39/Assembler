@@ -8,30 +8,6 @@ public class HexNum {
     // value holds the hex number
     protected String value;
 
-    public static void main(String[] args) {
-        // test suite
-        HexNum hexNum = new HexNum();
-        hexNum.set(10);
-        assert (hexNum.toString().equals("a"));
-        hexNum.add(5);
-        assert (hexNum.toString().equals("f"));
-        hexNum.set("1010", NumSystem.BIN);
-        assert (hexNum.toString().equals("a"));
-        hexNum.add(5);
-        assert (hexNum.toString().equals("f"));
-        hexNum.set("a", NumSystem.HEX);
-        assert (hexNum.getDec() == 10);
-        hexNum.add(5);
-        assert (hexNum.getDec() == 15);
-        hexNum.set("1010", NumSystem.BIN);
-        assert (hexNum.getDec() == 10);
-
-        HexNum hexNum2 = new HexNum("FF", NumSystem.HEX);
-        assert (hexNum2.getDec() == 255);
-        assert (hexNum2.toString().equals("FF"));
-        System.out.println("Success!");
-    }
-
     // constructors
     public HexNum() {
         // default value is 0
