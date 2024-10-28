@@ -1,0 +1,9 @@
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/NumSystem.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/Main.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/Statement.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/StatementFactoryInterface.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/RegisterStatement.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/HexNum.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/Format.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/ExtendedStatement.java
+/workspaces/Assembler/src/main/java/edu/iu/jrsalata/StatementFactory.java

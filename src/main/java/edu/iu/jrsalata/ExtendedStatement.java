@@ -3,6 +3,7 @@
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
 public class ExtendedStatement extends Statement {
+
     String args;
     boolean nFlag = false;
     boolean iFlag = false;
@@ -14,7 +15,7 @@ public class ExtendedStatement extends Statement {
     // constructors
     public ExtendedStatement() {
         super();
-        this.args = "";
+        this.args = "000";
         this.format = 3;
         this.size.set(this.format);
     }
@@ -27,15 +28,15 @@ public class ExtendedStatement extends Statement {
     }
 
     // flag managers
-    public void setNFlag() {
+    private void setNFlag() {
         this.nFlag = true;
     }
 
-    public void setIFlag() {
+    private void setIFlag() {
         this.iFlag = true;
     }
 
-    public void setXFlag() {
+    private void setXFlag() {
         this.xFlag = true;
     }
 
@@ -66,7 +67,6 @@ public class ExtendedStatement extends Statement {
     // assemble
     @Override
     public String assemble() {
-
 
         // check for the X flag
         // if the X flag exists, remove it from the args
@@ -109,10 +109,10 @@ public class ExtendedStatement extends Statement {
         // look up if args is in the symbolTable
         if(Main.symbolTable.containsKey(this.args)) {
             HexNum argValue = Main.symbolTable.get(this.args);
-            return first.toString() + third.toString() + argValue.toString();
+            return first.toString(2) + third.toString() + argValue.toString(this.size.getDec());
         }
         
-        String returnVal = first.toString() + third.toString() + this.args;
+        String returnVal = first.toString(2) + third.toString() + this.args;
         return returnVal;
     }
 
