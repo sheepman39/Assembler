@@ -70,9 +70,9 @@ public class ExtendedStatement extends Statement {
 
         // check for the X flag
         // if the X flag exists, remove it from the args
-        if(this.args.toUpperCase().contains(",X")){
+        if(this.args.toUpperCase().replace(" ", "").contains(",X")){
             this.setXFlag();
-            this.args = this.args.replace(",X", "");
+            this.args = this.args.toUpperCase().replace(" ","").replace(",X", "");
         }
 
         // check the addressing mode of the args

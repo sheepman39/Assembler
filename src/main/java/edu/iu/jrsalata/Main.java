@@ -9,12 +9,7 @@ class Main {
     public static final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
 
     public static void main(String[] args) {
-        // ArrayList<Statement> list = fileInput("input.asm");
-
-        HexNum location = new HexNum(0);
-        HexNum opcode = new HexNum("18", NumSystem.HEX);
-        ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "#222");
-        System.out.println(extendedStatement.assemble());
+        ArrayList<Statement> list = fileInput("input.asm");
     }
 
     public static ArrayList<Statement> fileInput(String filename) {
