@@ -51,6 +51,19 @@ public class HexNum {
         return this.value;
     }
 
+    public String toString(int digits) {
+        if(this.value.length() < digits) {
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < digits - this.value.length(); i++) {
+                sb.append("0");
+            }
+            sb.append(this.value);
+            return sb.toString();
+        } else {
+            return this.value;
+        }
+    }
+
     // returns a HexNum with a new value
     // assume int input is in decimal
     public HexNum add(int value) {

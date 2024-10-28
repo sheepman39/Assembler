@@ -12,6 +12,7 @@ public class HexNumTest {
         // Test default input
         HexNum hexNum = new HexNum();
         assertTrue(hexNum.getDec() == 0);
+        assertTrue(hexNum.toString().equals("0"));
 
         // Test decimal input
         HexNum hexNum2 = new HexNum(255);
@@ -73,5 +74,22 @@ public class HexNumTest {
         hexNum.set("ff", NumSystem.HEX);
         assertTrue(hexNum.getDec() == 255);
         assertTrue(hexNum.toString().equals("ff"));
+    }
+
+    @Test
+    public void testHexNumToStringWithDigits() {
+
+        // test toString with digits
+        HexNum hexNum = new HexNum(10);
+        assertTrue(hexNum.toString(4).equals("000a"));
+        assertTrue(hexNum.toString(3).equals("00a"));
+        assertTrue(hexNum.toString(2).equals("0a"));
+        assertTrue(hexNum.toString(1).equals("a"));
+
+        HexNum hexNum2 = new HexNum("ff", NumSystem.HEX);
+        assertTrue(hexNum2.toString(4).equals("00ff"));
+        assertTrue(hexNum2.toString(3).equals("0ff"));
+        assertTrue(hexNum2.toString(2).equals("ff"));
+        assertTrue(hexNum2.toString(1).equals("ff"));
     }
 }
