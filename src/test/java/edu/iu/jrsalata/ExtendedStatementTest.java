@@ -11,7 +11,6 @@ public class ExtendedStatementTest {
         ExtendedStatement extendedStatement = new ExtendedStatement();
         assertTrue(extendedStatement.getLocation().getDec() == 0);
         assertTrue(extendedStatement.getSize().getDec() == 3);
-        System.out.println(extendedStatement.assemble());
         assertTrue(extendedStatement.assemble().equals("030000"));
     }
 

@@ -1,9 +1,9 @@
-// Class: Statement
+// Abstract Class: Statement
 // Represents a given line in the program that needs to be assembled
 // Handles storing its location, its OP code, and its size
 package edu.iu.jrsalata;
 
-public class Statement {
+public abstract class Statement {
     protected HexNum opcode;
     protected HexNum location;
     protected HexNum size;
@@ -33,9 +33,12 @@ public class Statement {
         return this.location;
     }
 
+    // setters
+    public void setLocation(HexNum location) {
+        this.location = location;
+    }
+
     // this will be overridden by the subclasses
     // to assemble based on different formats
-    public String assemble() {
-        return this.opcode.toString();
-    }
+    abstract public String assemble();
 }
