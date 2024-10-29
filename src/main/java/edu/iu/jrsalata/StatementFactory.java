@@ -147,10 +147,9 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (this.formatTable.get(mnemonic) == Format.THREE) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
-            handleAsmStatement(mnemonic, args);
-            return null;
+            newStatement = handleAsmStatement(mnemonic, args);
         } else {
-            System.out.println("Error: Format not found");
+            System.out.println("Error: Mnemonic not found");
             System.out.println("Mnemonic: " + mnemonic);
             return null;
         }
@@ -158,7 +157,10 @@ public class StatementFactory implements StatementFactoryInterface {
         return newStatement;
     }
 
-    private void handleAsmStatement(String mnemonic, String args) {
+    private Statement handleAsmStatement(String mnemonic, String args) {
+
+        DirectiveStatement returnVal = new DirectiveStatement();
+        returnVal.setDirective(mnemonic);
         if (mnemonic.equals("START")) {
             this.locctr = new HexNum(args, NumSystem.HEX);
         } else if (mnemonic.equals("END")) {
@@ -166,17 +168,18 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (mnemonic.equals("BYTE")) {
             // add the size of the byte to the locctr
         } else if (mnemonic.equals("WORD")) {
-            // add 3 to the locctr
-            this.locctr = this.locctr.add(3);
+            // set size to 3
+            returnVal.setSize(new HexNum(3));
         } else if (mnemonic.equals("RESB")) {
-            // add args to the locctr
-            this.locctr = this.locctr.add(Integer.parseInt(args));
+            // set the args to the size
+            returnVal.setSize(new HexNum(Integer.parseInt(args)));
         } else if (mnemonic.equals("RESW")) {
-            // add 3 * args to the locctr
-            this.locctr = this.locctr.add(3 * Integer.parseInt(args));
+            // set 3 * args to the size
+            returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
         } else {
             System.out.println("Error: Invalid ASM mnemonic");
         }
+        return returnVal;
     }
 
     private Statement createStatement(String mnemonic, String args) {
