@@ -31,6 +31,15 @@ public class RegisterStatement extends Statement {
         this.reg2 = reg2;
     }
 
+    // setters
+    public void setReg1(HexNum reg1) {
+        this.reg1 = reg1;
+    }
+
+    public void setReg2(HexNum reg2) {
+        this.reg2 = reg2;
+    }
+
     // assembler
     @Override
     public String assemble() {

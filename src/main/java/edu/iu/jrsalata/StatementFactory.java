@@ -152,7 +152,7 @@ public class StatementFactory implements StatementFactoryInterface {
         } else {
             System.out.println("Error: Format not found");
             System.out.println("Mnemonic: " + mnemonic);
-            newStatement = new Statement();
+            return null;
         }
         this.locctr = this.locctr.add(newStatement.getSize());
         return newStatement;
@@ -183,19 +183,22 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // check to make sure that there is only one element in parts
         HexNum opcode = this.symbolTable.get(mnemonic);
-        return new Statement(this.locctr, opcode);
+        return new SingleStatement(this.locctr, opcode);
     }
 
     private Statement createRegStatement(String mnemonic, String args) {
+        
         // Statement to return
-        Statement returnVal = new Statement();
+        RegisterStatement returnVal = new RegisterStatement();
+        returnVal.setLocation(this.locctr);
+
+        // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
 
         // find both of the registers in parts[1]
         String[] registers = args.split(",");
         if (registers.length > 2 || registers.length <= 0) {
             System.out.println("Error: Invalid number of registers for format 2");
-
         }
 
         // find each of the registers in the registerTable
@@ -206,9 +209,10 @@ public class StatementFactory implements StatementFactoryInterface {
         if (reg1 == null) {
             System.out.println("Error: Register: " + registers[0] + " is invalid");
         } else if (reg2 == null && reg1 != null) {
-            returnVal = new RegisterStatement(this.locctr, opcode, reg1);
+            returnVal.setReg1(reg1);
         } else {
-            returnVal = new RegisterStatement(this.locctr, opcode, reg1, reg2);
+            returnVal.setReg1(reg1);
+            returnVal.setReg2(reg2);
         }
 
         return returnVal;
