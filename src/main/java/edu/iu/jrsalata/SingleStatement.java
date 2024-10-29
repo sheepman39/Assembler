@@ -3,7 +3,7 @@
 // Represents a single opcode in Format 1
 package edu.iu.jrsalata;
 
-public class SingleStatement extends Statement {
+public class SingleStatement extends BaseStatement {
     
     // constructors
     public SingleStatement() {

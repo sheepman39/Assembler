@@ -3,7 +3,7 @@
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
 
-public class ExtendedStatement extends Statement {
+public class ExtendedStatement extends BaseStatement {
 
     String args;
     boolean nFlag = false;
