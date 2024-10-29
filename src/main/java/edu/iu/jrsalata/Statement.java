@@ -6,6 +6,15 @@ package edu.iu.jrsalata;
 public abstract class Statement {
     protected HexNum size;
 
+    // constructors
+    public Statement() {
+        this.size = new HexNum(0);
+    }
+
+    public Statement(HexNum size) {
+        this.size = size;
+    }
+    
     public HexNum getSize() {
         return this.size;
     }

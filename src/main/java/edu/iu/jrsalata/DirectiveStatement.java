@@ -6,21 +6,20 @@ package edu.iu.jrsalata;
 public class DirectiveStatement extends Statement {
  
     protected String directive;
-    protected HexNum size;
 
     // constructors
     public DirectiveStatement() {
-        this.size = new HexNum(0);
+        super();
         this.directive = "";
     }
 
     public DirectiveStatement(String directive) {
-        this.size = new HexNum(0);
+        super();
         this.directive = directive;
     }
 
     public DirectiveStatement(HexNum size, String directive) {
-        this.size = size;
+        super(size);
         this.directive = directive;
     }
 
