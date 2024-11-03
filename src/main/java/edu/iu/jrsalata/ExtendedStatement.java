@@ -12,7 +12,7 @@ public class ExtendedStatement extends BaseStatement {
     boolean bFlag = false;
     boolean pFlag = false;
     boolean eFlag = false;
-
+    boolean sicFlag = false;
     // constructors
     public ExtendedStatement() {
         super();
@@ -53,6 +53,10 @@ public class ExtendedStatement extends BaseStatement {
         this.eFlag = true;
     }
 
+    public void setSICFlag() {
+        this.sicFlag = true;
+    }
+
     // this will be used by the factory to clean up the args. It will also handle
     // setting the flags
     public void setArgs(String args) {
@@ -80,18 +84,17 @@ public class ExtendedStatement extends BaseStatement {
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
-        // NOTE: if n=0, i=0, it is an SIC instruction
         if(this.args.length() == 0){
             return this.opcode.toString(2) + "0000";
-        }
-        if (this.args.charAt(0) == '#') {
+        } else if (this.sicFlag){
+            return assembleSic();
+        } else if (this.args.charAt(0) == '#') {
             this.setIFlag();
             this.args = this.args.substring(1);
         } else if (this.args.charAt(0) == '@') {
             this.setNFlag();
             this.args = this.args.substring(1);
         } else {
-            // NOTE: include SIC compatibility
             this.setIFlag();
             this.setNFlag(); 
         }
@@ -120,4 +123,22 @@ public class ExtendedStatement extends BaseStatement {
         return returnVal;
     }
 
+    private String assembleSic() {
+
+        // If an argument is given, find it in the symbol table
+        HexNum argValue = new HexNum();
+        if (SymTable.containsSymbol(this.args)) {
+            argValue = SymTable.getSymbol(this.args);
+        } else {
+            argValue = new HexNum(this.args, NumSystem.HEX);
+        }
+
+        // addresses are 15 bits with the 16th representing X
+        // so we need to add a 1 to the front of the string
+        if(this.xFlag){
+            argValue = argValue.add(new HexNum("8000", NumSystem.HEX));
+        }
+
+        return this.opcode.toString(2) + argValue.toString(4);  
+    }
 }

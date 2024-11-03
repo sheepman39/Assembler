@@ -48,7 +48,9 @@ public class StatementFactory implements StatementFactoryInterface {
                     newFormat = Format.TWO;
                 } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
-                } else if (parts[1].equals("ASM")) {
+                } else if (parts[1].equals("SIC")){
+                    newFormat = Format.SIC;
+                }else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
                     System.out.println("Error: Unexpected format in instructions.txt");
@@ -144,7 +146,7 @@ public class StatementFactory implements StatementFactoryInterface {
             newStatement = createStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.TWO) {
             newStatement = createRegStatement(mnemonic, args);
-        } else if (this.formatTable.get(mnemonic) == Format.THREE) {
+        } else if (this.formatTable.get(mnemonic) == Format.THREE || this.formatTable.get(mnemonic) == Format.SIC) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             newStatement = handleAsmStatement(mnemonic, args);
@@ -271,6 +273,11 @@ public class StatementFactory implements StatementFactoryInterface {
         // if there is an eFlag, set it
         if (eFlag) {
             returnVal.setEFlag();
+        }
+
+        // if the format is SIC, set the flag
+        if(this.formatTable.get(mnemonic) == Format.SIC){
+            returnVal.setSICFlag();
         }
 
         return returnVal;
