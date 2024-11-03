@@ -199,7 +199,6 @@ public class StatementFactory implements StatementFactoryInterface {
 
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
-        returnVal.setObjCode("args");
         if (mnemonic.equals("START")) {
             this.locctr = new HexNum(args, NumSystem.HEX);
         } else if (mnemonic.equals("END")) {

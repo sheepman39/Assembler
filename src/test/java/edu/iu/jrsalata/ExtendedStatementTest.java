@@ -81,7 +81,6 @@ public class ExtendedStatementTest {
         extendedStatement.setSICFlag();
         assertTrue(extendedStatement.getLocation().getDec() == 0);
         assertTrue(extendedStatement.getSize().getDec() == 3);
-        System.out.println(extendedStatement.assemble());
         assertTrue(extendedStatement.assemble().equals("188222"));
     }
 

@@ -35,7 +35,9 @@ public class StatementFactoryTest {
             for (Statement statement : statements) {
                 if (sc.hasNextLine()) {
                     String line = sc.nextLine();
-                    System.out.println(line + " " + statement.assemble());
+                    System.out.println("INFO: " + line.toUpperCase() + " " + statement.assemble().toUpperCase());
+                    assertTrue(line.toUpperCase().equals(statement.assemble().toUpperCase()));
+                      
                 }
             }
             sc.close();
