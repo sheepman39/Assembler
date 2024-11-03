@@ -31,7 +31,7 @@ public class SymTable {
     }
 
     private static void createIfNotExists() {
-        if(symbolTable == null) {
+        if (symbolTable == null) {
             symbolTable = new HashMap<String, HexNum>();
         }
     }

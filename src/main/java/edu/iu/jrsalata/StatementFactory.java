@@ -48,9 +48,9 @@ public class StatementFactory implements StatementFactoryInterface {
                     newFormat = Format.TWO;
                 } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
-                } else if (parts[1].equals("SIC")){
+                } else if (parts[1].equals("SIC")) {
                     newFormat = Format.SIC;
-                }else if (parts[1].equals("ASM")) {
+                } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
                     System.out.println("Error: Unexpected format in instructions.txt");
@@ -159,12 +159,12 @@ public class StatementFactory implements StatementFactoryInterface {
         return newStatement;
     }
 
-    private void handleByte(String args, DirectiveStatement statement){
+    private void handleByte(String args, DirectiveStatement statement) {
         // check if the first char is C or X
         // C represents a constant string whose length is the length of the string
         // the object code of C is the ASCII value of each character in the string
         // X represents an object code whose length is 1 and the object code is the arg
-        if(args.charAt(0) == 'C'){
+        if (args.charAt(0) == 'C') {
 
             // remove the C and the ' at the end
             args = args.substring(2, args.length() - 1);
@@ -174,12 +174,12 @@ public class StatementFactory implements StatementFactoryInterface {
 
             // set the object code to the ASCII value of each character
             String objCode = "";
-            for(int i = 0; i < args.length(); i++){
-                objCode += Integer.toHexString((int)args.charAt(i));
+            for (int i = 0; i < args.length(); i++) {
+                objCode += Integer.toHexString((int) args.charAt(i));
             }
             statement.setObjCode(objCode);
-        
-        } else if(args.charAt(0) == 'X'){
+
+        } else if (args.charAt(0) == 'X') {
 
             // remove the X and the ' at the end
             args = args.substring(2, args.length() - 1);
@@ -230,7 +230,7 @@ public class StatementFactory implements StatementFactoryInterface {
     }
 
     private Statement createRegStatement(String mnemonic, String args) {
-        
+
         // Statement to return
         RegisterStatement returnVal = new RegisterStatement();
         returnVal.setLocation(this.locctr);
@@ -275,7 +275,7 @@ public class StatementFactory implements StatementFactoryInterface {
         }
 
         // if the format is SIC, set the flag
-        if(this.formatTable.get(mnemonic) == Format.SIC){
+        if (this.formatTable.get(mnemonic) == Format.SIC) {
             returnVal.setSICFlag();
         }
 

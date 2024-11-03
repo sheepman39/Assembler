@@ -37,7 +37,7 @@ public class StatementFactoryTest {
                     String line = sc.nextLine();
                     System.out.println("INFO: " + line.toUpperCase() + " " + statement.assemble().toUpperCase());
                     assertTrue(line.toUpperCase().equals(statement.assemble().toUpperCase()));
-                      
+
                 }
             }
             sc.close();

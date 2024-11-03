@@ -14,7 +14,7 @@ public abstract class Statement {
     public Statement(HexNum size) {
         this.size = size;
     }
-    
+
     public HexNum getSize() {
         return this.size;
     }

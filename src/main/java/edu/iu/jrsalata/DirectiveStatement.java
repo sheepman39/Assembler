@@ -4,7 +4,7 @@
 package edu.iu.jrsalata;
 
 public class DirectiveStatement extends Statement {
- 
+
     protected String directive;
     protected String objectCode;
 
@@ -41,7 +41,7 @@ public class DirectiveStatement extends Statement {
         this.size = size;
     }
 
-    public void setObjCode(String code){
+    public void setObjCode(String code) {
         this.objectCode = code;
     }
 

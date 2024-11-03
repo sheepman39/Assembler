@@ -5,7 +5,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 public class DirectiveStatemnetTest {
- 
+
     @Test
     public void testDefaultConstructor() {
         DirectiveStatement directiveStatement = new DirectiveStatement();
@@ -23,8 +23,8 @@ public class DirectiveStatemnetTest {
         assertTrue(directiveStatement.getDirective().equals("END"));
     }
 
-    @Test 
-    public void testSizeGettersAndSetters(){
+    @Test
+    public void testSizeGettersAndSetters() {
         HexNum size = new HexNum(3);
         DirectiveStatement directiveStatement = new DirectiveStatement();
         directiveStatement.setSize(size);

@@ -13,6 +13,7 @@ public class ExtendedStatement extends BaseStatement {
     boolean pFlag = false;
     boolean eFlag = false;
     boolean sicFlag = false;
+
     // constructors
     public ExtendedStatement() {
         super();
@@ -84,9 +85,9 @@ public class ExtendedStatement extends BaseStatement {
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
-        if(this.args.length() == 0){
+        if (this.args.length() == 0) {
             return this.opcode.toString(2) + "0000";
-        } else if (this.sicFlag){
+        } else if (this.sicFlag) {
             return assembleSic();
         } else if (this.args.charAt(0) == '#') {
             this.setIFlag();
@@ -96,7 +97,7 @@ public class ExtendedStatement extends BaseStatement {
             this.args = this.args.substring(1);
         } else {
             this.setIFlag();
-            this.setNFlag(); 
+            this.setNFlag();
         }
 
         // Get the values of each individual flag
@@ -135,10 +136,10 @@ public class ExtendedStatement extends BaseStatement {
 
         // addresses are 15 bits with the 16th representing X
         // so we need to add a 1 to the front of the string
-        if(this.xFlag){
+        if (this.xFlag) {
             argValue = argValue.add(new HexNum("8000", NumSystem.HEX));
         }
 
-        return this.opcode.toString(2) + argValue.toString(4);  
+        return this.opcode.toString(2) + argValue.toString(4);
     }
 }

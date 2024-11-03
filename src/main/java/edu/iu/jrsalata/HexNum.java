@@ -67,11 +67,11 @@ public class HexNum {
         return this.convertToDec(this.value, NumSystem.HEX);
     }
 
-    public String getBin(){
+    public String getBin() {
         return Integer.toBinaryString(this.getDec());
     }
 
-    public String getBin(int digits){
+    public String getBin(int digits) {
         String binary = Integer.toBinaryString(this.getDec());
         if (binary.length() < digits) {
             StringBuilder sb = new StringBuilder();
