@@ -111,8 +111,8 @@ public class ExtendedStatement extends BaseStatement {
         HexNum third = new HexNum(x + b + p + e);
 
         // look up if args is in the symbolTable
-        if (Main.symbolTable.containsKey(this.args)) {
-            HexNum argValue = Main.symbolTable.get(this.args);
+        if (SymTable.containsSymbol(this.args)) {
+            HexNum argValue = SymTable.getSymbol(this.args);
             return first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         }
 

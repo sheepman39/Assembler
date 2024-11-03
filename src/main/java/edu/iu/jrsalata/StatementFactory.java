@@ -120,8 +120,8 @@ public class StatementFactory implements StatementFactoryInterface {
             String label = parts[0];
 
             // add the label with the to the symbol table
-            if (!Main.symbolTable.containsKey(label)) {
-                Main.symbolTable.put(label, this.locctr);
+            if (!SymTable.containsSymbol(label)) {
+                SymTable.addSymbol(label, this.locctr);
             } else {
                 System.out.println("Error: Duplicate label: " + label);
             }
