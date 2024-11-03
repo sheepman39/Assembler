@@ -4,11 +4,12 @@
 package edu.iu.jrsalata;
 
 public class SingleStatement extends BaseStatement {
-    
+
     // constructors
     public SingleStatement() {
         super();
     }
+
     public SingleStatement(HexNum location, HexNum opcode) {
         super(location, opcode);
         this.size = new HexNum(this.format);

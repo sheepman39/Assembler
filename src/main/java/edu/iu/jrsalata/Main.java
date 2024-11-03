@@ -6,7 +6,6 @@ import java.util.Scanner;
 import java.util.HashMap;
 
 class Main {
-    public static final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
 
     public static void main(String[] args) {
         ArrayList<Statement> list = fileInput("input.asm");

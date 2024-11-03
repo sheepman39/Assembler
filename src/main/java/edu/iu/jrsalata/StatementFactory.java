@@ -48,6 +48,8 @@ public class StatementFactory implements StatementFactoryInterface {
                     newFormat = Format.TWO;
                 } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
+                } else if (parts[1].equals("SIC")) {
+                    newFormat = Format.SIC;
                 } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
@@ -120,8 +122,8 @@ public class StatementFactory implements StatementFactoryInterface {
             String label = parts[0];
 
             // add the label with the to the symbol table
-            if (!Main.symbolTable.containsKey(label)) {
-                Main.symbolTable.put(label, this.locctr);
+            if (!SymTable.containsSymbol(label)) {
+                SymTable.addSymbol(label, this.locctr);
             } else {
                 System.out.println("Error: Duplicate label: " + label);
             }
@@ -144,7 +146,7 @@ public class StatementFactory implements StatementFactoryInterface {
             newStatement = createStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.TWO) {
             newStatement = createRegStatement(mnemonic, args);
-        } else if (this.formatTable.get(mnemonic) == Format.THREE) {
+        } else if (this.formatTable.get(mnemonic) == Format.THREE || this.formatTable.get(mnemonic) == Format.SIC) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             newStatement = handleAsmStatement(mnemonic, args);
@@ -157,6 +159,42 @@ public class StatementFactory implements StatementFactoryInterface {
         return newStatement;
     }
 
+    private void handleByte(String args, DirectiveStatement statement) {
+        // check if the first char is C or X
+        // C represents a constant string whose length is the length of the string
+        // the object code of C is the ASCII value of each character in the string
+        // X represents an object code whose length is 1 and the object code is the arg
+        if (args.charAt(0) == 'C') {
+
+            // remove the C and the ' at the end
+            args = args.substring(2, args.length() - 1);
+
+            // set the size to the length of the string
+            statement.setSize(new HexNum(args.length()));
+
+            // set the object code to the ASCII value of each character
+            String objCode = "";
+            for (int i = 0; i < args.length(); i++) {
+                objCode += Integer.toHexString((int) args.charAt(i));
+            }
+            statement.setObjCode(objCode);
+
+        } else if (args.charAt(0) == 'X') {
+
+            // remove the X and the ' at the end
+            args = args.substring(2, args.length() - 1);
+
+            // set the size to 1
+            statement.setSize(new HexNum(1));
+
+            // set the object code to the arg
+            statement.setObjCode(args);
+
+        } else {
+            System.out.println("Error: Invalid BYTE argument");
+        }
+    }
+
     private Statement handleAsmStatement(String mnemonic, String args) {
 
         DirectiveStatement returnVal = new DirectiveStatement();
@@ -166,10 +204,12 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (mnemonic.equals("END")) {
             // do nothing
         } else if (mnemonic.equals("BYTE")) {
-            // add the size of the byte to the locctr
+            // move BYTE logic to other method for cleanliness
+            handleByte(args, returnVal);
         } else if (mnemonic.equals("WORD")) {
-            // set size to 3
+            // set size to 3 and set the object code
             returnVal.setSize(new HexNum(3));
+            returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
         } else if (mnemonic.equals("RESB")) {
             // set the args to the size
             returnVal.setSize(new HexNum(Integer.parseInt(args)));
@@ -190,7 +230,7 @@ public class StatementFactory implements StatementFactoryInterface {
     }
 
     private Statement createRegStatement(String mnemonic, String args) {
-        
+
         // Statement to return
         RegisterStatement returnVal = new RegisterStatement();
         returnVal.setLocation(this.locctr);
@@ -232,6 +272,11 @@ public class StatementFactory implements StatementFactoryInterface {
         // if there is an eFlag, set it
         if (eFlag) {
             returnVal.setEFlag();
+        }
+
+        // if the format is SIC, set the flag
+        if (this.formatTable.get(mnemonic) == Format.SIC) {
+            returnVal.setSICFlag();
         }
 
         return returnVal;
