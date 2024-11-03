@@ -81,6 +81,9 @@ public class ExtendedStatement extends BaseStatement {
         // '@' means indirect addressing
         // if neither, assume direct addressing
         // NOTE: if n=0, i=0, it is an SIC instruction
+        if(this.args.length() == 0){
+            return this.opcode.toString(2) + "0000";
+        }
         if (this.args.charAt(0) == '#') {
             this.setIFlag();
             this.args = this.args.substring(1);
@@ -110,10 +113,10 @@ public class ExtendedStatement extends BaseStatement {
         // look up if args is in the symbolTable
         if (Main.symbolTable.containsKey(this.args)) {
             HexNum argValue = Main.symbolTable.get(this.args);
-            return first.toString(2) + third.toString() + argValue.toString(this.size.getDec());
+            return first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         }
 
-        String returnVal = first.toString(2) + third.toString() + this.args;
+        String returnVal = first.toString(2) + third.toString(1) + this.args;
         return returnVal;
     }
 

@@ -157,6 +157,42 @@ public class StatementFactory implements StatementFactoryInterface {
         return newStatement;
     }
 
+    private void handleByte(String args, DirectiveStatement statement){
+        // check if the first char is C or X
+        // C represents a constant string whose length is the length of the string
+        // the object code of C is the ASCII value of each character in the string
+        // X represents an object code whose length is 1 and the object code is the arg
+        if(args.charAt(0) == 'C'){
+
+            // remove the C and the ' at the end
+            args = args.substring(2, args.length() - 1);
+
+            // set the size to the length of the string
+            statement.setSize(new HexNum(args.length()));
+
+            // set the object code to the ASCII value of each character
+            String objCode = "";
+            for(int i = 2; i < args.length() - 1; i++){
+                objCode += Integer.toHexString((int)args.charAt(i));
+            }
+            statement.setObjCode(objCode);
+        
+        } else if(args.charAt(0) == 'X'){
+
+            // remove the X and the ' at the end
+            args = args.substring(2, args.length() - 1);
+
+            // set the size to 1
+            statement.setSize(new HexNum(1));
+
+            // set the object code to the arg
+            statement.setObjCode(args);
+
+        } else {
+            System.out.println("Error: Invalid BYTE argument");
+        }
+    }
+
     private Statement handleAsmStatement(String mnemonic, String args) {
 
         DirectiveStatement returnVal = new DirectiveStatement();
@@ -166,10 +202,12 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (mnemonic.equals("END")) {
             // do nothing
         } else if (mnemonic.equals("BYTE")) {
-            // add the size of the byte to the locctr
+            // move BYTE logic to other method for cleanliness
+            handleByte(args, returnVal);
         } else if (mnemonic.equals("WORD")) {
-            // set size to 3
+            // set size to 3 and set the object code
             returnVal.setSize(new HexNum(3));
+            returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
         } else if (mnemonic.equals("RESB")) {
             // set the args to the size
             returnVal.setSize(new HexNum(Integer.parseInt(args)));

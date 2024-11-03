@@ -10,6 +10,7 @@ public class DirectiveStatemnetTest {
     public void testDefaultConstructor() {
         DirectiveStatement directiveStatement = new DirectiveStatement();
         assertTrue(directiveStatement.getDirective().equals(""));
+        assertTrue(directiveStatement.assemble() == "");
         assertTrue(directiveStatement.getSize().getDec() == 0);
     }
 
@@ -28,5 +29,7 @@ public class DirectiveStatemnetTest {
         DirectiveStatement directiveStatement = new DirectiveStatement();
         directiveStatement.setSize(size);
         assertTrue(directiveStatement.getSize().getDec() == 3);
+        directiveStatement.setObjCode("F1");
+        assertTrue(directiveStatement.assemble().equals("F1"));
     }
 }
