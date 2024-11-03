@@ -172,7 +172,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
             // set the object code to the ASCII value of each character
             String objCode = "";
-            for(int i = 2; i < args.length() - 1; i++){
+            for(int i = 0; i < args.length(); i++){
                 objCode += Integer.toHexString((int)args.charAt(i));
             }
             statement.setObjCode(objCode);
@@ -197,6 +197,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
+        returnVal.setObjCode("args");
         if (mnemonic.equals("START")) {
             this.locctr = new HexNum(args, NumSystem.HEX);
         } else if (mnemonic.equals("END")) {

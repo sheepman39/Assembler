@@ -93,7 +93,7 @@ public class ExtendedStatement extends BaseStatement {
         } else {
             // NOTE: include SIC compatibility
             this.setIFlag();
-            this.setNFlag();
+            this.setNFlag(); 
         }
 
         // Get the values of each individual flag
