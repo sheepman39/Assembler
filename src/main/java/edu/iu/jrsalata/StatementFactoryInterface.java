@@ -4,4 +4,6 @@ package edu.iu.jrsalata;
 
 public interface StatementFactoryInterface {
     public Statement processStatement(String statement);
+    public HexNum getStart();
+    public HexNum getLen();
 }

@@ -13,6 +13,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
     // locctr keeps track of the current location of each statement
     protected HexNum locctr;
+    protected HexNum start = new HexNum(0);
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
     protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
@@ -87,6 +88,18 @@ public class StatementFactory implements StatementFactoryInterface {
             logger.warning("Error: Could not find registers.txt");
             logger.warning(e.getMessage());
         }
+    }
+
+    // get the start location
+    public HexNum getStart() {
+        return this.start;
+    }
+
+    // get the length of the program
+    public HexNum getLen() {
+        int start = this.start.getDec();
+        int end = this.locctr.getDec();
+        return new HexNum(end - start);
     }
 
     // create a statement from a string
@@ -204,6 +217,7 @@ public class StatementFactory implements StatementFactoryInterface {
         returnVal.setDirective(mnemonic);
         if (mnemonic.equals("START")) {
             this.locctr = new HexNum(args, NumSystem.HEX);
+            this.start = new HexNum(this.locctr.getDec());
         } else if (mnemonic.equals("END")) {
             // do nothing
         } else if (mnemonic.equals("BYTE")) {
