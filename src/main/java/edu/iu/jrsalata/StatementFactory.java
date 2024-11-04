@@ -148,8 +148,10 @@ public class StatementFactory implements StatementFactoryInterface {
             newStatement = createStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.TWO) {
             newStatement = createRegStatement(mnemonic, args);
-        } else if (this.formatTable.get(mnemonic) == Format.THREE || this.formatTable.get(mnemonic) == Format.SIC) {
+        } else if (this.formatTable.get(mnemonic) == Format.THREE) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
+        } else if (this.formatTable.get(mnemonic) == Format.SIC) {
+            newStatement = createSicStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             newStatement = handleAsmStatement(mnemonic, args);
         } else {
@@ -239,7 +241,7 @@ public class StatementFactory implements StatementFactoryInterface {
         // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
         returnVal.setOpcode(opcode);
-        
+
         // find both of the registers in parts[1]
         String[] registers = args.split(",");
         if (registers.length > 2 || registers.length <= 0) {
@@ -276,10 +278,16 @@ public class StatementFactory implements StatementFactoryInterface {
             returnVal.setEFlag();
         }
 
-        // if the format is SIC, set the flag
-        if (this.formatTable.get(mnemonic) == Format.SIC) {
-            returnVal.setSICFlag();
-        }
+        return returnVal;
+    }
+
+    private Statement createSicStatement(String mnemonic, String args) {
+
+        // find the opcode of the mnemonic
+        HexNum opcode = this.symbolTable.get(mnemonic);
+
+        // create the SICStatement
+        SicStatement returnVal = new SicStatement(this.locctr, opcode, args);
 
         return returnVal;
     }
