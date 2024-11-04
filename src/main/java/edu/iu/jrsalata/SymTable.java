@@ -10,11 +10,6 @@ public class SymTable {
     // static symbol table can be used across each instance of the class
     private static HashMap<String, HexNum> symbolTable;
 
-    // constructor
-    public SymTable() {
-        createIfNotExists();
-    }
-
     public static void addSymbol(String symbol, HexNum location) {
         createIfNotExists();
         symbolTable.put(symbol, location);
@@ -32,7 +27,7 @@ public class SymTable {
 
     private static void createIfNotExists() {
         if (symbolTable == null) {
-            symbolTable = new HashMap<String, HexNum>();
+            symbolTable = new HashMap<>();
         }
     }
 }

@@ -127,7 +127,7 @@ public class ExtendedStatement extends BaseStatement {
     private String assembleSic() {
 
         // If an argument is given, find it in the symbol table
-        HexNum argValue = new HexNum();
+        HexNum argValue;
         if (SymTable.containsSymbol(this.args)) {
             argValue = SymTable.getSymbol(this.args);
         } else {

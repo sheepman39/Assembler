@@ -7,11 +7,11 @@ public abstract class Statement {
     protected HexNum size;
 
     // constructors
-    public Statement() {
+    protected Statement() {
         this.size = new HexNum(0);
     }
 
-    public Statement(HexNum size) {
+    protected Statement(HexNum size) {
         this.size = size;
     }
 
@@ -21,5 +21,5 @@ public abstract class Statement {
 
     // this will be overridden by the subclasses
     // to assemble based on different formats
-    abstract public String assemble();
+    public abstract String assemble();
 }

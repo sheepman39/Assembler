@@ -9,14 +9,14 @@ public abstract class BaseStatement extends Statement {
     protected int format;
 
     // constructors
-    public BaseStatement() {
+    protected BaseStatement() {
         this.location = new HexNum();
         this.opcode = new HexNum();
         this.format = 1;
         this.size = new HexNum(this.format);
     }
 
-    public BaseStatement(HexNum location, HexNum opcode) {
+    protected BaseStatement(HexNum location, HexNum opcode) {
         this.location = location;
         this.opcode = opcode;
         this.format = 1;

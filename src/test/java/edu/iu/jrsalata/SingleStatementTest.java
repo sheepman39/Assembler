@@ -1,6 +1,6 @@
 package edu.iu.jrsalata;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -9,9 +9,9 @@ public class SingleStatementTest {
     @Test
     public void testDefaultConstructor() {
         SingleStatement statement = new SingleStatement();
-        assertTrue(statement.getLocation().getDec() == 0);
-        assertTrue(statement.getSize().getDec() == 1);
-        assertTrue(statement.assemble().equals("00"));
+        assertEquals(statement.getLocation().getDec(), 0);
+        assertEquals(statement.getSize().getDec(), 1);
+        assertEquals(statement.assemble(), "00");
     }
 
     @Test
@@ -19,9 +19,9 @@ public class SingleStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("C4", NumSystem.HEX);
         SingleStatement statement = new SingleStatement(location, opcode);
-        assertTrue(statement.getLocation().getDec() == 0);
-        assertTrue(statement.getSize().getDec() == 1);
-        assertTrue(statement.assemble().equals("C4"));
+        assertEquals(statement.getLocation().getDec(), 0);
+        assertEquals(statement.getSize().getDec(), 1);
+        assertEquals(statement.assemble(), "C4");
     }
 
     @Test
@@ -29,9 +29,9 @@ public class SingleStatementTest {
         HexNum location = new HexNum(100);
         HexNum opcode = new HexNum("D8", NumSystem.HEX);
         SingleStatement statement = new SingleStatement(location, opcode);
-        assertTrue(statement.getLocation().getDec() == 100);
-        assertTrue(statement.getLocation().toString().equals("64"));
-        assertTrue(statement.getSize().getDec() == 1);
-        assertTrue(statement.assemble().equals("D8"));
+        assertEquals(statement.getLocation().getDec(), 100);
+        assertEquals(statement.getLocation().toString(), "64");
+        assertEquals(statement.getSize().getDec(), 1);
+        assertEquals(statement.assemble(), "D8");
     }
 }

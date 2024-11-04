@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
 import java.io.InputStream;
+import java.util.logging.Logger;
 
 // Class: StatementFactory
 // Implements: StatementFactoryInterfac e
@@ -15,6 +16,7 @@ public class StatementFactory implements StatementFactoryInterface {
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
     protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
+    Logger logger = Logger.getLogger(getClass().getName());
 
     // constructor
     public StatementFactory() {
@@ -53,7 +55,7 @@ public class StatementFactory implements StatementFactoryInterface {
                 } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
-                    System.out.println("Error: Unexpected format in instructions.txt");
+                    logger.warning("Error: Unexpected format '" + parts[1] + "' in instructions.txt");
                 }
 
                 this.formatTable.put(parts[0], newFormat);
@@ -62,8 +64,8 @@ public class StatementFactory implements StatementFactoryInterface {
             // close the scanner
             sc.close();
         } catch (Exception e) {
-            System.out.println("Error: Could not find instructions.txt");
-            System.err.println(e);
+            logger.warning("Error: Could not find instructions.txt");
+            logger.warning(e.getMessage());
         }
 
         // add all of the registers to the table
@@ -82,8 +84,8 @@ public class StatementFactory implements StatementFactoryInterface {
             // close the scanner
             sc.close();
         } catch (Exception e) {
-            System.out.println("Error: Could not find registers.txt");
-            System.err.println(e);
+            logger.warning("Error: Could not find registers.txt");
+            logger.warning(e.getMessage());
         }
     }
 
@@ -125,14 +127,14 @@ public class StatementFactory implements StatementFactoryInterface {
             if (!SymTable.containsSymbol(label)) {
                 SymTable.addSymbol(label, this.locctr);
             } else {
-                System.out.println("Error: Duplicate label: " + label);
+                logger.warning("Error: Duplicate label: " + label);
             }
 
             mnemonic = parts[1];
             args = parts[2];
         } else {
             // throw an exception
-            System.out.println("Error: Invalid number of arguments");
+            logger.warning("Error: Invalid number of arguments");
         }
 
         // since some mnemonics may contain '+' at the beginning, we want to remove it
@@ -151,8 +153,7 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             newStatement = handleAsmStatement(mnemonic, args);
         } else {
-            System.out.println("Error: Mnemonic not found");
-            System.out.println("Mnemonic: " + mnemonic);
+            logger.severe("Error: Mnemonic" + mnemonic + " not found");
             return null;
         }
         this.locctr = this.locctr.add(newStatement.getSize());
@@ -175,7 +176,7 @@ public class StatementFactory implements StatementFactoryInterface {
             // set the object code to the ASCII value of each character
             String objCode = "";
             for (int i = 0; i < args.length(); i++) {
-                objCode += Integer.toHexString((int) args.charAt(i));
+                objCode += Integer.toHexString(args.charAt(i));
             }
             statement.setObjCode(objCode);
 
@@ -191,7 +192,7 @@ public class StatementFactory implements StatementFactoryInterface {
             statement.setObjCode(args);
 
         } else {
-            System.out.println("Error: Invalid BYTE argument");
+            logger.warning("Error: Invalid BYTE argument '" + args + "'");
         }
     }
 
@@ -217,7 +218,7 @@ public class StatementFactory implements StatementFactoryInterface {
             // set 3 * args to the size
             returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
         } else {
-            System.out.println("Error: Invalid ASM mnemonic");
+            logger.warning("Error: Invalid ASM mnemonic '" + mnemonic + "'");
         }
         return returnVal;
     }
@@ -241,7 +242,7 @@ public class StatementFactory implements StatementFactoryInterface {
         // find both of the registers in parts[1]
         String[] registers = args.split(",");
         if (registers.length > 2 || registers.length <= 0) {
-            System.out.println("Error: Invalid number of registers for format 2");
+            logger.warning("Error: Invalid number of registers for format 2");
         }
 
         // find each of the registers in the registerTable
@@ -250,7 +251,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // TODO: This is a bit of a hack, but it works for now
         if (reg1 == null) {
-            System.out.println("Error: Register: " + registers[0] + " is invalid");
+            logger.warning("Error: Register: " + registers[0] + " is invalid");
         } else if (reg2 == null && reg1 != null) {
             returnVal.setReg1(reg1);
         } else {
