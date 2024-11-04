@@ -238,7 +238,8 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
-
+        returnVal.setOpcode(opcode);
+        
         // find both of the registers in parts[1]
         String[] registers = args.split(",");
         if (registers.length > 2 || registers.length <= 0) {
@@ -251,7 +252,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // TODO: This is a bit of a hack, but it works for now
         if (reg1 == null) {
-            logger.warning("Error: Register: " + registers[0] + " is invalid");
+            logger.warning("Error: Register: " + args + " is invalid");
         } else if (reg2 == null && reg1 != null) {
             returnVal.setReg1(reg1);
         } else {

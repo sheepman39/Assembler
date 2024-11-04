@@ -87,8 +87,6 @@ public class ExtendedStatement extends BaseStatement {
         // if neither, assume direct addressing
         if (this.args.length() == 0) {
             return this.opcode.toString(2) + "0000";
-        } else if (this.sicFlag) {
-            return assembleSic();
         } else if (this.args.charAt(0) == '#') {
             this.setIFlag();
             this.args = this.args.substring(1);
@@ -98,6 +96,10 @@ public class ExtendedStatement extends BaseStatement {
         } else {
             this.setIFlag();
             this.setNFlag();
+        }
+
+        if (this.sicFlag) {
+            return assembleSic();
         }
 
         // Get the values of each individual flag
@@ -113,14 +115,17 @@ public class ExtendedStatement extends BaseStatement {
 
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
-
+        HexNum argValue;
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(this.args)) {
-            HexNum argValue = SymTable.getSymbol(this.args);
+            argValue = SymTable.getSymbol(this.args);
             return first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         }
 
-        String returnVal = first.toString(2) + third.toString(1) + this.args;
+        // if not, assume it is a hex number
+        argValue = new HexNum(this.args, NumSystem.HEX);
+
+        String returnVal = first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         return returnVal;
     }
 

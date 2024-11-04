@@ -4,11 +4,15 @@ import java.util.ArrayList;
 import java.io.File;
 import java.util.Scanner;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 class Main {
-
+    static Logger logger = Logger.getLogger(Main.class.getName());
     public static void main(String[] args) {
         ArrayList<Statement> list = fileInput("input.asm");
+        for (Statement statement : list) {
+            logger.info(statement.assemble());
+        }
     }
 
     public static ArrayList<Statement> fileInput(String filename) {
