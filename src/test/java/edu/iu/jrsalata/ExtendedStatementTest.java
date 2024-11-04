@@ -9,22 +9,11 @@ public class ExtendedStatementTest {
     @Test
     public void testDefaultConstructor() {
         ExtendedStatement extendedStatement = new ExtendedStatement();
-        extendedStatement.setSICFlag();
         assertEquals(extendedStatement.getLocation().getDec(), 0);
         assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "000000");
+        assertEquals(extendedStatement.assemble(), "030000");
     }
 
-    @Test
-    public void testAddInstruction() {
-        HexNum location = new HexNum(0);
-        HexNum opcode = new HexNum("18", NumSystem.HEX);
-        ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222");
-        extendedStatement.setSICFlag();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "180222");
-    }
 
     @Test
     public void testImmediateAddressing() {
@@ -78,10 +67,9 @@ public class ExtendedStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222, X");
-        extendedStatement.setSICFlag();
         assertEquals(extendedStatement.getLocation().getDec(), 0);
         assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "188222");
+        assertEquals(extendedStatement.assemble(), "1b8222");
     }
 
     @Test

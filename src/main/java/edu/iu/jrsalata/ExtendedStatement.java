@@ -5,14 +5,13 @@ package edu.iu.jrsalata;
 
 public class ExtendedStatement extends BaseStatement {
 
-    String args;
-    boolean nFlag = false;
-    boolean iFlag = false;
-    boolean xFlag = false;
-    boolean bFlag = false;
-    boolean pFlag = false;
-    boolean eFlag = false;
-    boolean sicFlag = false;
+    protected String args;
+    protected boolean nFlag = false;
+    protected boolean iFlag = false;
+    protected boolean xFlag = false;
+    protected boolean bFlag = false;
+    protected boolean pFlag = false;
+    protected boolean eFlag = false;
 
     // constructors
     public ExtendedStatement() {
@@ -52,10 +51,6 @@ public class ExtendedStatement extends BaseStatement {
 
     public void setEFlag() {
         this.eFlag = true;
-    }
-
-    public void setSICFlag() {
-        this.sicFlag = true;
     }
 
     // this will be used by the factory to clean up the args. It will also handle
@@ -98,10 +93,6 @@ public class ExtendedStatement extends BaseStatement {
             this.setNFlag();
         }
 
-        if (this.sicFlag) {
-            return assembleSic();
-        }
-
         // Get the values of each individual flag
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
@@ -127,24 +118,5 @@ public class ExtendedStatement extends BaseStatement {
 
         String returnVal = first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         return returnVal;
-    }
-
-    private String assembleSic() {
-
-        // If an argument is given, find it in the symbol table
-        HexNum argValue;
-        if (SymTable.containsSymbol(this.args)) {
-            argValue = SymTable.getSymbol(this.args);
-        } else {
-            argValue = new HexNum(this.args, NumSystem.HEX);
-        }
-
-        // addresses are 15 bits with the 16th representing X
-        // so we need to add a 1 to the front of the string
-        if (this.xFlag) {
-            argValue = argValue.add(new HexNum("8000", NumSystem.HEX));
-        }
-
-        return this.opcode.toString(2) + argValue.toString(4);
     }
 }
