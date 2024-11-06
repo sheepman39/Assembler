@@ -1,28 +1,36 @@
 package edu.iu.jrsalata;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.io.FileWriter;
 import java.io.File;
 import java.util.Scanner;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.logging.Logger;
 
 class Main {
     static Logger logger = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
         // Create an instance of the StatementFactory
         StatementFactoryInterface factory = new StatementFactory();
-        ArrayList<Statement> list = fileInput("input.asm", factory);
-        
-        try{
-            // Create a file writter to be passed around to write each section of the obj file
-            FileWritter fileWritter = new FileWritter("output.obj");
-            writeHeaderRecord(fileWritter, factory);
+        Queue<Statement> queue = fileInput("input.asm", factory);
+
+        try {
+            // Create a file writter to be passed around to write each section of the obj
+            // file
+            FileWriter fileWriter = new FileWriter("output.obj");
+            writeHeaderRecord(fileWriter, factory);
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
         }
-        
+
     }
 
     // Write the Header Record to the given obj file
-    public static void writeHeaderRecord(FileWritter fileWritter, StatementFactoryInterface factory){
+    public static void writeHeaderRecord(FileWriter fileWriter, StatementFactoryInterface factory) {
         // Create the StringBuilder that will add each component
         // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
@@ -37,23 +45,58 @@ class Main {
         // Col 14-19 is the length of the program
         headerRecord.append(factory.getLen().toString(6));
 
-        // write the final string to the header file
-        fileWritter.writeHeaderRecord(headerRecord.toString());
+        try {
+            // write the final string to the header file
+            fileWriter.write(headerRecord.toString());
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+        }
     }
 
     // Write the Text Record to the given obj file
-    public static void writeTextRecords(FileWriter fileWriter, ArrayList<Statement> list){
-        // Create the StringBuilder that will add each component
-        // Start with the 'T'
-        StringBuilder textRecord = new StringBuilder();
-        textRecord.append("T");
+    public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue, StatementFactoryInterface factory) {
 
-        // Col 2-7 is the starting address
+        // store the start to handle sizes
+        HexNum start = new HexNum(factory.getStart().getDec());
+
+        // Create the StringBuilder that will add each component
+        StringBuilder textRecord = new StringBuilder();
+        while (!queue.isEmpty()) {
+            
+            // Col 1 is "T"
+            textRecord.append("T");
+
+            // Col 2-7 is the starting address
+            textRecord.append(start.toString(6));
+
+            // Col 8-9 is the length of the record
+            // We will put a placeholder here for now
+            textRecord.append("00");
+
+            // Col 10-69 is the text record
+            while(!queue.isEmpty() && textRecord.length() + queue.peek().getSize() < 70) {
+                Statement statement = queue.poll();
+                textRecord.append(statement.assemble());
+                start = start.add(statement.getSize());
+            }
+
+            // Update the length of the record
+            textRecord.replace(7, 8, Integer.toHexString(tmpTextRecord.length()));
+
+            // Add the text record to the file
+            try{
+                fileWriter.write(textRecord.toString());
+            } catch (Exception e) {
+                logger.severe(e.getMessage());
+            }
+        }
+
     }
-    public static ArrayList<Statement> fileInput(String filename, StatementFactoryInterface factory) {
+
+    public static Queue<Statement> fileInput(String filename, StatementFactoryInterface factory) {
 
         // create the ArrayList that will be returned
-        ArrayList<Statement> list = new ArrayList<Statement>();
+        Queue<Statement> queue = new LinkedList<Statement>();
 
         // open up a new file and read the string
         // parse the string and create a list of lines
@@ -67,7 +110,7 @@ class Main {
                 String line = sc.nextLine();
                 Statement statement = factory.processStatement(line);
                 if (statement != null) {
-                    list.add(statement);
+                    queue.add(statement);
                 }
             }
             sc.close();
@@ -76,6 +119,6 @@ class Main {
             System.err.println(e);
         }
 
-        return list;
+        return queue;
     }
 }
