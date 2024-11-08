@@ -23,6 +23,11 @@ class Main {
             // file
             FileWriter fileWriter = new FileWriter("output.obj");
             writeHeaderRecord(fileWriter, factory);
+            writeTextRecords(fileWriter, queue, factory);
+            writeEndRecord(fileWriter, factory);
+
+            fileWriter.close();
+            logger.info("File written successfully");
         } catch (Exception e) {
             logger.severe(e.getMessage());
         }
@@ -48,6 +53,7 @@ class Main {
         try {
             // write the final string to the header file
             fileWriter.write(headerRecord.toString());
+            fileWriter.write('\n');
         } catch (Exception e) {
             logger.severe(e.getMessage());
         }
@@ -61,8 +67,11 @@ class Main {
 
         // Create the StringBuilder that will add each component
         StringBuilder textRecord = new StringBuilder();
+
+        // Statement that will be read from the queue
+        Statement statement;
+
         while (!queue.isEmpty()) {
-            
             // Col 1 is "T"
             textRecord.append("T");
 
@@ -71,28 +80,59 @@ class Main {
 
             // Col 8-9 is the length of the record
             // We will put a placeholder here for now
-            textRecord.append("00");
+            textRecord.append("--");
 
             // Col 10-69 is the text record
-            while(!queue.isEmpty() && textRecord.length() + queue.peek().getSize() < 70) {
-                Statement statement = queue.poll();
+            int test = queue.peek().getSize().getDec();
+            logger.info("Text Record Length: " + test);
+            logger.info("Record Assemble: " + queue.peek().assemble());
+            if(queue.peek() instanceof DirectiveStatement) {
+                logger.info("Directive Keyword:" + ((DirectiveStatement) queue.peek()).getDirective());
+            }
+
+            while(!queue.isEmpty() && (textRecord.length() + queue.peek().getSize().getDec() < 70)) {
+                statement = queue.poll();
                 textRecord.append(statement.assemble());
                 start = start.add(statement.getSize());
             }
 
             // Update the length of the record
-            textRecord.replace(7, 8, Integer.toHexString(tmpTextRecord.length()));
+            textRecord.replace(7, 9, Integer.toHexString(textRecord.length()));
 
             // Add the text record to the file
             try{
                 fileWriter.write(textRecord.toString());
+                fileWriter.write('\n');
             } catch (Exception e) {
                 logger.severe(e.getMessage());
             }
+
+            // Clear the text record
+            textRecord.setLength(0);
         }
 
     }
 
+    // Write the End Record to the given obj file
+    public static void writeEndRecord(FileWriter fileWriter, StatementFactoryInterface factory) {
+        
+        // Create the StringBuilder that will add each component
+        StringBuilder endRecord = new StringBuilder();
+
+        // Col 1 is "E"
+        endRecord.append("E");
+
+        // Col 2-7 is the starting address
+        endRecord.append(factory.getStart().toString(6));
+
+        try {
+            // write the final string to the header file
+            fileWriter.write(endRecord.toString());
+            fileWriter.write('\n');
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+        }
+    }
     public static Queue<Statement> fileInput(String filename, StatementFactoryInterface factory) {
 
         // create the ArrayList that will be returned
