@@ -255,11 +255,14 @@ public class StatementFactory implements StatementFactoryInterface {
             returnVal.setSize(new HexNum(3));
             returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
         } else if (mnemonic.equals("RESB")) {
-            // set the args to the size
-            returnVal.setSize(new HexNum(Integer.parseInt(args)));
+            
+            // increment the locctr by the number of bytes in RESB
+            // since this can be a large number, directly increment it
+            this.locctr = this.locctr.add(new HexNum(args, NumSystem.DEC));
         } else if (mnemonic.equals("RESW")) {
             // set 3 * args to the size
-            returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
+            // since this can be a large number, directly increment it
+            this.locctr = this.locctr.add(new HexNum(3 * Integer.parseInt(args)));
         } else {
             logger.warning("Error: Invalid ASM mnemonic '" + mnemonic + "'");
         }

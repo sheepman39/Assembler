@@ -97,7 +97,11 @@ class Main {
             }
 
             // Update the length of the record
-            textRecord.replace(7, 9, Integer.toHexString(textRecord.length()));
+            // since it is needed in bytes, we need to divide by 2 and round up
+            int length = textRecord.length() - 9;
+            length = (int)Math.ceil(length / 2.0);
+            HexNum size = new HexNum(length);
+            textRecord.replace(7, 9, size.toString(2));
 
             // Add the text record to the file
             try{
