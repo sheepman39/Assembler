@@ -64,6 +64,7 @@ class Main {
 
         // store the start to handle sizes
         HexNum start = new HexNum(factory.getStart().getDec());
+        int tmpSize = 0;
 
         // Create the StringBuilder that will add each component
         StringBuilder textRecord = new StringBuilder();
@@ -90,10 +91,12 @@ class Main {
                 logger.info("Directive Keyword:" + ((DirectiveStatement) queue.peek()).getDirective());
             }
 
-            while(!queue.isEmpty() && (textRecord.length() + queue.peek().getSize().getDec() < 70)) {
+            tmpSize = textRecord.length();
+            while(!queue.isEmpty() && (tmpSize + queue.peek().assemble().length()  < 70)) {
                 statement = queue.poll();
                 textRecord.append(statement.assemble());
                 start = start.add(statement.getSize());
+                tmpSize = tmpSize + statement.getSize().getDec() * 2;
             }
 
             // Update the length of the record
