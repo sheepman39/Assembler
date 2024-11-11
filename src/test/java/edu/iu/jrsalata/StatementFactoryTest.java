@@ -1,18 +1,23 @@
 package edu.iu.jrsalata;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Logger;
 import java.io.File;
 import java.io.InputStream;
 import org.junit.Test;
 
 public class StatementFactoryTest {
 
+    Logger logger = Logger.getLogger(getClass().getName());
+
     @Test
     public void testAsm1() {
         // read the input file and create a list of statements
+        // clear the symtable
+        SymTable.clear();
         ArrayList<Statement> statements = new ArrayList<Statement>();
         StatementFactory statementFactory = new StatementFactory();
         try {
@@ -35,16 +40,13 @@ public class StatementFactoryTest {
             for (Statement statement : statements) {
                 if (sc.hasNextLine()) {
                     String line = sc.nextLine();
-                    System.out.println("INFO: " + line.toUpperCase() + " " + statement.assemble().toUpperCase());
-                    assertTrue(line.toUpperCase().equals(statement.assemble().toUpperCase()));
-
+                    assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
                 }
             }
             sc.close();
 
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+            logger.severe(e.getMessage());
         }
     }
 }

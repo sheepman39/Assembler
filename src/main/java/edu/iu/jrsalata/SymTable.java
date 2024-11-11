@@ -11,8 +11,8 @@ public class SymTable {
     private static HashMap<String, HexNum> symbolTable;
 
     // constructor
-    public SymTable() {
-        createIfNotExists();
+    // private because we don't need to instantiate this class
+    private SymTable() {
     }
 
     public static void addSymbol(String symbol, HexNum location) {
@@ -30,9 +30,14 @@ public class SymTable {
         return symbolTable.containsKey(symbol);
     }
 
+    public static void clear() {
+        createIfNotExists();
+        symbolTable.clear();
+    }
+
     private static void createIfNotExists() {
         if (symbolTable == null) {
-            symbolTable = new HashMap<String, HexNum>();
+            symbolTable = new HashMap<>();
         }
     }
 }

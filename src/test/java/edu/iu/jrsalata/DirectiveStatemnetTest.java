@@ -1,6 +1,6 @@
 package edu.iu.jrsalata;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
@@ -9,18 +9,18 @@ public class DirectiveStatemnetTest {
     @Test
     public void testDefaultConstructor() {
         DirectiveStatement directiveStatement = new DirectiveStatement();
-        assertTrue(directiveStatement.getDirective().equals(""));
-        assertTrue(directiveStatement.assemble() == "");
-        assertTrue(directiveStatement.getSize().getDec() == 0);
+        assertEquals("", directiveStatement.getDirective());
+        assertEquals("", directiveStatement.assemble());
+        assertEquals(0, directiveStatement.getSize().getDec());
     }
 
     @Test
     public void testConstructor() {
         DirectiveStatement directiveStatement = new DirectiveStatement("START");
-        assertTrue(directiveStatement.getDirective().equals("START"));
-        assertTrue(directiveStatement.getSize().getDec() == 0);
+        assertEquals("START", directiveStatement.getDirective());
+        assertEquals(0, directiveStatement.getSize().getDec());
         directiveStatement.setDirective("END");
-        assertTrue(directiveStatement.getDirective().equals("END"));
+        assertEquals("END", directiveStatement.getDirective());
     }
 
     @Test
@@ -28,8 +28,8 @@ public class DirectiveStatemnetTest {
         HexNum size = new HexNum(3);
         DirectiveStatement directiveStatement = new DirectiveStatement();
         directiveStatement.setSize(size);
-        assertTrue(directiveStatement.getSize().getDec() == 3);
+        assertEquals(3, directiveStatement.getSize().getDec());
         directiveStatement.setObjCode("F1");
-        assertTrue(directiveStatement.assemble().equals("F1"));
+        assertEquals("F1", directiveStatement.assemble());
     }
 }
