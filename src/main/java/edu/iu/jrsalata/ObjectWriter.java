@@ -10,7 +10,7 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 public class ObjectWriter implements ObjectWriterInterface {
-    static Logger logger = Logger.getLogger(Main.class.getName());
+    static Logger logger = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
     protected StatementFactoryInterface factory;
     protected Queue<Statement> queue;
@@ -107,7 +107,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             textRecord.append("--");
 
             // Col 10-69 is the text record
-            int test = queue.peek().getSize().getDec();
+            int test;
 
             tmpSize = textRecord.length();
             while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70)) {

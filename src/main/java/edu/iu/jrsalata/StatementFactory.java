@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
 import java.io.InputStream;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Class: StatementFactory
@@ -57,7 +58,7 @@ public class StatementFactory implements StatementFactoryInterface {
                 } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
-                    logger.warning("Error: Unexpected format '" + parts[1] + "' in instructions.txt");
+                    logger.log(Level.WARNING, "Error: Unexpected format '{0}'in instructions.txt", parts[1]);
                 }
 
                 this.formatTable.put(parts[0], newFormat);
@@ -98,9 +99,9 @@ public class StatementFactory implements StatementFactoryInterface {
 
     // get the length of the program
     public HexNum getLen() {
-        int start = this.start.getDec();
-        int end = this.locctr.getDec();
-        return new HexNum(end - start);
+        int lenStart = this.start.getDec();
+        int lenEnd = this.locctr.getDec();
+        return new HexNum(lenEnd - lenStart);
     }
 
     public String getName() {
@@ -163,7 +164,7 @@ public class StatementFactory implements StatementFactoryInterface {
             if (!SymTable.containsSymbol(label)) {
                 SymTable.addSymbol(label, this.locctr);
             } else {
-                logger.warning("Error: Duplicate label: " + label);
+                logger.log(Level.WARNING, "Error: Duplicate label: {0}", label);
             }
 
             mnemonic = parts[1];
@@ -195,7 +196,7 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             newStatement = handleAsmStatement(mnemonic, args);
         } else {
-            logger.severe("Error: Mnemonic" + mnemonic + " not found");
+            logger.log(Level.SEVERE, "Error: Mnemonic {0}  not found", mnemonic);
             return null;
         }
         this.locctr = this.locctr.add(newStatement.getSize());
@@ -234,7 +235,7 @@ public class StatementFactory implements StatementFactoryInterface {
             statement.setObjCode(args);
 
         } else {
-            logger.warning("Error: Invalid BYTE argument '" + args + "'");
+            logger.log(Level.WARNING, "Error: Invalid BYTE argument '{0}'", args);
         }
     }
 
@@ -262,7 +263,7 @@ public class StatementFactory implements StatementFactoryInterface {
             // set 3 * args to the size
             returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
         } else {
-            logger.warning("Error: Invalid ASM mnemonic '" + mnemonic + "'");
+            logger.log(Level.WARNING, "Error: Invalid ASM mnemonic '{0}'", mnemonic);
         }
         return returnVal;
     }
@@ -296,7 +297,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // TODO: This is a bit of a hack, but it works for now
         if (reg1 == null) {
-            logger.warning("Error: Register: " + args + " is invalid");
+            logger.log(Level.WARNING, "Error: Register: {0} is invalid", args);
         } else if (reg2 == null && reg1 != null) {
             returnVal.setReg1(reg1);
         } else {

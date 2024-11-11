@@ -11,22 +11,22 @@ public class HexNumTest {
 
         // Test default input
         HexNum hexNum = new HexNum();
-        assertEquals(hexNum.getDec(), 0);
-        assertEquals(hexNum.toString(), "0");
+        assertEquals(0, hexNum.getDec());
+        assertEquals("0", hexNum.toString());
 
         // Test decimal input
         HexNum hexNum2 = new HexNum(255);
-        assertEquals(hexNum2.getDec(), 255);
-        assertEquals(hexNum2.toString(), "ff");
+        assertEquals(255, hexNum2.getDec());
+        assertEquals("ff", hexNum2.toString());
 
         // Test hex input
         HexNum hexNum3 = new HexNum("a", NumSystem.HEX);
-        assertEquals(hexNum3.getDec(), 10);
-        assertEquals(hexNum3.toString(), "a");
+        assertEquals(10, hexNum3.getDec());
+        assertEquals("a", hexNum3.toString());
 
         // Test binary input
         HexNum hexNum4 = new HexNum("1110", NumSystem.BIN);
-        assertEquals(hexNum4.getDec(), 14);
+        assertEquals(14, hexNum4.getDec());
     }
 
     @Test
@@ -35,14 +35,14 @@ public class HexNumTest {
         // test adding an int to a HexNum
         HexNum hexNum = new HexNum(10);
         hexNum = hexNum.add(5);
-        assertEquals(hexNum.getDec(), 15);
-        assertEquals(hexNum.toString(), "f");
+        assertEquals(15, hexNum.getDec());
+        assertEquals("f", hexNum.toString());
 
         // test adding a negative int
         HexNum hexNum2 = new HexNum(10);
         hexNum2 = hexNum2.add(-5);
-        assertEquals(hexNum2.getDec(), 5);
-        assertEquals(hexNum2.toString(), "5");
+        assertEquals(5, hexNum2.getDec());
+        assertEquals("5", hexNum2.toString());
     }
 
     @Test
@@ -52,8 +52,8 @@ public class HexNumTest {
         HexNum hexNum1 = new HexNum(10);
         HexNum hexNum2 = new HexNum(6);
         HexNum result = hexNum1.add(hexNum2);
-        assertEquals(result.getDec(), 16);
-        assertEquals(result.toString(), "10");
+        assertEquals(16, result.getDec());
+        assertEquals("10", result.toString());
     }
 
     @Test
@@ -62,18 +62,18 @@ public class HexNumTest {
         // test setting a HexNum with an int
         HexNum hexNum = new HexNum();
         hexNum.set(10);
-        assertEquals(hexNum.getDec(), 10);
-        assertEquals(hexNum.toString(), "a");
+        assertEquals(10, hexNum.getDec());
+        assertEquals("a", hexNum.toString());
 
         // test setting a HexNum with a binary string
         hexNum.set("1011", NumSystem.BIN);
-        assertEquals(hexNum.getDec(), 11);
-        assertEquals(hexNum.toString(), "b");
+        assertEquals(11, hexNum.getDec());
+        assertEquals("b", hexNum.toString());
 
         // test setting a HexNum with a hex string
         hexNum.set("ff", NumSystem.HEX);
-        assertEquals(hexNum.getDec(), 255);
-        assertEquals(hexNum.toString(), "ff");
+        assertEquals(255, hexNum.getDec());
+        assertEquals("ff", hexNum.toString());
     }
 
     @Test
@@ -81,15 +81,15 @@ public class HexNumTest {
 
         // test toString with digits
         HexNum hexNum = new HexNum(10);
-        assertEquals(hexNum.toString(4), "000a");
-        assertEquals(hexNum.toString(3), "00a");
-        assertEquals(hexNum.toString(2), "0a");
-        assertEquals(hexNum.toString(1), "a");
+        assertEquals("000a", hexNum.toString(4));
+        assertEquals("00a", hexNum.toString(3));
+        assertEquals("0a", hexNum.toString(2));
+        assertEquals("a", hexNum.toString(1));
 
         HexNum hexNum2 = new HexNum("ff", NumSystem.HEX);
-        assertEquals(hexNum2.toString(4), "00ff");
-        assertEquals(hexNum2.toString(3), "0ff");
-        assertEquals(hexNum2.toString(2), "ff");
-        assertEquals(hexNum2.toString(1), "ff");
+        assertEquals("00ff", hexNum2.toString(4));
+        assertEquals("0ff", hexNum2.toString(3));
+        assertEquals("ff", hexNum2.toString(2));
+        assertEquals("ff", hexNum2.toString(1));
     }
 }

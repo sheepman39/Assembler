@@ -9,9 +9,9 @@ public class ExtendedStatementTest {
     @Test
     public void testDefaultConstructor() {
         ExtendedStatement extendedStatement = new ExtendedStatement();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "030000");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("030000", extendedStatement.assemble());
     }
 
     @Test
@@ -20,9 +20,9 @@ public class ExtendedStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "#222");
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "650222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("650222", extendedStatement.assemble());
     }
 
     @Test
@@ -31,9 +31,9 @@ public class ExtendedStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "@222");
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "660222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("660222", extendedStatement.assemble());
     }
 
     @Test
@@ -43,9 +43,9 @@ public class ExtendedStatementTest {
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222");
         extendedStatement.setBFlag();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "674222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("674222", extendedStatement.assemble());
     }
 
     @Test
@@ -55,9 +55,9 @@ public class ExtendedStatementTest {
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222");
         extendedStatement.setPFlag();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "672222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("672222", extendedStatement.assemble());
     }
 
     @Test
@@ -66,9 +66,9 @@ public class ExtendedStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222, X");
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "1b8222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("1b8222", extendedStatement.assemble());
     }
 
     @Test
@@ -78,9 +78,9 @@ public class ExtendedStatementTest {
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222, X");
         extendedStatement.setBFlag();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 3);
-        assertEquals(extendedStatement.assemble(), "67c222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(3, extendedStatement.getSize().getDec());
+        assertEquals("67c222", extendedStatement.assemble());
     }
 
     @Test
@@ -90,9 +90,9 @@ public class ExtendedStatementTest {
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "2222");
         extendedStatement.setEFlag();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 4);
-        assertEquals(extendedStatement.assemble(), "6712222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(4, extendedStatement.getSize().getDec());
+        assertEquals("6712222", extendedStatement.assemble());
     }
 
     @Test
@@ -102,8 +102,8 @@ public class ExtendedStatementTest {
         HexNum opcode = new HexNum("64", NumSystem.HEX);
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "2222, X");
         extendedStatement.setEFlag();
-        assertEquals(extendedStatement.getLocation().getDec(), 0);
-        assertEquals(extendedStatement.getSize().getDec(), 4);
-        assertEquals(extendedStatement.assemble(), "6792222");
+        assertEquals(0, extendedStatement.getLocation().getDec());
+        assertEquals(4, extendedStatement.getSize().getDec());
+        assertEquals("6792222", extendedStatement.assemble());
     }
 }

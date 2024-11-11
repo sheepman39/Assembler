@@ -9,9 +9,9 @@ public class SingleStatementTest {
     @Test
     public void testDefaultConstructor() {
         SingleStatement statement = new SingleStatement();
-        assertEquals(statement.getLocation().getDec(), 0);
-        assertEquals(statement.getSize().getDec(), 1);
-        assertEquals(statement.assemble(), "00");
+        assertEquals(0, statement.getLocation().getDec());
+        assertEquals(1, statement.getSize().getDec());
+        assertEquals("00", statement.assemble());
     }
 
     @Test
@@ -19,9 +19,9 @@ public class SingleStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("C4", NumSystem.HEX);
         SingleStatement statement = new SingleStatement(location, opcode);
-        assertEquals(statement.getLocation().getDec(), 0);
-        assertEquals(statement.getSize().getDec(), 1);
-        assertEquals(statement.assemble(), "C4");
+        assertEquals(0, statement.getLocation().getDec());
+        assertEquals(1, statement.getSize().getDec());
+        assertEquals("C4", statement.assemble());
     }
 
     @Test
@@ -29,9 +29,9 @@ public class SingleStatementTest {
         HexNum location = new HexNum(100);
         HexNum opcode = new HexNum("D8", NumSystem.HEX);
         SingleStatement statement = new SingleStatement(location, opcode);
-        assertEquals(statement.getLocation().getDec(), 100);
-        assertEquals(statement.getLocation().toString(), "64");
-        assertEquals(statement.getSize().getDec(), 1);
-        assertEquals(statement.assemble(), "D8");
+        assertEquals(100, statement.getLocation().getDec());
+        assertEquals("64", statement.getLocation().toString());
+        assertEquals(1, statement.getSize().getDec());
+        assertEquals("D8", statement.assemble());
     }
 }

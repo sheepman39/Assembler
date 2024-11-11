@@ -9,18 +9,18 @@ public class DirectiveStatemnetTest {
     @Test
     public void testDefaultConstructor() {
         DirectiveStatement directiveStatement = new DirectiveStatement();
-        assertEquals(directiveStatement.getDirective(), "");
-        assertEquals(directiveStatement.assemble(), "");
-        assertEquals(directiveStatement.getSize().getDec(), 0);
+        assertEquals("", directiveStatement.getDirective());
+        assertEquals("", directiveStatement.assemble());
+        assertEquals(0, directiveStatement.getSize().getDec());
     }
 
     @Test
     public void testConstructor() {
         DirectiveStatement directiveStatement = new DirectiveStatement("START");
-        assertEquals(directiveStatement.getDirective(), "START");
-        assertEquals(directiveStatement.getSize().getDec(), 0);
+        assertEquals("START", directiveStatement.getDirective());
+        assertEquals(0, directiveStatement.getSize().getDec());
         directiveStatement.setDirective("END");
-        assertEquals(directiveStatement.getDirective(), "END");
+        assertEquals("END", directiveStatement.getDirective());
     }
 
     @Test
@@ -30,6 +30,6 @@ public class DirectiveStatemnetTest {
         directiveStatement.setSize(size);
         assertEquals(directiveStatement.getSize().getDec(), 3);
         directiveStatement.setObjCode("F1");
-        assertEquals(directiveStatement.assemble(), "F1");
+        assertEquals("F1", directiveStatement.assemble());
     }
 }

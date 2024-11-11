@@ -9,9 +9,9 @@ public class RegisterStatementTest {
     @Test
     public void testDefaultConstructor() {
         RegisterStatement registerStatement = new RegisterStatement();
-        assertEquals(registerStatement.getLocation().getDec(), 0);
-        assertEquals(registerStatement.getSize().getDec(), 2);
-        assertEquals(registerStatement.assemble(), "0000");
+        assertEquals(0, registerStatement.getLocation().getDec());
+        assertEquals(2, registerStatement.getSize().getDec());
+        assertEquals("0000", registerStatement.assemble());
     }
 
     @Test
@@ -23,9 +23,9 @@ public class RegisterStatementTest {
         HexNum opcode = new HexNum("A0", NumSystem.HEX);
         HexNum reg1 = new HexNum(3);
         RegisterStatement registerStatement = new RegisterStatement(location, opcode, reg1);
-        assertEquals(registerStatement.getLocation().getDec(), 10);
-        assertEquals(registerStatement.getSize().getDec(), 2);
-        assertEquals(registerStatement.assemble(), "A030");
+        assertEquals(10, registerStatement.getLocation().getDec());
+        assertEquals(2, registerStatement.getSize().getDec());
+        assertEquals("A030", registerStatement.assemble());
     }
 
     @Test
@@ -38,9 +38,9 @@ public class RegisterStatementTest {
         HexNum reg1 = new HexNum(2);
         HexNum reg2 = new HexNum(3);
         RegisterStatement registerStatement = new RegisterStatement(location, opcode, reg1, reg2);
-        assertEquals(registerStatement.getLocation().getDec(), 0);
-        assertEquals(registerStatement.getSize().getDec(), 2);
-        assertEquals(registerStatement.assemble(), "A023");
+        assertEquals(0, registerStatement.getLocation().getDec());
+        assertEquals(2, registerStatement.getSize().getDec());
+        assertEquals("A023", registerStatement.assemble());
     }
 
 }

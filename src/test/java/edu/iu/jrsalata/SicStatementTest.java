@@ -8,9 +8,9 @@ public class SicStatementTest {
     @Test
     public void testDefaultConstructor() {
         SicStatement sicStatement = new SicStatement();
-        assertEquals(sicStatement.getLocation().getDec(), 0);
-        assertEquals(sicStatement.getSize().getDec(), 3);
-        assertEquals(sicStatement.assemble(), "000000");
+        assertEquals(0, sicStatement.getLocation().getDec());
+        assertEquals(3, sicStatement.getSize().getDec());
+        assertEquals("000000", sicStatement.assemble());
     }
 
     @Test
@@ -18,9 +18,9 @@ public class SicStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
         SicStatement sicStatement = new SicStatement(location, opcode, "000");
-        assertEquals(sicStatement.getLocation().getDec(), 0);
-        assertEquals(sicStatement.getSize().getDec(), 3);
-        assertEquals(sicStatement.assemble(), "180000");
+        assertEquals(0, sicStatement.getLocation().getDec());
+        assertEquals(3, sicStatement.getSize().getDec());
+        assertEquals("180000", sicStatement.assemble());
     }
 
     @Test
@@ -28,8 +28,8 @@ public class SicStatementTest {
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("18", NumSystem.HEX);
         SicStatement sicStatement = new SicStatement(location, opcode, "020, X");
-        assertEquals(sicStatement.getLocation().getDec(), 0);
-        assertEquals(sicStatement.getSize().getDec(), 3);
-        assertEquals(sicStatement.assemble(), "188020");
+        assertEquals(0, sicStatement.getLocation().getDec());
+        assertEquals(3, sicStatement.getSize().getDec());
+        assertEquals("188020", sicStatement.assemble());
     }
 }
