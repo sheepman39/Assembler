@@ -19,7 +19,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     public ObjectWriter() {
         this.fileName = "output.obj";
         this.factory = new StatementFactory();
-        this.queue = new LinkedList<Statement>();
+        this.queue = new LinkedList<>();
     }
 
     public ObjectWriter(String fileName, StatementFactoryInterface factory, Queue<Statement> queue) {
@@ -107,8 +107,6 @@ public class ObjectWriter implements ObjectWriterInterface {
             textRecord.append("--");
 
             // Col 10-69 is the text record
-            int test;
-
             tmpSize = textRecord.length();
             while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70)) {
                 statement = queue.poll();

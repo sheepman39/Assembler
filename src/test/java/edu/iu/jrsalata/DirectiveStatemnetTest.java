@@ -28,7 +28,7 @@ public class DirectiveStatemnetTest {
         HexNum size = new HexNum(3);
         DirectiveStatement directiveStatement = new DirectiveStatement();
         directiveStatement.setSize(size);
-        assertEquals(directiveStatement.getSize().getDec(), 3);
+        assertEquals(3, directiveStatement.getSize().getDec());
         directiveStatement.setObjCode("F1");
         assertEquals("F1", directiveStatement.assemble());
     }

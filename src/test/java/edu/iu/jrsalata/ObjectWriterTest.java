@@ -2,15 +2,12 @@ package edu.iu.jrsalata;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.Queue;
 import java.util.LinkedList;
-import java.util.logging.Logger;
 import org.junit.Test;
 
 public class ObjectWriterTest {

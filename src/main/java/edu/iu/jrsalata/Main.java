@@ -1,13 +1,10 @@
 package edu.iu.jrsalata;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.io.FileWriter;
 import java.io.File;
 import java.util.Scanner;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.logging.Logger;
 
 class Main {
@@ -27,7 +24,7 @@ class Main {
     public static Queue<Statement> fileInput(String filename, StatementFactoryInterface factory) {
 
         // create the ArrayList that will be returned
-        Queue<Statement> queue = new LinkedList<Statement>();
+        Queue<Statement> queue = new LinkedList<>();
 
         // open up a new file and read the string
         // parse the string and create a list of lines

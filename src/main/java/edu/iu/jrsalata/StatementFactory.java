@@ -58,7 +58,7 @@ public class StatementFactory implements StatementFactoryInterface {
                 } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
-                    logger.log(Level.WARNING, "Error: Unexpected format '{0}'in instructions.txt", parts[1]);
+                    logger.log(Level.WARNING, "Error: Unexpected format '{}'in instructions.txt", parts[1]);
                 }
 
                 this.formatTable.put(parts[0], newFormat);
@@ -164,7 +164,7 @@ public class StatementFactory implements StatementFactoryInterface {
             if (!SymTable.containsSymbol(label)) {
                 SymTable.addSymbol(label, this.locctr);
             } else {
-                logger.log(Level.WARNING, "Error: Duplicate label: {0}", label);
+                logger.log(Level.WARNING, "Error: Duplicate label: {}", label);
             }
 
             mnemonic = parts[1];
@@ -196,7 +196,7 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
             newStatement = handleAsmStatement(mnemonic, args);
         } else {
-            logger.log(Level.SEVERE, "Error: Mnemonic {0}  not found", mnemonic);
+            logger.log(Level.SEVERE, "Error: Mnemonic {}  not found", mnemonic);
             return null;
         }
         this.locctr = this.locctr.add(newStatement.getSize());
@@ -235,7 +235,7 @@ public class StatementFactory implements StatementFactoryInterface {
             statement.setObjCode(args);
 
         } else {
-            logger.log(Level.WARNING, "Error: Invalid BYTE argument '{0}'", args);
+            logger.log(Level.WARNING, "Error: Invalid BYTE argument '{}'", args);
         }
     }
 
@@ -263,7 +263,7 @@ public class StatementFactory implements StatementFactoryInterface {
             // set 3 * args to the size
             returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
         } else {
-            logger.log(Level.WARNING, "Error: Invalid ASM mnemonic '{0}'", mnemonic);
+            logger.log(Level.WARNING, "Error: Invalid ASM mnemonic '{}'", mnemonic);
         }
         return returnVal;
     }
@@ -297,7 +297,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // TODO: This is a bit of a hack, but it works for now
         if (reg1 == null) {
-            logger.log(Level.WARNING, "Error: Register: {0} is invalid", args);
+            logger.log(Level.WARNING, "Error: Register: {} is invalid", args);
         } else if (reg2 == null && reg1 != null) {
             returnVal.setReg1(reg1);
         } else {
