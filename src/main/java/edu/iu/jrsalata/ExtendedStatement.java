@@ -3,15 +3,15 @@
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
 
-public class ExtendedStatement extends Statement {
+public class ExtendedStatement extends BaseStatement {
 
-    String args;
-    boolean nFlag = false;
-    boolean iFlag = false;
-    boolean xFlag = false;
-    boolean bFlag = false;
-    boolean pFlag = false;
-    boolean eFlag = false;
+    protected String args;
+    protected boolean nFlag = false;
+    protected boolean iFlag = false;
+    protected boolean xFlag = false;
+    protected boolean bFlag = false;
+    protected boolean pFlag = false;
+    protected boolean eFlag = false;
 
     // constructors
     public ExtendedStatement() {
@@ -80,15 +80,15 @@ public class ExtendedStatement extends Statement {
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
-        // NOTE: if n=0, i=0, it is an SIC instruction
-        if (this.args.charAt(0) == '#') {
+        if (this.args.length() == 0) {
+            return this.opcode.toString(2) + "0000";
+        } else if (this.args.charAt(0) == '#') {
             this.setIFlag();
             this.args = this.args.substring(1);
         } else if (this.args.charAt(0) == '@') {
             this.setNFlag();
             this.args = this.args.substring(1);
         } else {
-            // NOTE: include SIC compatibility
             this.setIFlag();
             this.setNFlag();
         }
@@ -106,15 +106,17 @@ public class ExtendedStatement extends Statement {
 
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
-
+        HexNum argValue;
         // look up if args is in the symbolTable
-        if (Main.symbolTable.containsKey(this.args)) {
-            HexNum argValue = Main.symbolTable.get(this.args);
-            return first.toString(2) + third.toString() + argValue.toString(this.size.getDec());
+        if (SymTable.containsSymbol(this.args)) {
+            argValue = SymTable.getSymbol(this.args);
+            return first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         }
 
-        String returnVal = first.toString(2) + third.toString() + this.args;
+        // if not, assume it is a hex number
+        argValue = new HexNum(this.args, NumSystem.HEX);
+
+        String returnVal = first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         return returnVal;
     }
-
 }

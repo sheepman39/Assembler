@@ -67,6 +67,24 @@ public class HexNum {
         return this.convertToDec(this.value, NumSystem.HEX);
     }
 
+    public String getBin() {
+        return Integer.toBinaryString(this.getDec());
+    }
+
+    public String getBin(int digits) {
+        String binary = Integer.toBinaryString(this.getDec());
+        if (binary.length() < digits) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < digits - binary.length(); i++) {
+                sb.append("0");
+            }
+            sb.append(binary);
+            return sb.toString();
+        } else {
+            return binary;
+        }
+    }
+
     // private method for converting values to hex
     private String convertToHex(String value, NumSystem numSystem) {
 

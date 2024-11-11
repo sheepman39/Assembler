@@ -3,7 +3,7 @@
 // Handles a statement in Format 2, which contains 1 or 2 registers
 package edu.iu.jrsalata;
 
-public class RegisterStatement extends Statement {
+public class RegisterStatement extends BaseStatement {
     HexNum reg1, reg2;
 
     // constructors
@@ -40,9 +40,13 @@ public class RegisterStatement extends Statement {
         this.reg2 = reg2;
     }
 
+    public void setOpcode(HexNum opcode) {
+        this.opcode = opcode;
+    }
+
     // assembler
     @Override
     public String assemble() {
-        return this.opcode.toString() + this.reg1.toString() + this.reg2.toString();
+        return this.opcode.toString(2) + this.reg1.toString(1) + this.reg2.toString(1);
     }
 }

@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.io.File;
 import java.util.Scanner;
 import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 // Class: StatementFactory
 // Implements: StatementFactoryInterfac e
@@ -12,9 +14,12 @@ public class StatementFactory implements StatementFactoryInterface {
 
     // locctr keeps track of the current location of each statement
     protected HexNum locctr;
+    protected HexNum start = new HexNum(0);
+    protected String name = "";
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
     protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
+    Logger logger = Logger.getLogger(getClass().getName());
 
     // constructor
     public StatementFactory() {
@@ -48,10 +53,12 @@ public class StatementFactory implements StatementFactoryInterface {
                     newFormat = Format.TWO;
                 } else if (parts[1].equals("3")) {
                     newFormat = Format.THREE;
+                } else if (parts[1].equals("SIC")) {
+                    newFormat = Format.SIC;
                 } else if (parts[1].equals("ASM")) {
                     newFormat = Format.ASM;
                 } else {
-                    System.out.println("Error: Unexpected format in instructions.txt");
+                    logger.log(Level.WARNING, "Error: Unexpected format '{}'in instructions.txt", parts[1]);
                 }
 
                 this.formatTable.put(parts[0], newFormat);
@@ -60,8 +67,8 @@ public class StatementFactory implements StatementFactoryInterface {
             // close the scanner
             sc.close();
         } catch (Exception e) {
-            System.out.println("Error: Could not find instructions.txt");
-            System.err.println(e);
+            logger.warning("Error: Could not find instructions.txt");
+            logger.warning(e.getMessage());
         }
 
         // add all of the registers to the table
@@ -80,8 +87,42 @@ public class StatementFactory implements StatementFactoryInterface {
             // close the scanner
             sc.close();
         } catch (Exception e) {
-            System.out.println("Error: Could not find registers.txt");
-            System.err.println(e);
+            logger.warning("Error: Could not find registers.txt");
+            logger.warning(e.getMessage());
+        }
+    }
+
+    // get the start location
+    public HexNum getStart() {
+        return this.start;
+    }
+
+    // get the length of the program
+    public HexNum getLen() {
+        int lenStart = this.start.getDec();
+        int lenEnd = this.locctr.getDec();
+        return new HexNum(lenEnd - lenStart);
+    }
+
+    public String getName() {
+
+        // name needs to be exactly six characters long
+        // if we have no name, default is OBJECT
+        // if the name is longer than 6, truncate it
+        // if the name is shorter than 6, pad it with spaces at the end
+        // if the name is exactly 6, return it
+        if (this.name.equals("")) {
+            return "OUTPUT";
+        } else if (this.name.length() > 6) {
+            return this.name.substring(0, 6).toUpperCase();
+        } else if (this.name.length() < 6) {
+            StringBuilder sb = new StringBuilder(this.name);
+            for (int i = 0; i < 6 - this.name.length(); i++) {
+                sb.append(" ");
+            }
+            return sb.toString().toUpperCase();
+        } else {
+            return this.name.toUpperCase();
         }
     }
 
@@ -120,17 +161,21 @@ public class StatementFactory implements StatementFactoryInterface {
             String label = parts[0];
 
             // add the label with the to the symbol table
-            if (!Main.symbolTable.containsKey(label)) {
-                Main.symbolTable.put(label, this.locctr);
+            if (!SymTable.containsSymbol(label)) {
+                SymTable.addSymbol(label, this.locctr);
             } else {
-                System.out.println("Error: Duplicate label: " + label);
+                logger.log(Level.WARNING, "Error: Duplicate label: {}", label);
             }
 
             mnemonic = parts[1];
             args = parts[2];
+
+            if (mnemonic.equals("START")) {
+                this.name = label;
+            }
         } else {
             // throw an exception
-            System.out.println("Error: Invalid number of arguments");
+            logger.warning("Error: Invalid number of arguments");
         }
 
         // since some mnemonics may contain '+' at the beginning, we want to remove it
@@ -146,37 +191,81 @@ public class StatementFactory implements StatementFactoryInterface {
             newStatement = createRegStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.THREE) {
             newStatement = createExtStatement(mnemonic, args, eFlag);
+        } else if (this.formatTable.get(mnemonic) == Format.SIC) {
+            newStatement = createSicStatement(mnemonic, args);
         } else if (this.formatTable.get(mnemonic) == Format.ASM) {
-            handleAsmStatement(mnemonic, args);
-            return null;
+            newStatement = handleAsmStatement(mnemonic, args);
         } else {
-            System.out.println("Error: Format not found");
-            System.out.println("Mnemonic: " + mnemonic);
+            logger.log(Level.SEVERE, "Error: Mnemonic {}  not found", mnemonic);
             return null;
         }
         this.locctr = this.locctr.add(newStatement.getSize());
         return newStatement;
     }
 
-    private void handleAsmStatement(String mnemonic, String args) {
+    private void handleByte(String args, DirectiveStatement statement) {
+        // check if the first char is C or X
+        // C represents a constant string whose length is the length of the string
+        // the object code of C is the ASCII value of each character in the string
+        // X represents an object code whose length is 1 and the object code is the arg
+        if (args.charAt(0) == 'C') {
+
+            // remove the C and the ' at the end
+            args = args.substring(2, args.length() - 1);
+
+            // set the size to the length of the string
+            statement.setSize(new HexNum(args.length()));
+
+            // set the object code to the ASCII value of each character
+            String objCode = "";
+            for (int i = 0; i < args.length(); i++) {
+                objCode += Integer.toHexString(args.charAt(i));
+            }
+            statement.setObjCode(objCode);
+
+        } else if (args.charAt(0) == 'X') {
+
+            // remove the X and the ' at the end
+            args = args.substring(2, args.length() - 1);
+
+            // set the size to 1
+            statement.setSize(new HexNum(1));
+
+            // set the object code to the arg
+            statement.setObjCode(args);
+
+        } else {
+            logger.log(Level.WARNING, "Error: Invalid BYTE argument '{}'", args);
+        }
+    }
+
+    private Statement handleAsmStatement(String mnemonic, String args) {
+
+        DirectiveStatement returnVal = new DirectiveStatement();
+        returnVal.setDirective(mnemonic);
         if (mnemonic.equals("START")) {
             this.locctr = new HexNum(args, NumSystem.HEX);
+            this.start = new HexNum(this.locctr.getDec());
         } else if (mnemonic.equals("END")) {
             // do nothing
         } else if (mnemonic.equals("BYTE")) {
-            // add the size of the byte to the locctr
+            // move BYTE logic to other method for cleanliness
+            handleByte(args, returnVal);
         } else if (mnemonic.equals("WORD")) {
-            // add 3 to the locctr
-            this.locctr = this.locctr.add(3);
+            // set size to 3 and set the object code
+            returnVal.setSize(new HexNum(3));
+            returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
         } else if (mnemonic.equals("RESB")) {
-            // add args to the locctr
-            this.locctr = this.locctr.add(Integer.parseInt(args));
+            // set the args to the size
+            returnVal.setSize(new HexNum(args, NumSystem.DEC));
+
         } else if (mnemonic.equals("RESW")) {
-            // add 3 * args to the locctr
-            this.locctr = this.locctr.add(3 * Integer.parseInt(args));
+            // set 3 * args to the size
+            returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
         } else {
-            System.out.println("Error: Invalid ASM mnemonic");
+            logger.log(Level.WARNING, "Error: Invalid ASM mnemonic '{}'", mnemonic);
         }
+        return returnVal;
     }
 
     private Statement createStatement(String mnemonic, String args) {
@@ -187,18 +276,19 @@ public class StatementFactory implements StatementFactoryInterface {
     }
 
     private Statement createRegStatement(String mnemonic, String args) {
-        
+
         // Statement to return
         RegisterStatement returnVal = new RegisterStatement();
         returnVal.setLocation(this.locctr);
 
         // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
+        returnVal.setOpcode(opcode);
 
         // find both of the registers in parts[1]
         String[] registers = args.split(",");
         if (registers.length > 2 || registers.length <= 0) {
-            System.out.println("Error: Invalid number of registers for format 2");
+            logger.warning("Error: Invalid number of registers for format 2");
         }
 
         // find each of the registers in the registerTable
@@ -207,7 +297,7 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // TODO: This is a bit of a hack, but it works for now
         if (reg1 == null) {
-            System.out.println("Error: Register: " + registers[0] + " is invalid");
+            logger.log(Level.WARNING, "Error: Register: {} is invalid", args);
         } else if (reg2 == null && reg1 != null) {
             returnVal.setReg1(reg1);
         } else {
@@ -230,6 +320,17 @@ public class StatementFactory implements StatementFactoryInterface {
         if (eFlag) {
             returnVal.setEFlag();
         }
+
+        return returnVal;
+    }
+
+    private Statement createSicStatement(String mnemonic, String args) {
+
+        // find the opcode of the mnemonic
+        HexNum opcode = this.symbolTable.get(mnemonic);
+
+        // create the SICStatement
+        SicStatement returnVal = new SicStatement(this.locctr, opcode, args);
 
         return returnVal;
     }

@@ -4,41 +4,22 @@
 package edu.iu.jrsalata;
 
 public abstract class Statement {
-    protected HexNum opcode;
-    protected HexNum location;
     protected HexNum size;
-    protected int format;
 
     // constructors
-    public Statement() {
-        this.location = new HexNum();
-        this.opcode = new HexNum();
-        this.format = 1;
-        this.size = new HexNum(this.format);
+    protected Statement() {
+        this.size = new HexNum(0);
     }
 
-    public Statement(HexNum location, HexNum opcode) {
-        this.location = location;
-        this.opcode = opcode;
-        this.format = 1;
-        this.size = new HexNum(this.format);
+    protected Statement(HexNum size) {
+        this.size = size;
     }
 
-    // getters
     public HexNum getSize() {
         return this.size;
     }
 
-    public HexNum getLocation() {
-        return this.location;
-    }
-
-    // setters
-    public void setLocation(HexNum location) {
-        this.location = location;
-    }
-
     // this will be overridden by the subclasses
     // to assemble based on different formats
-    abstract public String assemble();
+    public abstract String assemble();
 }
