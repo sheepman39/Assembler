@@ -25,3 +25,7 @@ replay_pid*
 
 # maven target directory
 target/
+
+# vscode settings
+.vscode
+
