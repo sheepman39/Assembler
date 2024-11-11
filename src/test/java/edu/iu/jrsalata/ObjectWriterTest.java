@@ -30,7 +30,7 @@ public class ObjectWriterTest {
         writer.execute();
 
         // now compare the output between the two files
-        try{
+        try {
 
             // read the original compare file
             InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
@@ -43,7 +43,7 @@ public class ObjectWriterTest {
             Scanner scTest = new Scanner(test);
 
             // compare the two files
-            while(scControl.hasNextLine() && scTest.hasNextLine()) {
+            while (scControl.hasNextLine() && scTest.hasNextLine()) {
                 String lineControl = scControl.nextLine();
                 String lineTest = scTest.nextLine();
                 assertEquals(lineControl, lineTest);
