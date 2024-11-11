@@ -108,11 +108,6 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // Col 10-69 is the text record
             int test = queue.peek().getSize().getDec();
-            logger.info("Text Record Length: " + test);
-            logger.info("Record Assemble: " + queue.peek().assemble());
-            if (queue.peek() instanceof DirectiveStatement) {
-                logger.info("Directive Keyword:" + ((DirectiveStatement) queue.peek()).getDirective());
-            }
 
             tmpSize = textRecord.length();
             while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70)) {

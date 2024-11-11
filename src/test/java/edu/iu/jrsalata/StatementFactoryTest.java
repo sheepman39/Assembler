@@ -17,6 +17,8 @@ public class StatementFactoryTest {
     @Test
     public void testAsm1() {
         // read the input file and create a list of statements
+        // clear the symtable
+        SymTable.clear();
         ArrayList<Statement> statements = new ArrayList<Statement>();
         StatementFactory statementFactory = new StatementFactory();
         try {
@@ -39,9 +41,7 @@ public class StatementFactoryTest {
             for (Statement statement : statements) {
                 if (sc.hasNextLine()) {
                     String line = sc.nextLine();
-                    logger.info(line.toUpperCase() + " " + statement.assemble().toUpperCase());
                     assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
-
                 }
             }
             sc.close();

@@ -25,6 +25,11 @@ public class SymTable {
         return symbolTable.containsKey(symbol);
     }
 
+    public static void clear() {
+        createIfNotExists();
+        symbolTable.clear();
+    }
+
     private static void createIfNotExists() {
         if (symbolTable == null) {
             symbolTable = new HashMap<>();
