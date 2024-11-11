@@ -3,8 +3,63 @@
 ### Overview
 This is an SIC/XE assembler that is currently a work in progress.  SIC/XE is a hypothetical instruction set designed to make it easier to understand assembly and use those concepts on real-world architectures.  More information can be found in [this article](https://www.geeksforgeeks.org/sic-xe-architecture/). 
 
+### Requirements
+This project is written in Java 1.8 using Maven to help manage it.  In order to run this assembler, you must have java 1.8 installed.  You can check your current java version by running `java -version` in your terminal of choice.  You can install the JDK [here](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html).
+You can compile a jar file by running `mvn install` and executing the jar file using `java -jar target/<name of jar file>`
+
+### Usage
+#### Expected Input
+Right now, the input file is hardcoded to be `input.asm` in the root directory.  In the future, a flexible file selector will be used to allow different files to be used.  The file should look something like this:
+```
+. comments are marked by a period
+. this is an example of an SIC program
+NAME START 1000 . the left column represents the label, the middle column represents the operation, and the right column represents the operand
+. it should be noted that the spacing is purely aesthetic
+	LDS	#3	 .Initialize Register S to 3
+	LDT	#300 .Initialize Register T to 300
+	LDX	#0	 .Initialize Index Register to 0
+ADDLP	LDA	ALPHA,X	.Load Word from ALPHA into Register A
+	ADD	BETA,X	.Add Word From BETA
+	STA	GAMMA,X	.Store the Result in a work in GAMMA
+	ADDR	S,X	.ADD 3 to INDEX value
+	COMPR	X,T	.Compare new INDEX value to 300
+	JLT	ADDLP	.Loop if INDEX value is less than 300
+ALPHA	RESW	100
+BETA	RESW	100
+GAMMA	RESW	100
+```
+
+#### Output
+The output will be an object file called `output.obj`.  In the future, we will be able to select a filename.  The format of the object file will be
+```
+Header Record:
+Col. 1:       H
+Col. 2-7:    Program Name (START if none given)
+Col. 8-13:   Starting address of object program (hex)
+Col. 14-19: Length of object program in bytes (hex)
+
+Text Record:
+Col. 1:      T
+Col. 2-7:   Starting address for object code (hex)
+Col. 8-9:   Length of object code in this record in bytes (hex)
+Col. 10-69: Object code (hex)
+
+End Record:
+Col. 1:  E
+Col. 2-7: Address of first executable instruction in object program (hex)
+```
+and an example output will be
+```
+HCOPY  00100000107a
+T0010001e1410334820390010362810303010154820613C100300102a0C103900102d
+T00101e150C10364820610810334C0000454f46000003000000
+T0020391e041030001030E0205d30203fD8205d2810303020575490392C205e38203f
+T0020571c1010364C0000F1001000041030E02079302064509039DC20792C1036
+T002073073820644C000005
+E001000
+```
+
 #### SIC/XE Architecture
-This section will contain some important details about the SIC/XE Architecture.
 ##### Formats
 There are 4 formats in SIC/XE. 
 1. Format 1
@@ -23,11 +78,6 @@ There are 4 formats in SIC/XE.
 * 1 byte opcode and NI flags
 * 1/2 byte for BXPE flags
 * 5/2 byte for address
-
-
-### Requirements
-This project is written in Java 1.8 using Maven to help manage it.  In order to run this assembler, you must have java 1.8 installed.  You can check your current java version by running `java -version` in your terminal of choice.  You can install the JDK [here](https://www.oracle.com/java/technologies/javase-jdk8-downloads.html).
-
 
 ### Structure
 
@@ -114,55 +164,3 @@ This is used to differentiate between the different number systems that a proces
 * HEX
 * DEC
 * BIN
-
-### Usage
-#### Expected Input
-Right now, the input file is hardcoded to be `input.asm` in the root directory.  In the future, a flexible file selector will be used to allow different files to be used.  The file should look something like this:
-```
-. comments are marked by a period
-. this is an example of an SIC program
-NAME START 1000 . the left column represents the label, the middle column represents the operation, and the right column represents the operand
-. it should be noted that the spacing is purely aesthetic
-	LDS	#3	 .Initialize Register S to 3
-	LDT	#300 .Initialize Register T to 300
-	LDX	#0	 .Initialize Index Register to 0
-ADDLP	LDA	ALPHA,X	.Load Word from ALPHA into Register A
-	ADD	BETA,X	.Add Word From BETA
-	STA	GAMMA,X	.Store the Result in a work in GAMMA
-	ADDR	S,X	.ADD 3 to INDEX value
-	COMPR	X,T	.Compare new INDEX value to 300
-	JLT	ADDLP	.Loop if INDEX value is less than 300
-ALPHA	RESW	100
-BETA	RESW	100
-GAMMA	RESW	100
-```
-
-#### Output
-The output will be an object file called `output.obj`.  In the future, we will be able to select a filename.  The format of the object file will be
-```
-Header Record:
-Col. 1:       H
-Col. 2-7:    Program Name (START if none given)
-Col. 8-13:   Starting address of object program (hex)
-Col. 14-19: Length of object program in bytes (hex)
-
-Text Record:
-Col. 1:      T
-Col. 2-7:   Starting address for object code (hex)
-Col. 8-9:   Length of object code in this record in bytes (hex)
-Col. 10-69: Object code (hex)
-
-End Record:
-Col. 1:  E
-Col. 2-7: Address of first executable instruction in object program (hex)
-```
-and an example output will be
-```
-HCOPY  00100000107a
-T0010001e1410334820390010362810303010154820613C100300102a0C103900102d
-T00101e150C10364820610810334C0000454f46000003000000
-T0020391e041030001030E0205d30203fD8205d2810303020575490392C205e38203f
-T0020571c1010364C0000F1001000041030E02079302064509039DC20792C1036
-T002073073820644C000005
-E001000
-```
