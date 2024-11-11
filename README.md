@@ -74,6 +74,29 @@ This is a concrete class that represents statements in the original SIC architec
 ##### Extends Statement
 This is a concrete class that represents statements that are assembler directives.  It contains the directive and the operand needed to assemble the statement.  If it generates object code, it will return the object code.  Otherwise, it will return an empty string.  Assembler directives have many different types of behaviors and this ensures that they are handled uniformly.
 
+#### StatementFactoryInterface
+##### Interface
+The StatementFactoryInterface is an interface that contains the necessary methods to create and handle the creation of statements.  They include
+* `createStatement(String statement) : Statement`: This method takes a string and returns a statement object.
+* `getStart(void) : HexNum`: This method returns the starting address of the program.
+* `getLen(void) : HexNum`: This method returns the length of the program.
+* `getName(void) : String`: This method returns the name of the program.
+
+#### StatementFactory
+##### Implements StatementFactoryInterface
+This is a concrete class that implements the StatementFactoryInterface.  It contains the complex logic needed to create statements and handle the assembler directives.  
+
+#### ObjectWritterInterface
+##### Interface
+The ObjectWritterInterface is an interface that makes it easier writing to an object file. The methods it includes are
+* `setFileName(String fileName)` : This method sets the filename of the output object file.
+* `setFactory(StatementFactoryInterface factory)` : This method sets the factory that will be used to generate the object code. The factory is needed for the starting locations of the program.
+* `setQueue(Queue<Statement> queue)` : This method sets the queue that will be used to write to the object file. The queue should be generated from the `Statement` objects produced by the factory.
+* `execute(void)` : This method creates the object file
+
+#### ObjectWritter
+##### Implements ObjectWritterInterface
+This is a concrete class that implements the ObjectWritterInterface.  It contains the logic needed to write to an object file.  The object file produced is written to the specifications down below in the "Output" section.
 
 ### Enumerations
 
