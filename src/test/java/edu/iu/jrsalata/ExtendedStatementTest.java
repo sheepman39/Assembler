@@ -14,7 +14,6 @@ public class ExtendedStatementTest {
         assertEquals(extendedStatement.assemble(), "030000");
     }
 
-
     @Test
     public void testImmediateAddressing() {
         // use ADD instruction with indirect addressing

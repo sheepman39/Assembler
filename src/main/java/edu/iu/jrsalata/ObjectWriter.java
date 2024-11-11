@@ -44,7 +44,8 @@ public class ObjectWriter implements ObjectWriterInterface {
     // execute the writing of the object file
     public void execute() {
         try {
-            // Create a file writter to be passed around to write each section of the obj file
+            // Create a file writter to be passed around to write each section of the obj
+            // file
             FileWriter fileWriter = new FileWriter(this.fileName);
             writeHeaderRecord(fileWriter, this.factory);
             writeTextRecords(fileWriter, this.queue, this.factory);

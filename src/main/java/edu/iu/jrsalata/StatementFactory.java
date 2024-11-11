@@ -257,7 +257,7 @@ public class StatementFactory implements StatementFactoryInterface {
         } else if (mnemonic.equals("RESB")) {
             // set the args to the size
             returnVal.setSize(new HexNum(args, NumSystem.DEC));
-            
+
         } else if (mnemonic.equals("RESW")) {
             // set 3 * args to the size
             returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
