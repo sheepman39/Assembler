@@ -157,6 +157,7 @@ This enumeration represents the different SIC/XE formats.  It contains the value
 * THREE
 * ASM
 * SIC
+  
 Note that FOUR is ommited as the process for handling Format 4 is the same as Format 3.  ASM is used for assembler directives and SIC is used for the original SIC architecture.
 
 #### NumSystem
