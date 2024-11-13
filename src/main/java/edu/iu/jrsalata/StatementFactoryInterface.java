@@ -3,7 +3,7 @@
 package edu.iu.jrsalata;
 
 public interface StatementFactoryInterface {
-    public Statement processStatement(String statement);
+    public Statement processStatement(String statement) throws InvalidAssemblyFileException;
 
     public HexNum getStart();
 

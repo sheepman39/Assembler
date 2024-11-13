@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.File;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.Queue;
@@ -21,7 +22,7 @@ public class ObjectWriterTest {
         StatementFactoryInterface factory = new StatementFactory();
         InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
         Queue<Statement> queue = fileInput(file, factory);
-        String fileName = "testAsm1.obj";
+        String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
         writer.execute();
@@ -45,6 +46,12 @@ public class ObjectWriterTest {
                 String lineTest = scTest.nextLine();
                 assertEquals(lineControl, lineTest);
             }
+
+            scControl.close();
+            scTest.close();
+            
+            // delete the generated test file
+            new File(fileName).delete();
         } catch (Exception e) {
             logger.warning(e.getMessage());
         }

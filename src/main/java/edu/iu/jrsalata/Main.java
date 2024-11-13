@@ -18,7 +18,6 @@ class Main {
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
         writer.execute();
-        logger.info("File written successfully");
     }
 
     public static Queue<Statement> fileInput(String filename, StatementFactoryInterface factory) {
@@ -42,9 +41,19 @@ class Main {
                 }
             }
             sc.close();
-        } catch (Exception e) {
-            System.out.println("File not found");
-            System.err.println(e);
+        } catch (InvalidAssemblyFileException e){
+
+            // inforamtive error message from our StatementFactory
+            logger.severe("===========");
+            logger.severe("ASSEMBLY FAILURE!!! Shutting down....");
+            logger.severe(e.getMessage());
+            logger.severe("===========");
+
+            // clear out the queue so no invalid code can be generated
+            queue.clear();
+        }catch (Exception e) {
+            logger.severe(e.getMessage());
+            logger.severe(e.toString());
         }
 
         return queue;
