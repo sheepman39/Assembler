@@ -28,4 +28,5 @@ target/
 
 # vscode settings
 .vscode
-
+test.obj
+output.obj
