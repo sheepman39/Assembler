@@ -33,11 +33,15 @@ public class RegisterStatement extends BaseStatement {
 
     // setters
     public void setReg1(HexNum reg1) {
-        this.reg1 = reg1;
+        if (reg1 != null) {
+            this.reg1 = reg1;
+        }
     }
 
     public void setReg2(HexNum reg2) {
-        this.reg2 = reg2;
+        if (reg2 != null) {
+            this.reg2 = reg2;
+        }
     }
 
     public void setOpcode(HexNum opcode) {

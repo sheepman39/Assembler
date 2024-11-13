@@ -19,7 +19,11 @@ public class SicStatement extends BaseStatement {
 
     public SicStatement(HexNum location, HexNum opcode, String args) {
         super(location, opcode);
-        this.args = args;
+        if(args == ""){
+            this.args = "000";
+        } else {
+            this.args = args;
+        }
         this.format = 3;
         this.size.set(this.format);
     }
@@ -30,7 +34,9 @@ public class SicStatement extends BaseStatement {
     }
 
     public void setArgs(String args) {
-        this.args = args;
+        if(args != ""){
+            this.args = args;
+        }
     }
 
     @Override

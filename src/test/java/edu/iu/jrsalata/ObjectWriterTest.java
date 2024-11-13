@@ -21,7 +21,7 @@ public class ObjectWriterTest {
         StatementFactoryInterface factory = new StatementFactory();
         InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
         Queue<Statement> queue = fileInput(file, factory);
-        String fileName = "testAsm1.obj";
+        String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
         writer.execute();
