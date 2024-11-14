@@ -181,18 +181,25 @@ public class StatementFactory implements StatementFactoryInterface {
 
                 // add the format to the format table
                 Format newFormat = Format.ONE;
-                if (parts[1].equals("1")) {
-                    newFormat = Format.ONE;
-                } else if (parts[1].equals("2")) {
-                    newFormat = Format.TWO;
-                } else if (parts[1].equals("3")) {
-                    newFormat = Format.THREE;
-                } else if (parts[1].equals("SIC")) {
-                    newFormat = Format.SIC;
-                } else if (parts[1].equals("ASM")) {
-                    newFormat = Format.ASM;
-                } else {
-                    logger.log(Level.WARNING, "Error: Unexpected format '{}'in instructions.txt", parts[1]);
+                switch (parts[1]) {
+                    case "1":
+                        newFormat = Format.ONE;
+                        break;
+                    case "2":
+                        newFormat = Format.TWO;
+                        break;
+                    case "3":
+                        newFormat = Format.THREE;
+                        break;
+                    case "SIC":
+                        newFormat = Format.SIC;
+                        break;
+                    case "ASM":
+                        newFormat = Format.ASM;
+                        break;
+                    default:
+                        logger.log(Level.WARNING, "Error: Unexpected format '{}' in instructions.txt", parts[1]);
+                        break;
                 }
 
                 this.formatTable.put(parts[0], newFormat);
