@@ -26,7 +26,7 @@ public class StatementFactory implements StatementFactoryInterface {
     public StatementFactory() {
         this.locctr = new HexNum(0);
         loadInstructions("/instructions.txt");
-        loadRegisters("/registers.txt");   
+        loadRegisters("/registers.txt");
     }
 
     // get the start location
@@ -132,27 +132,33 @@ public class StatementFactory implements StatementFactoryInterface {
             mnemonic = mnemonic.substring(1);
         }
         // generate a new statement based on its format
-        if (this.formatTable.get(mnemonic) == Format.ONE) {
-            newStatement = createStatement(mnemonic, args);
-        } else if (this.formatTable.get(mnemonic) == Format.TWO) {
-            newStatement = createRegStatement(mnemonic, args);
-        } else if (this.formatTable.get(mnemonic) == Format.THREE) {
-            newStatement = createExtStatement(mnemonic, args, eFlag);
-        } else if (this.formatTable.get(mnemonic) == Format.SIC) {
-            newStatement = createSicStatement(mnemonic, args);
-        } else if (this.formatTable.get(mnemonic) == Format.ASM) {
-            newStatement = handleAsmStatement(mnemonic, args);
-        } else {
-            StringBuilder msg = new StringBuilder("Mnemonic '");
-            msg.append(mnemonic);
-            msg.append("' not found");
-            throw new InvalidAssemblyFileException(lineNum, msg.toString());
+        switch (this.formatTable.get(mnemonic)) {
+            case ONE:
+                newStatement = createStatement(mnemonic, args);
+                break;
+            case TWO:
+                newStatement = createRegStatement(mnemonic, args);
+                break;
+            case THREE:
+                newStatement = createExtStatement(mnemonic, args, eFlag);
+                break;
+            case SIC:
+                newStatement = createSicStatement(mnemonic, args);
+                break;
+            case ASM:
+                newStatement = handleAsmStatement(mnemonic, args);
+                break;
+            default:
+                StringBuilder msg = new StringBuilder("Mnemonic '");
+                msg.append(mnemonic);
+                msg.append("' not found");
+                throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         this.locctr = this.locctr.add(newStatement.getSize());
         return newStatement;
     }
 
-    private void loadInstructions(String filename){
+    private void loadInstructions(String filename) {
         // add all of the opcodes to the table
         try {
 
@@ -200,7 +206,7 @@ public class StatementFactory implements StatementFactoryInterface {
         }
     }
 
-    private void loadRegisters(String filename){
+    private void loadRegisters(String filename) {
         // add all of the registers to the table
         try {
             InputStream file = getClass().getResourceAsStream(filename);
@@ -221,7 +227,8 @@ public class StatementFactory implements StatementFactoryInterface {
             logger.warning(e.getMessage());
         }
     }
-    private void handleByte(String args, DirectiveStatement statement) throws InvalidAssemblyFileException{
+
+    private void handleByte(String args, DirectiveStatement statement) throws InvalidAssemblyFileException {
         // check if the first char is C or X
         // C represents a constant string whose length is the length of the string
         // the object code of C is the ASCII value of each character in the string
@@ -259,36 +266,46 @@ public class StatementFactory implements StatementFactoryInterface {
         }
     }
 
-    private Statement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException{
+    private Statement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
 
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
-        if (mnemonic.equals("START")) {
-            this.locctr = new HexNum(args, NumSystem.HEX);
-            this.start = new HexNum(this.locctr.getDec());
-        } else if (mnemonic.equals("END")) {
-            // do nothing
-        } else if (mnemonic.equals("BYTE")) {
-            // move BYTE logic to other method for cleanliness
-            handleByte(args, returnVal);
-        } else if (mnemonic.equals("WORD")) {
-            // set size to 3 and set the object code
-            returnVal.setSize(new HexNum(3));
-            returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
-        } else if (mnemonic.equals("RESB")) {
-            // set the args to the size
-            returnVal.setSize(new HexNum(args, NumSystem.DEC));
-
-        } else if (mnemonic.equals("RESW")) {
-            // set 3 * args to the size
-            returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
-        } else if (mnemonic.equals("BASE")){
-            // enable bFlag
-            this.bFlag = true;
-        }else {
-            StringBuilder msg = new StringBuilder("Invalid ASM mnemonic: ");
-            msg.append(mnemonic);
-            throw new InvalidAssemblyFileException(lineNum, msg.toString());
+        switch (mnemonic) {
+            case "START":
+                this.locctr = new HexNum(args, NumSystem.HEX);
+                this.start = new HexNum(this.locctr.getDec());
+                break;
+            case "END":
+                // do nothing
+                break;
+            case "BYTE":
+                // move BYTE logic to other method for cleanliness
+                handleByte(args, returnVal);
+                break;
+            case "WORD":
+                // set size to 3 and set the object code
+                returnVal.setSize(new HexNum(3));
+                returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
+                break;
+            case "RESB":
+                // set the args to the size
+                returnVal.setSize(new HexNum(args, NumSystem.DEC));
+                break;
+            case "RESW":
+                // set 3 * args to the size
+                returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
+                break;
+            case "BASE":
+                // enable bFlag
+                this.bFlag = true;
+                break;
+            case "NOBASE":
+                // disable bFlag
+                this.bFlag = false;
+            default:
+                StringBuilder msg = new StringBuilder("Invalid ASM mnemonic: ");
+                msg.append(mnemonic);
+                throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         return returnVal;
     }
@@ -300,7 +317,7 @@ public class StatementFactory implements StatementFactoryInterface {
         return new SingleStatement(this.locctr, opcode);
     }
 
-    private Statement createRegStatement(String mnemonic, String args) throws InvalidAssemblyFileException{
+    private Statement createRegStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
 
         // Statement to return
         RegisterStatement returnVal = new RegisterStatement();
@@ -323,11 +340,11 @@ public class StatementFactory implements StatementFactoryInterface {
         returnVal.setReg1(reg1);
 
         // if there is a second register, set it
-        if(registers.length == 2){
+        if (registers.length == 2) {
             HexNum reg2 = this.registerTable.get(registers[1]);
             returnVal.setReg2(reg2);
         }
-       
+
         return returnVal;
     }
 
@@ -344,7 +361,7 @@ public class StatementFactory implements StatementFactoryInterface {
             returnVal.setEFlag();
         }
 
-        if (bFlag){
+        if (bFlag) {
             returnVal.setBFlag();
         }
 
