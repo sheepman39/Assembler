@@ -25,72 +25,8 @@ public class StatementFactory implements StatementFactoryInterface {
     // constructor
     public StatementFactory() {
         this.locctr = new HexNum(0);
-
-        // add all of the opcodes to the table
-        try {
-
-            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient
-            // txt file
-            // Format is: Mnemonic, Format, Opcode
-            // Credit to
-            // https://stackoverflow.com/questions/20389255/reading-a-resource-file-from-within-jar
-            // for reading files within a jar
-            InputStream file = getClass().getResourceAsStream("/instructions.txt");
-
-            // read the file
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\s+");
-
-                // add the opcode and format to their respective tables
-                this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
-
-                // add the format to the format table
-                Format newFormat = Format.ONE;
-                if (parts[1].equals("1")) {
-                    newFormat = Format.ONE;
-                } else if (parts[1].equals("2")) {
-                    newFormat = Format.TWO;
-                } else if (parts[1].equals("3")) {
-                    newFormat = Format.THREE;
-                } else if (parts[1].equals("SIC")) {
-                    newFormat = Format.SIC;
-                } else if (parts[1].equals("ASM")) {
-                    newFormat = Format.ASM;
-                } else {
-                    logger.log(Level.WARNING, "Error: Unexpected format '{}'in instructions.txt", parts[1]);
-                }
-
-                this.formatTable.put(parts[0], newFormat);
-
-            }
-            // close the scanner
-            sc.close();
-        } catch (Exception e) {
-            logger.warning("Error: Could not find instructions.txt");
-            logger.warning(e.getMessage());
-        }
-
-        // add all of the registers to the table
-        try {
-            InputStream file = getClass().getResourceAsStream("/registers.txt");
-
-            // read the file
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\s+");
-                HexNum reg = new HexNum(parts[1], NumSystem.HEX);
-                // add the register to the table
-                this.registerTable.put(parts[0], reg);
-            }
-            // close the scanner
-            sc.close();
-        } catch (Exception e) {
-            logger.warning("Error: Could not find registers.txt");
-            logger.warning(e.getMessage());
-        }
+        loadInstructions("/instructions.txt");
+        loadRegisters("/registers.txt");   
     }
 
     // get the start location
@@ -139,6 +75,11 @@ public class StatementFactory implements StatementFactoryInterface {
         boolean eFlag = false;
         // First strip any unnecessary whitespace
         statement = statement.strip();
+
+        // if the line is emtpy or is just a comment, return null
+        if (statement.equals("") || statement.charAt(0) == '.') {
+            return null;
+        }
 
         // find the comment character
         // since there is the possibility of no comment existing, check if the comment
@@ -211,6 +152,75 @@ public class StatementFactory implements StatementFactoryInterface {
         return newStatement;
     }
 
+    private void loadInstructions(String filename){
+        // add all of the opcodes to the table
+        try {
+
+            // Credit to https://github.com/cppcoders/SIC-XE-Assembler for the convenient
+            // txt file
+            // Format is: Mnemonic, Format, Opcode
+            // Credit to
+            // https://stackoverflow.com/questions/20389255/reading-a-resource-file-from-within-jar
+            // for reading files within a jar
+            InputStream file = getClass().getResourceAsStream(filename);
+
+            // read the file
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] parts = line.split("\\s+");
+
+                // add the opcode and format to their respective tables
+                this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
+
+                // add the format to the format table
+                Format newFormat = Format.ONE;
+                if (parts[1].equals("1")) {
+                    newFormat = Format.ONE;
+                } else if (parts[1].equals("2")) {
+                    newFormat = Format.TWO;
+                } else if (parts[1].equals("3")) {
+                    newFormat = Format.THREE;
+                } else if (parts[1].equals("SIC")) {
+                    newFormat = Format.SIC;
+                } else if (parts[1].equals("ASM")) {
+                    newFormat = Format.ASM;
+                } else {
+                    logger.log(Level.WARNING, "Error: Unexpected format '{}'in instructions.txt", parts[1]);
+                }
+
+                this.formatTable.put(parts[0], newFormat);
+
+            }
+            // close the scanner
+            sc.close();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error: Could not find {}", filename);
+            logger.warning(e.getMessage());
+        }
+    }
+
+    private void loadRegisters(String filename){
+        // add all of the registers to the table
+        try {
+            InputStream file = getClass().getResourceAsStream(filename);
+
+            // read the file
+            Scanner sc = new Scanner(file);
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] parts = line.split("\\s+");
+                HexNum reg = new HexNum(parts[1], NumSystem.HEX);
+                // add the register to the table
+                this.registerTable.put(parts[0], reg);
+            }
+            // close the scanner
+            sc.close();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Error: Could not find {}", filename);
+            logger.warning(e.getMessage());
+        }
+    }
     private void handleByte(String args, DirectiveStatement statement) throws InvalidAssemblyFileException{
         // check if the first char is C or X
         // C represents a constant string whose length is the length of the string
@@ -308,11 +318,15 @@ public class StatementFactory implements StatementFactoryInterface {
 
         // find each of the registers in the registerTable
         HexNum reg1 = this.registerTable.get(registers[0]);
-        HexNum reg2 = this.registerTable.get(registers[1]);
 
         // setters ensure a null value can not be set
         returnVal.setReg1(reg1);
-        returnVal.setReg2(reg2);
+
+        // if there is a second register, set it
+        if(registers.length == 2){
+            HexNum reg2 = this.registerTable.get(registers[1]);
+            returnVal.setReg2(reg2);
+        }
        
         return returnVal;
     }
