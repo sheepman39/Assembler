@@ -57,6 +57,34 @@ public class HexNumTest {
     }
 
     @Test
+    public void testHexNumSubtractInt() {
+
+        // test adding an int to a HexNum
+        HexNum hexNum = new HexNum(10);
+        hexNum = hexNum.subtract(5);
+        assertEquals(5, hexNum.getDec());
+        assertEquals("5", hexNum.toString());
+
+        // test adding a negative int
+        HexNum hexNum2 = new HexNum(10);
+        hexNum2 = hexNum2.subtract(-5);
+        assertEquals(15, hexNum2.getDec());
+        assertEquals("f", hexNum2.toString());
+    }
+
+    @Test
+    public void testHexNumSubtractHexNum() {
+
+        // test adding two HexNum objects
+        HexNum hexNum1 = new HexNum(10);
+        HexNum hexNum2 = new HexNum(6);
+        HexNum result = hexNum1.subtract(hexNum2);
+        assertEquals(4, result.getDec());
+        assertEquals("4", result.toString());
+
+    }
+
+    @Test
     public void testHexNumSet() {
 
         // test setting a HexNum with an int

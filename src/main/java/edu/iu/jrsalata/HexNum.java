@@ -55,6 +55,21 @@ public class HexNum {
         return new HexNum(newVal);
     }
 
+        // returns a HexNum with a new value
+    // assume int input is in decimal
+    public HexNum subtract(int value) {
+        int newVal = this.convertToDec(this.value, NumSystem.HEX) - value;
+        return new HexNum(newVal);
+    }
+
+    // convert hex values to decimal, then back to hex
+    public HexNum subtract(HexNum value) {
+
+        int newVal = this.convertToDec(this.value.toString(), NumSystem.HEX);
+        newVal -= this.convertToDec(value.toString(), NumSystem.HEX);
+        return new HexNum(newVal);
+    }
+
     public void set(int value) {
         this.value = this.convertToHex(Integer.toString(value), NumSystem.DEC);
     }
