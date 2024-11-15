@@ -17,6 +17,7 @@ public class StatementFactory implements StatementFactoryInterface {
     protected String name = "";
     protected int lineNum = 0;
     protected boolean bFlag = false;
+    protected boolean pFlag = true;
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
     protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
@@ -142,9 +143,6 @@ public class StatementFactory implements StatementFactoryInterface {
             case THREE:
                 newStatement = createExtStatement(mnemonic, args, eFlag);
                 break;
-            case SIC:
-                newStatement = createSicStatement(mnemonic, args);
-                break;
             case ASM:
                 newStatement = handleAsmStatement(mnemonic, args);
                 break;
@@ -192,7 +190,9 @@ public class StatementFactory implements StatementFactoryInterface {
                         newFormat = Format.THREE;
                         break;
                     case "SIC":
-                        newFormat = Format.SIC;
+                        // note that since this is sic/xe
+                        // we will be using F3
+                        newFormat = Format.THREE;
                         break;
                     case "ASM":
                         newFormat = Format.ASM;
@@ -372,16 +372,9 @@ public class StatementFactory implements StatementFactoryInterface {
             returnVal.setBFlag();
         }
 
-        return returnVal;
-    }
-
-    private Statement createSicStatement(String mnemonic, String args) {
-
-        // find the opcode of the mnemonic
-        HexNum opcode = this.symbolTable.get(mnemonic);
-
-        // create the SICStatement
-        SicStatement returnVal = new SicStatement(this.locctr, opcode, args);
+        if (pFlag) {
+            returnVal.setPFlag();
+        }
 
         return returnVal;
     }

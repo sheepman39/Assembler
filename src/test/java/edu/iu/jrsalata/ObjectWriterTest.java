@@ -19,7 +19,7 @@ public class ObjectWriterTest {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        StatementFactoryInterface factory = new StatementFactory();
+        StatementFactoryInterface factory = new SicStatementFactory();
         InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
         Queue<Statement> queue = fileInput(file, factory);
         String fileName = "test.obj";
@@ -32,6 +32,49 @@ public class ObjectWriterTest {
 
             // read the original compare file
             InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
+
+            // read the generated file
+            InputStream test = new FileInputStream(fileName);
+
+            // create a scanner for each file
+            Scanner scControl = new Scanner(control);
+            Scanner scTest = new Scanner(test);
+
+            // compare the two files
+            while (scControl.hasNextLine() && scTest.hasNextLine()) {
+                String lineControl = scControl.nextLine();
+                String lineTest = scTest.nextLine();
+                assertEquals(lineControl, lineTest);
+            }
+
+            scControl.close();
+            scTest.close();
+            
+            // delete the generated test file
+            new File(fileName).delete();
+        } catch (Exception e) {
+            logger.warning(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testAsm2() {
+        // Create an instance of the StatementFactory
+        // clear out the symtable since it is used in previous tests
+        SymTable.clear();
+        StatementFactoryInterface factory = new StatementFactory();
+        InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
+        Queue<Statement> queue = fileInput(file, factory);
+        String fileName = "test.obj";
+        ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
+
+        writer.execute();
+
+        // now compare the output between the two files
+        try {
+
+            // read the original compare file
+            InputStream control = getClass().getResourceAsStream("/testAsm2.obj");
 
             // read the generated file
             InputStream test = new FileInputStream(fileName);

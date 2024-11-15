@@ -110,11 +110,10 @@ public class ExtendedStatement extends BaseStatement {
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(this.args)) {
             argValue = SymTable.getSymbol(this.args);
-            return first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
+        } else {
+            // if not, assume it is a hex number
+            argValue = new HexNum(this.args, NumSystem.HEX);
         }
-
-        // if not, assume it is a hex number
-        argValue = new HexNum(this.args, NumSystem.HEX);
 
         String returnVal = first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
         return returnVal;

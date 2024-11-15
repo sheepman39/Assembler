@@ -13,14 +13,14 @@ public class StatementFactoryTest {
     Logger logger = Logger.getLogger(getClass().getName());
 
     @Test
-    public void testAsm1() {
+    public void testAsm2() {
         // read the input file and create a list of statements
         // clear the symtable
         SymTable.clear();
         ArrayList<Statement> statements = new ArrayList<Statement>();
         StatementFactory statementFactory = new StatementFactory();
         try {
-            InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
+            InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
 
             // read the file
             Scanner sc = new Scanner(file);
@@ -34,7 +34,7 @@ public class StatementFactoryTest {
             sc.close();
 
             // read the object code file and compare assembled results
-            file = getClass().getResourceAsStream("/testAsm1.txt");
+            file = getClass().getResourceAsStream("/testAsm2.txt");
             sc = new Scanner(file);
             for (Statement statement : statements) {
                 if (sc.hasNextLine()) {

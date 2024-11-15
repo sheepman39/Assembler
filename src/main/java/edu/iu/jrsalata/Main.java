@@ -32,6 +32,7 @@ class Main {
 
             // read the file
             Scanner sc = new Scanner(file);
+
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 Statement statement = factory.processStatement(line);
