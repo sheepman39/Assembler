@@ -92,7 +92,7 @@ public class ExtendedStatementTest {
         extendedStatement.setEFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(4, extendedStatement.getSize().getDec());
-        assertEquals("6712222", extendedStatement.assemble());
+        assertEquals("67102222", extendedStatement.assemble());
     }
 
     @Test
@@ -104,6 +104,6 @@ public class ExtendedStatementTest {
         extendedStatement.setEFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(4, extendedStatement.getSize().getDec());
-        assertEquals("6792222", extendedStatement.assemble());
+        assertEquals("67902222", extendedStatement.assemble());
     }
 }

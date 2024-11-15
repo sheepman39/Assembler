@@ -85,9 +85,11 @@ public class ExtendedStatement extends BaseStatement {
         } else if (this.args.charAt(0) == '#') {
             this.setIFlag();
             this.args = this.args.substring(1);
+
         } else if (this.args.charAt(0) == '@') {
             this.setNFlag();
             this.args = this.args.substring(1);
+
         } else {
             this.setIFlag();
             this.setNFlag();
@@ -110,12 +112,21 @@ public class ExtendedStatement extends BaseStatement {
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(this.args)) {
             argValue = SymTable.getSymbol(this.args);
+
+            // if we are PC relative, we need to subtract the PC from the value
+            if (this.pFlag) {
+                HexNum pc = this.location.add(this.size);
+                argValue = argValue.subtract(pc);
+            }
         } else {
             // if not, assume it is a hex number
             argValue = new HexNum(this.args, NumSystem.HEX);
         }
 
-        String returnVal = first.toString(2) + third.toString(1) + argValue.toString(this.size.getDec());
+        // if the e flag is set, we need to ensure the args is 5 hex numbers
+        int argSize = this.eFlag ? 5 : 3;
+
+        String returnVal = first.toString(2) + third.toString(1) + argValue.toString(argSize);
         return returnVal;
     }
 }

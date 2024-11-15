@@ -304,7 +304,7 @@ public class StatementFactory implements StatementFactoryInterface {
                 break;
             case "BASE":
                 // enable bFlag
-                this.bFlag = true;
+                // this.bFlag = true;
                 break;
             case "NOBASE":
                 // disable bFlag
@@ -366,14 +366,15 @@ public class StatementFactory implements StatementFactoryInterface {
         // if there is an eFlag, set it
         if (eFlag) {
             returnVal.setEFlag();
-        }
+        } else {
 
-        if (bFlag) {
-            returnVal.setBFlag();
-        }
+            if (bFlag) {
+                returnVal.setBFlag();
+            }
 
-        if (pFlag) {
-            returnVal.setPFlag();
+            if (pFlag) {
+                returnVal.setPFlag();
+            }
         }
 
         return returnVal;
