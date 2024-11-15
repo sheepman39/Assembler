@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.io.File;
 import java.util.Scanner;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 class Main {
@@ -49,8 +48,8 @@ class Main {
             logger.severe(e.getMessage());
             logger.severe("===========");
 
-            // clear out the queue so no invalid code can be generated
-            queue.clear();
+            // exit the program
+            System.exit(1);
         }catch (Exception e) {
             logger.severe(e.getMessage());
             logger.severe(e.toString());
