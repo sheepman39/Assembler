@@ -8,52 +8,72 @@ import java.util.logging.Logger;
 
 class Main {
     static Logger logger = Logger.getLogger(Main.class.getName());
+    static final String sicFlag = "!USE SIC";
 
     public static void main(String[] args) {
         // Create an instance of the StatementFactory
-        AbstractStatementFactory factory = new StatementFactory();
-        Queue<Statement> queue = fileInput("input.asm", factory);
-        String fileName = "output.obj";
-        ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
+        String inputFile = "input.asm";
+        AbstractStatementFactory factory;
 
-        writer.execute();
-    }
-
-    public static Queue<Statement> fileInput(String filename, AbstractStatementFactory factory) {
-
-        // create the ArrayList that will be returned
-        Queue<Statement> queue = new LinkedList<>();
-
-        // open up a new file and read the string
-        // parse the string and create a list of lines
+        // open up the inputFile and look at the first line
+        // to determine which factory to use
+        Scanner sc = null;
         try {
-            // open the file
-            File file = new File(filename);
+            File file = new File(inputFile);
+            sc = new Scanner(file);
 
-            // read the file
-            Scanner sc = new Scanner(file);
+            String firstLine = sc.nextLine();
 
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                Statement statement = factory.processStatement(line);
-                if (statement != null) {
-                    queue.add(statement);
-                }
+            // compare with the sicFlag defined above
+            if (firstLine.strip().equals(sicFlag)) {
+                factory = new SicStatementFactory();
+                logger.info("Using SIC Factory");
+            } else {
+                factory = new StatementFactory();
+                logger.info("Using SIC/XE Factory");
+
+                // reset the scanner to the beginning of the file
+                sc.close();
+                sc = new Scanner(file);
             }
-            sc.close();
-        } catch (InvalidAssemblyFileException e) {
+            Queue<Statement> queue = fileInput(sc, factory);
+            String fileName = "output.obj";
+            ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
+            // write the object file
+            writer.execute();
+            logger.info("Object file successfully created");
+
+        } catch (InvalidAssemblyFileException e) {
             // inforamtive error message from our StatementFactory
             logger.severe("===========");
             logger.severe("ASSEMBLY FAILURE!!! Shutting down....");
             logger.severe(e.getMessage());
             logger.severe("===========");
 
-            // exit the program
-            System.exit(1);
         } catch (Exception e) {
+            logger.severe("Something went wrong...");
             logger.severe(e.getMessage());
-            logger.severe(e.toString());
+        } finally {
+            if(sc != null){
+                sc.close();
+            }
+            logger.info("Shutting down...");
+        }
+    }
+
+    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementFactory factory)
+            throws InvalidAssemblyFileException, Exception {
+
+        // create the ArrayList that will be returned
+        Queue<Statement> queue = new LinkedList<>();
+
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            Statement statement = factory.processStatement(line);
+            if (statement != null) {
+                queue.add(statement);
+            }
         }
 
         return queue;
