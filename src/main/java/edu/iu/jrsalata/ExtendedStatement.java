@@ -80,25 +80,27 @@ public class ExtendedStatement extends BaseStatement {
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
+        String processedArgs;
         if (this.args.length() == 0) {
             return this.opcode.toString(2) + "0000";
         } else if (this.args.charAt(0) == '#') {
             this.setIFlag();
-            this.args = this.args.substring(1);
+            processedArgs = this.args.substring(1);
 
         } else if (this.args.charAt(0) == '@') {
             this.setNFlag();
-            this.args = this.args.substring(1);
+            processedArgs = this.args.substring(1);
 
         } else {
             this.setIFlag();
             this.setNFlag();
+            processedArgs = this.args;
         }
 
         HexNum argValue;
         // look up if args is in the symbolTable
-        if (SymTable.containsSymbol(this.args)) {
-            argValue = SymTable.getSymbol(this.args);
+        if (SymTable.containsSymbol(processedArgs)) {
+            argValue = SymTable.getSymbol(processedArgs);
 
             // if we are PC relative, we need to subtract the PC from the value
             if (this.pFlag) {
@@ -107,7 +109,7 @@ public class ExtendedStatement extends BaseStatement {
             }
         } else {
             // if not, assume it is a hex number
-            argValue = new HexNum(this.args, NumSystem.HEX);
+            argValue = new HexNum(processedArgs, NumSystem.HEX);
             this.pFlag = false;
 
         }

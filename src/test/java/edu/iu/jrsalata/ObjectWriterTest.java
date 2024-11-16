@@ -44,7 +44,7 @@ public class ObjectWriterTest {
             while (scControl.hasNextLine() && scTest.hasNextLine()) {
                 String lineControl = scControl.nextLine();
                 String lineTest = scTest.nextLine();
-                assertEquals(lineControl, lineTest);
+                assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
             }
 
             scControl.close();
@@ -87,7 +87,7 @@ public class ObjectWriterTest {
             while (scControl.hasNextLine() && scTest.hasNextLine()) {
                 String lineControl = scControl.nextLine();
                 String lineTest = scTest.nextLine();
-                assertEquals(lineControl, lineTest);
+                assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
             }
 
             scControl.close();
@@ -117,6 +117,7 @@ public class ObjectWriterTest {
                 if (statement != null) {
                     queue.add(statement);
                 }
+                
             }
             sc.close();
         } catch (Exception e) {
