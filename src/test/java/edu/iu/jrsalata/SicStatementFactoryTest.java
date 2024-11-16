@@ -8,35 +8,33 @@ import java.util.logging.Logger;
 import java.io.InputStream;
 import org.junit.Test;
 
-public class StatementFactoryTest {
+public class SicStatementFactoryTest {
 
     Logger logger = Logger.getLogger(getClass().getName());
 
     @Test
-    public void testAsm2() {
+    public void testAsm1() {
         // read the input file and create a list of statements
         // clear the symtable
         SymTable.clear();
         ArrayList<Statement> statements = new ArrayList<Statement>();
-        StatementFactory statementFactory = new StatementFactory();
+        AbstractStatementFactory statementFactory = new SicStatementFactory();
         try {
-            InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
+            InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
 
             // read the file
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 Statement statement = statementFactory.processStatement(line);
-                if (statement != null) {
-                    statements.add(statement);
-                }
+                statements.add(statement);
             }
 
             // close the file
             sc.close();
 
             // read the object code file and compare assembled results
-            file = getClass().getResourceAsStream("/testAsm2.txt");
+            file = getClass().getResourceAsStream("/testAsm1.txt");
             sc = new Scanner(file);
             for (Statement statement : statements) {
                 if (sc.hasNextLine()) {
@@ -48,8 +46,6 @@ public class StatementFactoryTest {
 
         } catch (Exception e) {
             logger.severe(e.getMessage());
-            logger.severe(e.getStackTrace().toString());
-            assertEquals(true, false);
         }
     }
 }

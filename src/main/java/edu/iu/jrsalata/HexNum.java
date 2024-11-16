@@ -36,6 +36,8 @@ public class HexNum {
             }
             sb.append(this.value);
             return sb.toString();
+        } else if (this.value.length() > digits) {
+            return this.value.substring(this.value.length() - digits);
         } else {
             return this.value;
         }
@@ -52,6 +54,21 @@ public class HexNum {
     public HexNum add(HexNum value) {
         int newVal = this.convertToDec(value.toString(), NumSystem.HEX);
         newVal += this.convertToDec(this.value, NumSystem.HEX);
+        return new HexNum(newVal);
+    }
+
+    // returns a HexNum with a new value
+    // assume int input is in decimal
+    public HexNum subtract(int value) {
+        int newVal = this.convertToDec(this.value, NumSystem.HEX) - value;
+        return new HexNum(newVal);
+    }
+
+    // convert hex values to decimal, then back to hex
+    public HexNum subtract(HexNum value) {
+
+        int newVal = this.convertToDec(this.value, NumSystem.HEX);
+        newVal -= this.convertToDec(value.toString(), NumSystem.HEX);
         return new HexNum(newVal);
     }
 

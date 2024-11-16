@@ -11,7 +11,7 @@ class Main {
 
     public static void main(String[] args) {
         // Create an instance of the StatementFactory
-        StatementFactoryInterface factory = new StatementFactory();
+        AbstractStatementFactory factory = new StatementFactory();
         Queue<Statement> queue = fileInput("input.asm", factory);
         String fileName = "output.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
@@ -19,7 +19,7 @@ class Main {
         writer.execute();
     }
 
-    public static Queue<Statement> fileInput(String filename, StatementFactoryInterface factory) {
+    public static Queue<Statement> fileInput(String filename, AbstractStatementFactory factory) {
 
         // create the ArrayList that will be returned
         Queue<Statement> queue = new LinkedList<>();
@@ -32,6 +32,7 @@ class Main {
 
             // read the file
             Scanner sc = new Scanner(file);
+
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 Statement statement = factory.processStatement(line);
@@ -40,7 +41,7 @@ class Main {
                 }
             }
             sc.close();
-        } catch (InvalidAssemblyFileException e){
+        } catch (InvalidAssemblyFileException e) {
 
             // inforamtive error message from our StatementFactory
             logger.severe("===========");
@@ -50,7 +51,7 @@ class Main {
 
             // exit the program
             System.exit(1);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.severe(e.getMessage());
             logger.severe(e.toString());
         }
