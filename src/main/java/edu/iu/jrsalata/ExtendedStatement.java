@@ -163,8 +163,8 @@ public class ExtendedStatement extends BaseStatement {
                 disp = new HexNum(pcRelative);
             } else {
                 // if pc relative is not possible, try base relative
-                int base = SymTable.getSymbol(this.base).getDec();
-                int baseRelative = targetAddress.getDec() - base;
+                int baseInt = SymTable.getSymbol(this.base).getDec();
+                int baseRelative = targetAddress.getDec() - baseInt;
                 if (baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);

@@ -21,7 +21,7 @@ public abstract class AbstractStatementFactory {
     protected final HashMap<String, HexNum> registerTable;
 
     // constructor
-    public AbstractStatementFactory() {
+    protected AbstractStatementFactory() {
         this.symbolTable = new HashMap<>();
         this.formatTable = new HashMap<>();
         this.registerTable = new HashMap<>();
@@ -88,7 +88,7 @@ public abstract class AbstractStatementFactory {
                 this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
 
                 // add the format to the format table
-                Format newFormat = Format.ONE;
+                Format newFormat;
                 switch (parts[1]) {
                     case "1":
                         newFormat = Format.ONE;
@@ -106,6 +106,7 @@ public abstract class AbstractStatementFactory {
                         newFormat = Format.ASM;
                         break;
                     default:
+                        newFormat = Format.ASM;
                         logger.log(Level.WARNING, "Error: Unexpected format '{}' in instructions.txt", parts[1]);
                         break;
                 }

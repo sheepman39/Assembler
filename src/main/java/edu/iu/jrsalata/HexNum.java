@@ -67,7 +67,7 @@ public class HexNum {
     // convert hex values to decimal, then back to hex
     public HexNum subtract(HexNum value) {
 
-        int newVal = this.convertToDec(this.value.toString(), NumSystem.HEX);
+        int newVal = this.convertToDec(this.value, NumSystem.HEX);
         newVal -= this.convertToDec(value.toString(), NumSystem.HEX);
         return new HexNum(newVal);
     }
