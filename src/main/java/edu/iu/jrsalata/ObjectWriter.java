@@ -95,7 +95,16 @@ public class ObjectWriter implements ObjectWriterInterface {
         // Statement that will be read from the queue
         Statement statement;
 
-        while (!queue.isEmpty()) {
+        // create two queues to hold the assembled data and its respective size
+        Queue<String> assembledQueue = new LinkedList<>();
+        Queue<HexNum> sizeQueue = new LinkedList<>();
+        while(!queue.isEmpty()) {
+            statement = queue.poll();
+            assembledQueue.add(statement.assemble());
+            sizeQueue.add(statement.getSize());
+        }
+
+        while (!assembledQueue.isEmpty()) {
             // Col 1 is "T"
             textRecord.append("T");
 
@@ -108,11 +117,10 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // Col 10-69 is the text record
             tmpSize = textRecord.length();
-            while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70)) {
-                statement = queue.poll();
-                textRecord.append(statement.assemble());
-                start = start.add(statement.getSize());
-                tmpSize = tmpSize + statement.getSize().getDec() * 2;
+            while (!assembledQueue.isEmpty() && (tmpSize + assembledQueue.peek().length() < 70)) {
+                textRecord.append(assembledQueue.poll());
+                start = start.add(sizeQueue.peek());
+                tmpSize = tmpSize + sizeQueue.poll().getDec() * 2;
             }
 
             // Update the length of the record

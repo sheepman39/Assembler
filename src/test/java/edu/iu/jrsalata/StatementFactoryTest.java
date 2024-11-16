@@ -27,7 +27,9 @@ public class StatementFactoryTest {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 Statement statement = statementFactory.processStatement(line);
-                statements.add(statement);
+                if(statement != null){
+                    statements.add(statement);
+                }
             }
 
             // close the file

@@ -6,6 +6,7 @@ package edu.iu.jrsalata;
 public class ExtendedStatement extends BaseStatement {
 
     protected String args;
+    protected String assembled = "";
     protected boolean nFlag = false;
     protected boolean iFlag = false;
     protected boolean xFlag = false;
@@ -19,6 +20,7 @@ public class ExtendedStatement extends BaseStatement {
         this.args = "000";
         this.format = 3;
         this.size.set(this.format);
+        this.assembled = "";
     }
 
     public ExtendedStatement(HexNum location, HexNum opcode, String args) {
@@ -26,6 +28,7 @@ public class ExtendedStatement extends BaseStatement {
         this.args = args;
         this.format = 3;
         this.size.set(this.format);
+        this.assembled = "";
     }
 
     // flag managers
@@ -68,33 +71,36 @@ public class ExtendedStatement extends BaseStatement {
     // assemble
     @Override
     public String assemble() {
+        if(!this.assembled.equals("")) {
+            return this.assembled;
+        }
 
+        String processedArgs = this.args;
         // check for the X flag
         // if the X flag exists, remove it from the args
-        if (this.args.toUpperCase().replace(" ", "").contains(",X")) {
+        if (processedArgs.toUpperCase().replace(" ", "").contains(",X")) {
             this.setXFlag();
-            this.args = this.args.toUpperCase().replace(" ", "").replace(",X", "");
+            processedArgs = processedArgs.toUpperCase().replace(" ", "").replace(",X", "");
         }
 
         // check the addressing mode of the args
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
-        String processedArgs;
-        if (this.args.length() == 0) {
-            return this.opcode.toString(2) + "0000";
-        } else if (this.args.charAt(0) == '#') {
+        if (processedArgs.length() == 0) {
+            this.assembled = this.opcode.toString(2) + "0000";
+            return this.assembled;
+        } else if (processedArgs.charAt(0) == '#') {
             this.setIFlag();
-            processedArgs = this.args.substring(1);
+            processedArgs = processedArgs.substring(1);
 
-        } else if (this.args.charAt(0) == '@') {
+        } else if (processedArgs.charAt(0) == '@') {
             this.setNFlag();
-            processedArgs = this.args.substring(1);
+            processedArgs = processedArgs.substring(1);
 
         } else {
             this.setIFlag();
             this.setNFlag();
-            processedArgs = this.args;
         }
 
         HexNum argValue;
@@ -131,7 +137,7 @@ public class ExtendedStatement extends BaseStatement {
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
 
-        String returnVal = first.toString(2) + third.toString(1) + argValue.toString(argSize);
-        return returnVal;
+        this.assembled = first.toString(2) + third.toString(1) + argValue.toString(argSize);
+        return this.assembled;
     }
 }
