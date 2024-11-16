@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class StatementFactory extends AbstractStatementFactory {
 
     protected String base = "";
-    Logger logger = Logger.getLogger(getClass().getName());
+    Logger statementLogger = Logger.getLogger(getClass().getName());
 
     // constructor
     public StatementFactory() {

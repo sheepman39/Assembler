@@ -7,9 +7,7 @@ package edu.iu.jrsalata;
 import java.util.logging.Logger;
 
 public class SicStatementFactory extends AbstractStatementFactory {
-
-    protected int lineNum = 0;
-    Logger logger = Logger.getLogger(getClass().getName());
+    Logger sicStatementLogger = Logger.getLogger(getClass().getName());
 
     // constructors
     public SicStatementFactory() {
@@ -58,9 +56,7 @@ public class SicStatementFactory extends AbstractStatementFactory {
         // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
 
-        // create the SICStatement
-        SicStatement returnVal = new SicStatement(this.locctr, opcode, args);
-
-        return returnVal;
+        // create and return the SICStatement
+        return new SicStatement(this.locctr, opcode, args);
     }
 }

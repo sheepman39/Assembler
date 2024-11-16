@@ -212,11 +212,11 @@ public abstract class AbstractStatementFactory {
             statement.setSize(new HexNum(args.length()));
 
             // set the object code to the ASCII value of each character
-            String objCode = "";
+            StringBuilder objCode = new StringBuilder();
             for (int i = 0; i < args.length(); i++) {
-                objCode += Integer.toHexString(args.charAt(i));
+                objCode.append(Integer.toHexString(args.charAt(i)));
             }
-            statement.setObjCode(objCode);
+            statement.setObjCode(objCode.toString());
 
         } else if (args.charAt(0) == 'X') {
 
