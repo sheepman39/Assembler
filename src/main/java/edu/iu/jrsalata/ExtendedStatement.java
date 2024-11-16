@@ -7,6 +7,7 @@ public class ExtendedStatement extends BaseStatement {
 
     protected String args;
     protected String assembled = "";
+    protected String base = "";
     protected boolean nFlag = false;
     protected boolean iFlag = false;
     protected boolean xFlag = false;
@@ -21,6 +22,7 @@ public class ExtendedStatement extends BaseStatement {
         this.format = 3;
         this.size.set(this.format);
         this.assembled = "";
+        this.base = "";
     }
 
     public ExtendedStatement(HexNum location, HexNum opcode, String args) {
@@ -29,6 +31,7 @@ public class ExtendedStatement extends BaseStatement {
         this.format = 3;
         this.size.set(this.format);
         this.assembled = "";
+        this.base = "";
     }
 
     // flag managers
@@ -54,6 +57,10 @@ public class ExtendedStatement extends BaseStatement {
 
     public void setEFlag() {
         this.eFlag = true;
+    }
+
+    public void setBase(String base) {
+        this.base = base;
     }
 
     // this will be used by the factory to clean up the args. It will also handle
@@ -103,21 +110,39 @@ public class ExtendedStatement extends BaseStatement {
             this.setNFlag();
         }
 
-        HexNum argValue;
+        HexNum targetAddress;
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(processedArgs)) {
-            argValue = SymTable.getSymbol(processedArgs);
+            targetAddress = SymTable.getSymbol(processedArgs);
 
-            // if we are PC relative, we need to subtract the PC from the value
-            if (this.pFlag) {
-                HexNum pc = this.location.add(this.size);
-                argValue = argValue.subtract(pc);
-            }
         } else {
             // if not, assume it is a hex number
-            argValue = new HexNum(processedArgs, NumSystem.DEC);
-            this.pFlag = false;
+            targetAddress = new HexNum(processedArgs, NumSystem.DEC);
+        }
 
+        // now we calculate disp and if it is base or pc relative
+        // if we are in F4, then keep it the same
+        // otherwise assume pc relative first then base relative
+        HexNum disp = new HexNum();
+        if(this.eFlag){
+            disp = targetAddress;
+        } else {
+
+            // try to do pc relative first
+            int pc = this.location.add(3).getDec();
+            int pcRelative = targetAddress.subtract(pc).getDec();
+            if(pcRelative >= -2048 && pcRelative <= 2047){
+                this.setPFlag();
+                disp = new HexNum(pcRelative);
+            } else {
+                // if pc relative is not possible, try base relative
+                int base = SymTable.getSymbol(this.base).getDec();
+                int baseRelative = targetAddress.subtract(base).getDec();
+                if(baseRelative >= 0 && baseRelative <= 4095){
+                    this.setBFlag();
+                    disp = new HexNum(baseRelative);
+                }
+            }
         }
 
         // Get the values of each individual flag
@@ -137,7 +162,7 @@ public class ExtendedStatement extends BaseStatement {
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
 
-        this.assembled = first.toString(2) + third.toString(1) + argValue.toString(argSize);
+        this.assembled = first.toString(2) + third.toString(1) + disp.toString(argSize);
         return this.assembled;
     }
 }

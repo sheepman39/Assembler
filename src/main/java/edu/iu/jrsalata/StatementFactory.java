@@ -16,8 +16,7 @@ public class StatementFactory implements StatementFactoryInterface {
     protected HexNum start = new HexNum(0);
     protected String name = "";
     protected int lineNum = 0;
-    protected boolean bFlag = false;
-    protected boolean pFlag = true;
+    protected String base = "";
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
     protected final HashMap<String, Format> formatTable = new HashMap<String, Format>();
     protected final HashMap<String, HexNum> registerTable = new HashMap<String, HexNum>();
@@ -303,12 +302,11 @@ public class StatementFactory implements StatementFactoryInterface {
                 returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
                 break;
             case "BASE":
-                // enable bFlag
-                // this.bFlag = true;
+                this.base = args;
                 break;
             case "NOBASE":
                 // disable bFlag
-                this.bFlag = false;
+                this.base = "";
             default:
                 StringBuilder msg = new StringBuilder("Invalid ASM mnemonic: ");
                 msg.append(mnemonic);
@@ -366,16 +364,8 @@ public class StatementFactory implements StatementFactoryInterface {
         // if there is an eFlag, set it
         if (eFlag) {
             returnVal.setEFlag();
-        } else {
-
-            if (bFlag) {
-                returnVal.setBFlag();
-            }
-
-            if (pFlag) {
-                returnVal.setPFlag();
-            }
-        }
+        } 
+        returnVal.setBase(this.base);
 
         return returnVal;
     }

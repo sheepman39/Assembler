@@ -42,12 +42,17 @@ public class StatementFactoryTest {
                 if (sc.hasNextLine()) {
                     String line = sc.nextLine();
                     assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
+            logger.info("Got past here");
+
                 }
             }
             sc.close();
 
         } catch (Exception e) {
             logger.severe(e.getMessage());
+            logger.severe(e.getStackTrace().toString());
+            logger.severe(e.getCause().toString());
+            assertEquals(true, false);
         }
     }
 }

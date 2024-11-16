@@ -54,6 +54,7 @@ public class ObjectWriterTest {
             new File(fileName).delete();
         } catch (Exception e) {
             logger.warning(e.getMessage());
+            assertEquals(true, false);
         }
     }
 
