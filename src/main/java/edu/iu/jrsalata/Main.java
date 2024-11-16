@@ -11,7 +11,7 @@ class Main {
 
     public static void main(String[] args) {
         // Create an instance of the StatementFactory
-        StatementFactoryInterface factory = new StatementFactory();
+        AbstractStatementFactory factory = new StatementFactory();
         Queue<Statement> queue = fileInput("input.asm", factory);
         String fileName = "output.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
@@ -19,7 +19,7 @@ class Main {
         writer.execute();
     }
 
-    public static Queue<Statement> fileInput(String filename, StatementFactoryInterface factory) {
+    public static Queue<Statement> fileInput(String filename, AbstractStatementFactory factory) {
 
         // create the ArrayList that will be returned
         Queue<Statement> queue = new LinkedList<>();

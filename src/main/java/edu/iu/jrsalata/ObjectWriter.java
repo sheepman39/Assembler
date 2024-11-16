@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public class ObjectWriter implements ObjectWriterInterface {
     static Logger logger = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
-    protected StatementFactoryInterface factory;
+    protected AbstractStatementFactory factory;
     protected Queue<Statement> queue;
 
     // constructors
@@ -22,7 +22,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.queue = new LinkedList<>();
     }
 
-    public ObjectWriter(String fileName, StatementFactoryInterface factory, Queue<Statement> queue) {
+    public ObjectWriter(String fileName, AbstractStatementFactory factory, Queue<Statement> queue) {
         this.fileName = fileName;
         this.factory = factory;
         this.queue = queue;
@@ -33,7 +33,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.fileName = fileName;
     }
 
-    public void setFactory(StatementFactoryInterface factory) {
+    public void setFactory(AbstractStatementFactory factory) {
         this.factory = factory;
     }
 
@@ -57,7 +57,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the Header Record to the given obj file
-    public static void writeHeaderRecord(FileWriter fileWriter, StatementFactoryInterface factory) {
+    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementFactory factory) {
         // Create the StringBuilder that will add each component
         // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
@@ -83,7 +83,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // Write the Text Record to the given obj file
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            StatementFactoryInterface factory) {
+            AbstractStatementFactory factory) {
 
         // store the start to handle sizes
         HexNum start = new HexNum(factory.getStart().getDec());
@@ -145,7 +145,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the End Record to the given obj file
-    public static void writeEndRecord(FileWriter fileWriter, StatementFactoryInterface factory) {
+    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementFactory factory) {
 
         // Create the StringBuilder that will add each component
         StringBuilder endRecord = new StringBuilder();

@@ -19,7 +19,7 @@ public class ObjectWriterTest {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        StatementFactoryInterface factory = new SicStatementFactory();
+        AbstractStatementFactory factory = new SicStatementFactory();
         InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
         Queue<Statement> queue = fileInput(file, factory);
         String fileName = "test.obj";
@@ -63,7 +63,7 @@ public class ObjectWriterTest {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        StatementFactoryInterface factory = new StatementFactory();
+        AbstractStatementFactory factory = new StatementFactory();
         InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
         Queue<Statement> queue = fileInput(file, factory);
         String fileName = "test.obj";
@@ -101,7 +101,7 @@ public class ObjectWriterTest {
         }
     }
 
-    public static Queue<Statement> fileInput(InputStream filename, StatementFactoryInterface factory) {
+    public static Queue<Statement> fileInput(InputStream filename, AbstractStatementFactory factory) {
 
         // create the ArrayList that will be returned
         Queue<Statement> queue = new LinkedList<Statement>();

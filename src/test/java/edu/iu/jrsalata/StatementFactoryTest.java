@@ -42,8 +42,6 @@ public class StatementFactoryTest {
                 if (sc.hasNextLine()) {
                     String line = sc.nextLine();
                     assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
-            logger.info("Got past here");
-
                 }
             }
             sc.close();

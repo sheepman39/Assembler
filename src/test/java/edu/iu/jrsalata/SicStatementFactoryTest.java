@@ -18,7 +18,7 @@ public class SicStatementFactoryTest {
         // clear the symtable
         SymTable.clear();
         ArrayList<Statement> statements = new ArrayList<Statement>();
-        StatementFactoryInterface statementFactory = new SicStatementFactory();
+        AbstractStatementFactory statementFactory = new SicStatementFactory();
         try {
             InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
 

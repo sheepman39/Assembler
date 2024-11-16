@@ -7,14 +7,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 // Class: StatementFactory
-// Implements: StatementFactoryInterfac e
+// extends: StatementFactoryInterfac e
 // This class will handle all of the statement parsing and statement creation, including setting flags and defining labels
-public class StatementFactory implements StatementFactoryInterface {
+public class StatementFactory extends AbstractStatementFactory {
 
-    // locctr keeps track of the current location of each statement
-    protected HexNum locctr;
-    protected HexNum start = new HexNum(0);
-    protected String name = "";
     protected int lineNum = 0;
     protected String base = "";
     protected final HashMap<String, HexNum> symbolTable = new HashMap<String, HexNum>();
@@ -24,44 +20,11 @@ public class StatementFactory implements StatementFactoryInterface {
 
     // constructor
     public StatementFactory() {
-        this.locctr = new HexNum(0);
+        super();
         loadInstructions("/instructions.txt");
         loadRegisters("/registers.txt");
     }
 
-    // get the start location
-    public HexNum getStart() {
-        return this.start;
-    }
-
-    // get the length of the program
-    public HexNum getLen() {
-        int lenStart = this.start.getDec();
-        int lenEnd = this.locctr.getDec();
-        return new HexNum(lenEnd - lenStart);
-    }
-
-    public String getName() {
-
-        // name needs to be exactly six characters long
-        // if we have no name, default is OBJECT
-        // if the name is longer than 6, truncate it
-        // if the name is shorter than 6, pad it with spaces at the end
-        // if the name is exactly 6, return it
-        if (this.name.equals("")) {
-            return "OUTPUT";
-        } else if (this.name.length() > 6) {
-            return this.name.substring(0, 6).toUpperCase();
-        } else if (this.name.length() < 6) {
-            StringBuilder sb = new StringBuilder(this.name);
-            for (int i = 0; i < 6 - this.name.length(); i++) {
-                sb.append(" ");
-            }
-            return sb.toString().toUpperCase();
-        } else {
-            return this.name.toUpperCase();
-        }
-    }
 
     // create a statement from a string
     public Statement processStatement(String statement) throws InvalidAssemblyFileException {
