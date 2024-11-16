@@ -36,6 +36,8 @@ public class HexNum {
             }
             sb.append(this.value);
             return sb.toString();
+        } else if(this.value.length() > digits) {
+            return this.value.substring(this.value.length() - digits);
         } else {
             return this.value;
         }

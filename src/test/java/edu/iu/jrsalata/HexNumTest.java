@@ -118,6 +118,6 @@ public class HexNumTest {
         assertEquals("00ff", hexNum2.toString(4));
         assertEquals("0ff", hexNum2.toString(3));
         assertEquals("ff", hexNum2.toString(2));
-        assertEquals("ff", hexNum2.toString(1));
+        assertEquals("f", hexNum2.toString(1));
     }
 }

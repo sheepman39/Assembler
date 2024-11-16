@@ -95,19 +95,6 @@ public class ExtendedStatement extends BaseStatement {
             this.setNFlag();
         }
 
-        // Get the values of each individual flag
-        int n = this.nFlag ? 2 : 0;
-        int i = this.iFlag ? 1 : 0;
-        int x = this.xFlag ? 8 : 0;
-        int b = this.bFlag ? 4 : 0;
-        int p = this.pFlag ? 2 : 0;
-        int e = this.eFlag ? 1 : 0;
-
-        // sicne n and i are part of the opcode bit, we will add them here
-        HexNum first = this.opcode.add(n + i);
-
-        // set the 3rd hex number to x, b, p, e
-        HexNum third = new HexNum(x + b + p + e);
         HexNum argValue;
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(this.args)) {
@@ -121,10 +108,26 @@ public class ExtendedStatement extends BaseStatement {
         } else {
             // if not, assume it is a hex number
             argValue = new HexNum(this.args, NumSystem.HEX);
+            this.pFlag = false;
+
         }
+
+        // Get the values of each individual flag
+        int n = this.nFlag ? 2 : 0;
+        int i = this.iFlag ? 1 : 0;
+        int x = this.xFlag ? 8 : 0;
+        int b = this.bFlag ? 4 : 0;
+        int p = this.pFlag ? 2 : 0;
+        int e = this.eFlag ? 1 : 0;
 
         // if the e flag is set, we need to ensure the args is 5 hex numbers
         int argSize = this.eFlag ? 5 : 3;
+
+        // sicne n and i are part of the opcode bit, we will add them here
+        HexNum first = this.opcode.add(n + i);
+
+        // set the 3rd hex number to x, b, p, e
+        HexNum third = new HexNum(x + b + p + e);
 
         String returnVal = first.toString(2) + third.toString(1) + argValue.toString(argSize);
         return returnVal;

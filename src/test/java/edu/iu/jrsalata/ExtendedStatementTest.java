@@ -51,13 +51,14 @@ public class ExtendedStatementTest {
     @Test
     public void testPCRelative() {
         // use ADD instruction with base relative addressing
+        SymTable.addSymbol("test", new HexNum("222", NumSystem.HEX));
         HexNum location = new HexNum(0);
         HexNum opcode = new HexNum("64", NumSystem.HEX);
-        ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222");
+        ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "test");
         extendedStatement.setPFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(3, extendedStatement.getSize().getDec());
-        assertEquals("672222", extendedStatement.assemble());
+        assertEquals("67221f", extendedStatement.assemble());
     }
 
     @Test
