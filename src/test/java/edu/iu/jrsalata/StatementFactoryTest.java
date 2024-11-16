@@ -51,7 +51,6 @@ public class StatementFactoryTest {
         } catch (Exception e) {
             logger.severe(e.getMessage());
             logger.severe(e.getStackTrace().toString());
-            logger.severe(e.getCause().toString());
             assertEquals(true, false);
         }
     }

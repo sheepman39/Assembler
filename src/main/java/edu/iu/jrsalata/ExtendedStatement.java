@@ -83,6 +83,10 @@ public class ExtendedStatement extends BaseStatement {
         }
 
         String processedArgs = this.args;
+
+        if(processedArgs.length() == 0){
+            processedArgs = "000";
+        }
         // check for the X flag
         // if the X flag exists, remove it from the args
         if (processedArgs.toUpperCase().replace(" ", "").contains(",X")) {
@@ -94,10 +98,7 @@ public class ExtendedStatement extends BaseStatement {
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
-        if (processedArgs.length() == 0) {
-            this.assembled = this.opcode.toString(2) + "0000";
-            return this.assembled;
-        } else if (processedArgs.charAt(0) == '#') {
+        if (processedArgs.charAt(0) == '#') {
             this.setIFlag();
             processedArgs = processedArgs.substring(1);
 
@@ -114,36 +115,13 @@ public class ExtendedStatement extends BaseStatement {
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(processedArgs)) {
             targetAddress = SymTable.getSymbol(processedArgs);
-
+            targetAddress = this.calculateDisp(targetAddress);
         } else {
             // if not, assume it is a hex number
             targetAddress = new HexNum(processedArgs, NumSystem.DEC);
         }
 
-        // now we calculate disp and if it is base or pc relative
-        // if we are in F4, then keep it the same
-        // otherwise assume pc relative first then base relative
-        HexNum disp = new HexNum();
-        if(this.eFlag){
-            disp = targetAddress;
-        } else {
 
-            // try to do pc relative first
-            int pc = this.location.add(3).getDec();
-            int pcRelative = targetAddress.subtract(pc).getDec();
-            if(pcRelative >= -2048 && pcRelative <= 2047){
-                this.setPFlag();
-                disp = new HexNum(pcRelative);
-            } else {
-                // if pc relative is not possible, try base relative
-                int base = SymTable.getSymbol(this.base).getDec();
-                int baseRelative = targetAddress.subtract(base).getDec();
-                if(baseRelative >= 0 && baseRelative <= 4095){
-                    this.setBFlag();
-                    disp = new HexNum(baseRelative);
-                }
-            }
-        }
 
         // Get the values of each individual flag
         int n = this.nFlag ? 2 : 0;
@@ -162,7 +140,36 @@ public class ExtendedStatement extends BaseStatement {
         // set the 3rd hex number to x, b, p, e
         HexNum third = new HexNum(x + b + p + e);
 
-        this.assembled = first.toString(2) + third.toString(1) + disp.toString(argSize);
+        this.assembled = first.toString(2) + third.toString(1) + targetAddress.toString(argSize);
         return this.assembled;
+    }
+
+    // this will be used to set the displacement
+    private HexNum calculateDisp(HexNum targetAddress){
+        // now we calculate disp and if it is base or pc relative
+        // if we are in F4, then keep it the same
+        // otherwise assume pc relative first then base relative
+        HexNum disp = new HexNum();
+        if(this.eFlag){
+            disp = targetAddress;
+        } else {
+
+            // try to do pc relative first
+            int pc = this.location.add(3).getDec();
+            int pcRelative = targetAddress.getDec() - pc;
+            if(pcRelative >= -2048 && pcRelative <= 2047){
+                this.setPFlag();
+                disp = new HexNum(pcRelative);
+            } else {
+                // if pc relative is not possible, try base relative
+                int base = SymTable.getSymbol(this.base).getDec();
+                int baseRelative = targetAddress.getDec() - base;
+                if(baseRelative >= 0 && baseRelative <= 4095){
+                    this.setBFlag();
+                    disp = new HexNum(baseRelative);
+                }
+            }
+        }
+        return disp;
     }
 }
