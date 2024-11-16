@@ -302,10 +302,12 @@ public class StatementFactory implements StatementFactoryInterface {
                 returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
                 break;
             case "BASE":
+                // set the base to the args
+                // will be passed to the ExtendedStatement
                 this.base = args;
                 break;
             case "NOBASE":
-                // disable bFlag
+                // clear the base
                 this.base = "";
             default:
                 StringBuilder msg = new StringBuilder("Invalid ASM mnemonic: ");

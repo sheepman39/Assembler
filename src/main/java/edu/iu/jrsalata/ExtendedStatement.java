@@ -84,9 +84,11 @@ public class ExtendedStatement extends BaseStatement {
 
         String processedArgs = this.args;
 
+        // if the args is empty, assume it is 000
         if(processedArgs.length() == 0){
             processedArgs = "000";
         }
+
         // check for the X flag
         // if the X flag exists, remove it from the args
         if (processedArgs.toUpperCase().replace(" ", "").contains(",X")) {
@@ -121,8 +123,6 @@ public class ExtendedStatement extends BaseStatement {
             targetAddress = new HexNum(processedArgs, NumSystem.DEC);
         }
 
-
-
         // Get the values of each individual flag
         int n = this.nFlag ? 2 : 0;
         int i = this.iFlag ? 1 : 0;
@@ -155,6 +155,7 @@ public class ExtendedStatement extends BaseStatement {
         } else {
 
             // try to do pc relative first
+            // it is easier to convert each value to decimal and compare
             int pc = this.location.add(3).getDec();
             int pcRelative = targetAddress.getDec() - pc;
             if(pcRelative >= -2048 && pcRelative <= 2047){
