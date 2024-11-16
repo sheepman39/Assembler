@@ -26,56 +26,16 @@ public class StatementFactory extends AbstractStatementFactory {
 
         // flag for format 4
         boolean eFlag = false;
-        // First strip any unnecessary whitespace
-        statement = statement.strip();
+        
+        // get the parts of the statement
+        String[] parts = splitStatement(statement);
+        String mnemonic = parts[0];
+        String args = parts[1];
 
-        // if the line is emtpy or is just a comment, return null
-        if (statement.equals("") || statement.charAt(0) == '.') {
+        // check if mnemonic is empty
+        // if so, return null
+        if (mnemonic.equals("")) {
             return null;
-        }
-
-        // find the comment character
-        // since there is the possibility of no comment existing, check if the comment
-        // character exists
-        // if not, then set it to the length of the string
-        int period = statement.indexOf('.') == -1 ? statement.length() : statement.indexOf('.');
-        statement = statement.substring(0, period).strip();
-
-        // now we are going to split the string up into the different parts based on
-        // space or tabs
-        String[] parts = statement.split("\\s+");
-
-        // the number of arguments determines the position of each part
-        String mnemonic = "";
-        String args = "";
-        if (parts.length == 1) {
-            mnemonic = parts[0];
-        } else if (parts.length == 2) {
-            mnemonic = parts[0];
-            args = parts[1];
-        } else if (parts.length == 3) {
-
-            // if there are 3 parts, the 0 index is the label
-            String label = parts[0];
-
-            // add the label with the to the symbol table
-            if (!SymTable.containsSymbol(label)) {
-                SymTable.addSymbol(label, this.locctr);
-            } else {
-                StringBuilder msg = new StringBuilder("Duplicate label: ");
-                msg.append(label);
-                throw new InvalidAssemblyFileException(lineNum, msg.toString());
-            }
-
-            mnemonic = parts[1];
-            args = parts[2];
-
-            if (mnemonic.equals("START")) {
-                this.name = label;
-            }
-        } else {
-            // throw an exception
-            throw new InvalidAssemblyFileException(lineNum, "Invalid Number of Arguments");
         }
 
         // since some mnemonics may contain '+' at the beginning, we want to remove it
@@ -243,7 +203,7 @@ public class StatementFactory extends AbstractStatementFactory {
         // if there is an eFlag, set it
         if (eFlag) {
             returnVal.setEFlag();
-        } 
+        }
         returnVal.setBase(this.base);
 
         return returnVal;

@@ -8,7 +8,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 public abstract class AbstractStatementFactory {
     Logger logger = Logger.getLogger(getClass().getName());
 
@@ -17,12 +16,15 @@ public abstract class AbstractStatementFactory {
     protected HexNum start = new HexNum(0);
     protected String name = "";
     protected int lineNum = 0;
-    protected final HashMap<String, HexNum> symbolTable = new HashMap<>();
-    protected final HashMap<String, Format> formatTable = new HashMap<>();
-    protected final HashMap<String, HexNum> registerTable = new HashMap<>();
+    protected final HashMap<String, HexNum> symbolTable;
+    protected final HashMap<String, Format> formatTable;
+    protected final HashMap<String, HexNum> registerTable;
 
     // constructor
     public AbstractStatementFactory() {
+        this.symbolTable = new HashMap<>();
+        this.formatTable = new HashMap<>();
+        this.registerTable = new HashMap<>();
         this.locctr = new HexNum(0);
         this.start = new HexNum();
         this.name = "";
@@ -141,6 +143,60 @@ public abstract class AbstractStatementFactory {
         }
     }
 
+    protected String[] splitStatement(String statement) throws InvalidAssemblyFileException {
+        // First strip any unnecessary whitespace
+        statement = statement.strip();
+
+        // if the line is emtpy or is just a comment, return null
+        if (statement.equals("") || statement.charAt(0) == '.') {
+            return new String[] { "", "" };
+        }
+
+        // find the comment character
+        // since there is the possibility of no comment existing, check if the comment
+        // character exists
+        // if not, then set it to the length of the string
+        int period = statement.indexOf('.') == -1 ? statement.length() : statement.indexOf('.');
+        statement = statement.substring(0, period).strip();
+
+        // now we are going to split the string up into the different parts based on
+        // space or tabs
+        String[] parts = statement.split("\\s+");
+
+        // the number of arguments determines the position of each part
+        String mnemonic = "";
+        String args = "";
+        if (parts.length == 1) {
+            mnemonic = parts[0];
+        } else if (parts.length == 2) {
+            mnemonic = parts[0];
+            args = parts[1];
+        } else if (parts.length == 3) {
+
+            // if there are 3 parts, the 0 index is the label
+            String label = parts[0];
+
+            // add the label with the to the symbol table
+            if (!SymTable.containsSymbol(label)) {
+                SymTable.addSymbol(label, this.locctr);
+            } else {
+                StringBuilder msg = new StringBuilder("Duplicate label: ");
+                msg.append(label);
+                throw new InvalidAssemblyFileException(lineNum, msg.toString());
+            }
+
+            mnemonic = parts[1];
+            args = parts[2];
+
+            if (mnemonic.equals("START")) {
+                this.name = label;
+            }
+        } else {
+            // throw an exception
+            throw new InvalidAssemblyFileException(lineNum, "Invalid Number of Arguments");
+        }
+        return new String[] { mnemonic, args };
+    }
 
     public abstract Statement processStatement(String statement) throws InvalidAssemblyFileException;
 
