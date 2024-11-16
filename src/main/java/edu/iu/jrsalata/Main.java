@@ -55,7 +55,9 @@ class Main {
             logger.severe("Something went wrong...");
             logger.severe(e.getMessage());
         } finally {
-            sc.close();
+            if(sc != null){
+                sc.close();
+            }
             logger.info("Shutting down...");
         }
     }
