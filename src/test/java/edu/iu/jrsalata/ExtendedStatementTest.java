@@ -22,7 +22,7 @@ public class ExtendedStatementTest {
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "#222");
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(3, extendedStatement.getSize().getDec());
-        assertEquals("650222", extendedStatement.assemble());
+        assertEquals("6500de", extendedStatement.assemble());
     }
 
     @Test
@@ -33,7 +33,7 @@ public class ExtendedStatementTest {
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "@222");
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(3, extendedStatement.getSize().getDec());
-        assertEquals("660222", extendedStatement.assemble());
+        assertEquals("6600de", extendedStatement.assemble());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class ExtendedStatementTest {
         extendedStatement.setBFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(3, extendedStatement.getSize().getDec());
-        assertEquals("674222", extendedStatement.assemble());
+        assertEquals("6740de", extendedStatement.assemble());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class ExtendedStatementTest {
         ExtendedStatement extendedStatement = new ExtendedStatement(location, opcode, "222, X");
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(3, extendedStatement.getSize().getDec());
-        assertEquals("1b8222", extendedStatement.assemble());
+        assertEquals("1b80de", extendedStatement.assemble());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class ExtendedStatementTest {
         extendedStatement.setBFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(3, extendedStatement.getSize().getDec());
-        assertEquals("67c222", extendedStatement.assemble());
+        assertEquals("67c0de", extendedStatement.assemble());
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ExtendedStatementTest {
         extendedStatement.setEFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(4, extendedStatement.getSize().getDec());
-        assertEquals("67102222", extendedStatement.assemble());
+        assertEquals("671008ae", extendedStatement.assemble());
     }
 
     @Test
@@ -105,6 +105,6 @@ public class ExtendedStatementTest {
         extendedStatement.setEFlag();
         assertEquals(0, extendedStatement.getLocation().getDec());
         assertEquals(4, extendedStatement.getSize().getDec());
-        assertEquals("67902222", extendedStatement.assemble());
+        assertEquals("679008ae", extendedStatement.assemble());
     }
 }

@@ -109,7 +109,7 @@ public class ExtendedStatement extends BaseStatement {
             }
         } else {
             // if not, assume it is a hex number
-            argValue = new HexNum(processedArgs, NumSystem.HEX);
+            argValue = new HexNum(processedArgs, NumSystem.DEC);
             this.pFlag = false;
 
         }
