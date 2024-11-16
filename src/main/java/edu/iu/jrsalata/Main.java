@@ -25,7 +25,7 @@ class Main {
             String firstLine = sc.nextLine();
 
             // compare with the sicFlag defined above
-            if (firstLine.equals(sicFlag)) {
+            if (firstLine.strip().equals(sicFlag)) {
                 factory = new SicStatementFactory();
                 logger.info("Using SIC Factory");
             } else {
