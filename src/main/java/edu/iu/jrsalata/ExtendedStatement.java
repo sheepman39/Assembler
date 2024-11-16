@@ -78,14 +78,14 @@ public class ExtendedStatement extends BaseStatement {
     // assemble
     @Override
     public String assemble() {
-        if(!this.assembled.equals("")) {
+        if (!this.assembled.equals("")) {
             return this.assembled;
         }
 
         String processedArgs = this.args;
 
         // if the args is empty, assume it is 000
-        if(processedArgs.length() == 0){
+        if (processedArgs.length() == 0) {
             processedArgs = "000";
         }
 
@@ -145,12 +145,12 @@ public class ExtendedStatement extends BaseStatement {
     }
 
     // this will be used to set the displacement
-    private HexNum calculateDisp(HexNum targetAddress){
+    private HexNum calculateDisp(HexNum targetAddress) {
         // now we calculate disp and if it is base or pc relative
         // if we are in F4, then keep it the same
         // otherwise assume pc relative first then base relative
         HexNum disp = new HexNum();
-        if(this.eFlag){
+        if (this.eFlag) {
             disp = targetAddress;
         } else {
 
@@ -158,14 +158,14 @@ public class ExtendedStatement extends BaseStatement {
             // it is easier to convert each value to decimal and compare
             int pc = this.location.add(3).getDec();
             int pcRelative = targetAddress.getDec() - pc;
-            if(pcRelative >= -2048 && pcRelative <= 2047){
+            if (pcRelative >= -2048 && pcRelative <= 2047) {
                 this.setPFlag();
                 disp = new HexNum(pcRelative);
             } else {
                 // if pc relative is not possible, try base relative
                 int base = SymTable.getSymbol(this.base).getDec();
                 int baseRelative = targetAddress.getDec() - base;
-                if(baseRelative >= 0 && baseRelative <= 4095){
+                if (baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);
                 }

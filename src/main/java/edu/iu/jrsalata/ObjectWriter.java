@@ -98,7 +98,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         // create two queues to hold the assembled data and its respective size
         Queue<String> assembledQueue = new LinkedList<>();
         Queue<HexNum> sizeQueue = new LinkedList<>();
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             statement = queue.poll();
             assembledQueue.add(statement.assemble());
             sizeQueue.add(statement.getSize());

@@ -7,17 +7,17 @@
 package edu.iu.jrsalata;
 
 public class InvalidAssemblyFileException extends Exception {
-    
+
     // constructors
-    public InvalidAssemblyFileException(){
+    public InvalidAssemblyFileException() {
         super("Error with input file");
     }
 
-    public InvalidAssemblyFileException(int lineNum){
+    public InvalidAssemblyFileException(int lineNum) {
         super("Error on line " + lineNum);
     }
 
-    public InvalidAssemblyFileException(int lineNum, String msg){
+    public InvalidAssemblyFileException(int lineNum, String msg) {
         super("Error on line " + lineNum + ": " + msg);
     }
 }

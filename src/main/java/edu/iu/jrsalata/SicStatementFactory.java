@@ -14,7 +14,6 @@ public class SicStatementFactory extends AbstractStatementFactory {
     // constructors
     public SicStatementFactory() {
         super();
-
     }
 
     // create a statement from a string

@@ -41,7 +41,7 @@ class Main {
                 }
             }
             sc.close();
-        } catch (InvalidAssemblyFileException e){
+        } catch (InvalidAssemblyFileException e) {
 
             // inforamtive error message from our StatementFactory
             logger.severe("===========");
@@ -51,7 +51,7 @@ class Main {
 
             // exit the program
             System.exit(1);
-        }catch (Exception e) {
+        } catch (Exception e) {
             logger.severe(e.getMessage());
             logger.severe(e.toString());
         }

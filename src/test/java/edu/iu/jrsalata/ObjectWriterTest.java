@@ -49,7 +49,7 @@ public class ObjectWriterTest {
 
             scControl.close();
             scTest.close();
-            
+
             // delete the generated test file
             new File(fileName).delete();
         } catch (Exception e) {
@@ -93,7 +93,7 @@ public class ObjectWriterTest {
 
             scControl.close();
             scTest.close();
-            
+
             // delete the generated test file
             new File(fileName).delete();
         } catch (Exception e) {
@@ -118,7 +118,7 @@ public class ObjectWriterTest {
                 if (statement != null) {
                     queue.add(statement);
                 }
-                
+
             }
             sc.close();
         } catch (Exception e) {
