@@ -79,4 +79,9 @@ public class SicStatement extends BaseStatement {
 
         return this.opcode.toString(2) + argValue.toString(4);
     }
+
+    @Override
+    public void accept(VisitorInterface visitor) {
+        visitor.visit(this);
+    }
 }
