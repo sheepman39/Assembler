@@ -151,14 +151,10 @@ public class ObjectWriter implements ObjectWriterInterface {
         // we need to write the modification records
         // since the visitor is local here, we are going to simply pass it 
         // instead of making copies
-        writeModificationRecords(fileWriter, visitor);
+        writeModificationRecords(fileWriter, visitor.getStrings());
     }
 
-    public static void writeModificationRecords(FileWriter fileWriter, VisitorInterface visitor){
-        
-        // get the modifications from the visitor
-        Queue<String> modifications = visitor.getStrings();
-
+    public static void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications) {
         // loop through each modification and write it
         while(!modifications.isEmpty()){
             try {

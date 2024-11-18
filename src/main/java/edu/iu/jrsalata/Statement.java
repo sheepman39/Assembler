@@ -20,9 +20,7 @@ public abstract class Statement {
     }
 
     // entry point for visitors
-    public void accept(VisitorInterface visitor){
-        visitor.visit(this);
-    }
+    public abstract void accept(VisitorInterface visitor);
 
     // this will be overridden by the subclasses
     // to assemble based on different formats

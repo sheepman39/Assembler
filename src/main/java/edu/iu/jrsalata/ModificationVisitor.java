@@ -6,8 +6,10 @@ package edu.iu.jrsalata;
 
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 public class ModificationVisitor implements VisitorInterface{
+    Logger logger = Logger.getLogger(getClass().getName());
 
     // queue to store modification information
     protected Queue<String> modifications;

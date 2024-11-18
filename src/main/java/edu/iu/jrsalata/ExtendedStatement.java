@@ -3,7 +3,10 @@
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
 
+import java.util.logging.Logger;
+
 public class ExtendedStatement extends BaseStatement {
+    Logger logger = Logger.getLogger(getClass().getName());
 
     protected String args;
     protected String assembled = "";
@@ -80,6 +83,11 @@ public class ExtendedStatement extends BaseStatement {
         return this.modification;
     }
 
+    @Override
+    public void accept(VisitorInterface visitor) {
+        visitor.visit(this);
+    }
+
     // assemble
     @Override
     public String assemble() {
@@ -150,10 +158,11 @@ public class ExtendedStatement extends BaseStatement {
         // check if we need to create a modification record
         // we need to create a modification record if it is using direct addressing
         // meaning that we are not using base or pc relative addressing
-        if (!this.bFlag && !this.pFlag) {
+        if (!this.bFlag && !this.pFlag && this.iFlag && this.nFlag && !processedArgs.equals("000")) {
             StringBuilder modificationBuilder = new StringBuilder();
             modificationBuilder.append("M");
-            modificationBuilder.append(this.location.toString(6));
+            modificationBuilder.append(this.location.add(1).toString(6));
+            modificationBuilder.append("0");
             modificationBuilder.append(argSize);
             this.modification = modificationBuilder.toString();
         }

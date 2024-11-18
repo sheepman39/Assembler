@@ -53,4 +53,9 @@ public class RegisterStatement extends BaseStatement {
     public String assemble() {
         return this.opcode.toString(2) + this.reg1.toString(1) + this.reg2.toString(1);
     }
+
+    @Override
+    public void accept(VisitorInterface visitor) {
+        visitor.visit(this);
+    }
 }

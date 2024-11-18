@@ -20,4 +20,9 @@ public class SingleStatement extends BaseStatement {
     public String assemble() {
         return this.opcode.toString(2);
     }
+
+    @Override
+    public void accept(VisitorInterface visitor) {
+        visitor.visit(this);
+    }
 }

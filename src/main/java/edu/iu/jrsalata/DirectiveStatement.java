@@ -50,4 +50,9 @@ public class DirectiveStatement extends Statement {
     public String assemble() {
         return this.objectCode;
     }
+
+    @Override
+    public void accept(VisitorInterface visitor) {
+        visitor.visit(this);
+    }
 }
