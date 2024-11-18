@@ -19,6 +19,11 @@ public abstract class Statement {
         return this.size;
     }
 
+    // entry point for visitors
+    public void accept(VisitorInterface visitor){
+        visitor.visit(this);
+    }
+
     // this will be overridden by the subclasses
     // to assemble based on different formats
     public abstract String assemble();

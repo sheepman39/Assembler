@@ -98,9 +98,14 @@ public class ObjectWriter implements ObjectWriterInterface {
         // create two queues to hold the assembled data and its respective size
         Queue<String> assembledQueue = new LinkedList<>();
         Queue<HexNum> sizeQueue = new LinkedList<>();
+
+        // create the visitor that will collect modification records
+        VisitorInterface visitor = new ModificationVisitor();
+
         while (!queue.isEmpty()) {
             statement = queue.poll();
             assembledQueue.add(statement.assemble());
+            statement.accept(visitor);
             sizeQueue.add(statement.getSize());
         }
 
@@ -142,6 +147,27 @@ public class ObjectWriter implements ObjectWriterInterface {
             textRecord.setLength(0);
         }
 
+        // after we are done writing the text records,
+        // we need to write the modification records
+        // since the visitor is local here, we are going to simply pass it 
+        // instead of making copies
+        writeModificationRecords(fileWriter, visitor);
+    }
+
+    public static void writeModificationRecords(FileWriter fileWriter, VisitorInterface visitor){
+        
+        // get the modifications from the visitor
+        Queue<String> modifications = visitor.getStrings();
+
+        // loop through each modification and write it
+        while(!modifications.isEmpty()){
+            try {
+                fileWriter.write(modifications.poll());
+                fileWriter.write('\n');
+            } catch (Exception e) {
+                logger.severe(e.getMessage());
+            }
+        }
     }
 
     // Write the End Record to the given obj file
