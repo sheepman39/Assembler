@@ -24,5 +24,5 @@ public abstract class Statement {
 
     // this will be overridden by the subclasses
     // to assemble based on different formats
-    public abstract String assemble();
+    public abstract String assemble() throws InvalidAssemblyFileException;
 }

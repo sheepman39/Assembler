@@ -90,7 +90,7 @@ public class ExtendedStatement extends BaseStatement {
 
     // assemble
     @Override
-    public String assemble() {
+    public String assemble() throws InvalidAssemblyFileException {
         if (!this.assembled.equals("")) {
             return this.assembled;
         }
@@ -172,7 +172,7 @@ public class ExtendedStatement extends BaseStatement {
     }
 
     // this will be used to set the displacement
-    private HexNum calculateDisp(HexNum targetAddress) {
+    private HexNum calculateDisp(HexNum targetAddress) throws InvalidAssemblyFileException{
         // now we calculate disp and if it is base or pc relative
         // if we are in F4, then keep it the same
         // otherwise assume pc relative first then base relative
@@ -192,9 +192,11 @@ public class ExtendedStatement extends BaseStatement {
                 // if pc relative is not possible, try base relative
                 int baseInt = SymTable.getSymbol(this.base).getDec();
                 int baseRelative = targetAddress.getDec() - baseInt;
-                if (baseRelative >= 0 && baseRelative <= 4095) {
+                if (this.base.length() > 0 && baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);
+                } else if (this.base.length() == 0){
+                    throw new InvalidAssemblyFileException(-1, "MISSING BASE REGISTER");
                 }
             }
         }
