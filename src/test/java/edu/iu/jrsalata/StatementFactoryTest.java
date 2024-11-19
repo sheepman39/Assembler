@@ -68,8 +68,8 @@ public class StatementFactoryTest {
         }
     }
     @Parameterized.Parameters()
-    public static Collection files() {
-        return Arrays.asList(new Object[][] {
+    public static Collection<String[]> files() {
+        return Arrays.asList(new String[][] {
             {"/testAsm2.asm", "/testAsm2.txt"},
             {"/testAsm3.asm", "/testAsm3.txt"},
         });

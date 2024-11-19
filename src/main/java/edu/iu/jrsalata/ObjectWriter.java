@@ -51,6 +51,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             writeTextRecords(fileWriter, this.queue, this.factory);
             writeEndRecord(fileWriter, this.factory);
             fileWriter.close();
+
         } catch (Exception e) {
             logger.severe(e.getMessage());
         }
@@ -83,7 +84,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // Write the Text Record to the given obj file
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            AbstractStatementFactory factory) {
+            AbstractStatementFactory factory) throws InvalidAssemblyFileException{
 
         // store the start to handle sizes
         HexNum start = new HexNum(factory.getStart().getDec());
