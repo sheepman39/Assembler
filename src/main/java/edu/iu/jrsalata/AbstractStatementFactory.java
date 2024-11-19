@@ -8,6 +8,11 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.lang.model.element.ModuleElement.Directive;
+
+import java.util.Queue;
+import java.util.LinkedList;
+
 public abstract class AbstractStatementFactory {
     Logger logger = Logger.getLogger(getClass().getName());
 
@@ -16,6 +21,7 @@ public abstract class AbstractStatementFactory {
     protected HexNum start = new HexNum(0);
     protected String name = "";
     protected int lineNum = 0;
+    protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected final HashMap<String, HexNum> symbolTable;
     protected final HashMap<String, Format> formatTable;
     protected final HashMap<String, HexNum> registerTable;
@@ -196,8 +202,28 @@ public abstract class AbstractStatementFactory {
             // throw an exception
             throw new InvalidAssemblyFileException(lineNum, "Invalid Number of Arguments");
         }
+
+        // check for the '=' character meaning it is a literal value
+        if(args.length() > 0 && args.charAt(0) == '=') {
+            args = args.substring(1);
+            handleLiteral(args);
+        }
         return new String[] { mnemonic, args };
     }
+
+    protected void handleLiteral(String args) throws InvalidAssemblyFileException {
+
+        // create a directive statement to hold the literal
+        DirectiveStatement literal = new DirectiveStatement();
+        literal.setDirective(args);
+
+        // since literals and BYTE statements use the same syntax to define and generate object code, we can interchange them here
+        handleByte(args, literal);
+
+        // add the literal to the queue
+        // this queue will be handled when LTORG is called or after END
+        literals.add(literal);
+    };
 
     protected void handleByte(String args, DirectiveStatement statement) throws InvalidAssemblyFileException {
         // check if the first char is C or X
@@ -237,6 +263,25 @@ public abstract class AbstractStatementFactory {
         }
     }
 
+    protected DirectiveStatement assembleLiterals(){
+        DirectiveStatement returnVal = new DirectiveStatement();
+        DirectiveStatement tmpLiteral;
+        StringBuilder objCode = new StringBuilder();
+        HexNum size = new HexNum();
+        // loop to assemble each unique literal and add it to our SymTable for other statements to use
+        while(!this.literals.isEmpty()){
+            tmpLiteral = this.literals.poll();
+            if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
+                SymTable.addSymbol(tmpLiteral.getDirective(), this.locctr);
+                objCode.append(tmpLiteral.assemble());
+                size = size.add(tmpLiteral.getSize());
+            }
+        }
+        returnVal.setObjCode(objCode.toString());
+        returnVal.setSize(size);
+        return returnVal;
+    }
+
     protected Statement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
 
         DirectiveStatement returnVal = new DirectiveStatement();
@@ -247,7 +292,8 @@ public abstract class AbstractStatementFactory {
                 this.start = new HexNum(this.locctr.getDec());
                 break;
             case "END":
-                // do nothing
+                // handle any remaining literals
+                returnVal = assembleLiterals();
                 break;
             case "BYTE":
                 // move BYTE logic to other method for cleanliness
@@ -265,6 +311,9 @@ public abstract class AbstractStatementFactory {
             case "RESW":
                 // set 3 * args to the size
                 returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
+                break;
+            case "LTORG":
+                returnVal = assembleLiterals();
                 break;
             default:
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");
