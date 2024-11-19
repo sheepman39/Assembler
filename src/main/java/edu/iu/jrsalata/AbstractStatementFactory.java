@@ -182,33 +182,47 @@ public abstract class AbstractStatementFactory {
 
             // if there are 3 parts, the 0 index is the label
             String label = parts[0];
-
-            // add the label with the to the symbol table
-            if (!SymTable.containsSymbol(label)) {
-                SymTable.addSymbol(label, this.locctr);
-            } else {
-                StringBuilder msg = new StringBuilder("Duplicate label: ");
-                msg.append(label);
-                throw new InvalidAssemblyFileException(lineNum, msg.toString());
-            }
-
             mnemonic = parts[1];
             args = parts[2];
+            handleLabels(label, mnemonic, args);
 
-            if (mnemonic.equals("START")) {
-                this.name = label;
-            }
         } else {
             // throw an exception
             throw new InvalidAssemblyFileException(lineNum, "Invalid Number of Arguments");
         }
 
         // check for the '=' character meaning it is a literal value
-        if(args.length() > 0 && args.charAt(0) == '=') {
+        if (args.length() > 0 && args.charAt(0) == '=') {
             args = args.substring(1);
             handleLiteral(args);
         }
         return new String[] { mnemonic, args };
+    }
+
+    protected void handleLabels(String label, String mnemonic, String args) throws InvalidAssemblyFileException {
+        // add the label with the to the symbol table
+        if (!SymTable.containsSymbol(label) && !mnemonic.equals("EQU")) {
+            SymTable.addSymbol(label, this.locctr);
+        } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
+
+            // check if the arg is * first, meaning the label is the current location
+            if(args.equals("*")) {
+                SymTable.addSymbol(label, this.locctr);
+                
+            } else {
+                SymTable.addSymbol(label, new HexNum(args, NumSystem.HEX));
+            }
+
+        } else {
+            StringBuilder msg = new StringBuilder("Duplicate label: ");
+            msg.append(label);
+            throw new InvalidAssemblyFileException(lineNum, msg.toString());
+        }
+
+        // check if the mnemonic is START
+        if (mnemonic.equals("START")) {
+            this.name = label;
+        }
     }
 
     protected void handleLiteral(String args) throws InvalidAssemblyFileException {
@@ -217,7 +231,8 @@ public abstract class AbstractStatementFactory {
         DirectiveStatement literal = new DirectiveStatement();
         literal.setDirective(args);
 
-        // since literals and BYTE statements use the same syntax to define and generate object code, we can interchange them here
+        // since literals and BYTE statements use the same syntax to define and generate
+        // object code, we can interchange them here
         handleByte(args, literal);
 
         // add the literal to the queue
@@ -263,13 +278,14 @@ public abstract class AbstractStatementFactory {
         }
     }
 
-    protected DirectiveStatement assembleLiterals(){
+    protected DirectiveStatement assembleLiterals() {
         DirectiveStatement returnVal = new DirectiveStatement();
         DirectiveStatement tmpLiteral;
         StringBuilder objCode = new StringBuilder();
         HexNum size = new HexNum();
-        // loop to assemble each unique literal and add it to our SymTable for other statements to use
-        while(!this.literals.isEmpty()){
+        // loop to assemble each unique literal and add it to our SymTable for other
+        // statements to use
+        while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
             if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
                 SymTable.addSymbol(tmpLiteral.getDirective(), this.locctr);
@@ -314,6 +330,9 @@ public abstract class AbstractStatementFactory {
                 break;
             case "LTORG":
                 returnVal = assembleLiterals();
+                break;
+            case "EQU":
+                // EQU is handled in the handleLabels method
                 break;
             default:
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");
