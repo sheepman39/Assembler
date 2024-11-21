@@ -8,11 +8,24 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.Queue;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ObjectWriterTest {
     Logger logger = Logger.getLogger(getClass().getName());
+    String assemblyFile;
+    String objectFile;
+
+    // constructor to help with parameterization
+    public ObjectWriterTest(String assemblyFile, String objectFile) {
+        this.assemblyFile = assemblyFile;
+        this.objectFile = objectFile;
+    }
 
     @Test
     public void testAsm1() {
@@ -64,7 +77,7 @@ public class ObjectWriterTest {
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
         AbstractStatementBuilder factory = new StatementBuildler();
-        InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
+        InputStream file = getClass().getResourceAsStream(assemblyFile);
         Queue<Statement> queue = fileInput(file, factory);
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
@@ -75,7 +88,7 @@ public class ObjectWriterTest {
         try {
 
             // read the original compare file
-            InputStream control = getClass().getResourceAsStream("/testAsm2.obj");
+            InputStream control = getClass().getResourceAsStream(objectFile);
 
             // read the generated file
             InputStream test = new FileInputStream(fileName);
@@ -125,5 +138,12 @@ public class ObjectWriterTest {
         }
 
         return queue;
+    }
+        @Parameterized.Parameters()
+    public static Collection<String[]> files() {
+        return Arrays.asList(new String[][] {
+            {"/testAsm2.asm", "/testAsm2.obj"},
+            {"/testAsm3.asm", "/testAsm3.obj"},
+        });
     }
 }
