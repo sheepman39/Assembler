@@ -1,5 +1,5 @@
-// Class: SicStatementFactory
-// Extends: StatementFactoryBuilder
+// Class: SicStatementBuilder
+// Extends: AbstractStatementBuilder
 // Uses sic specific instructions to assemble for SIC machines
 
 package edu.iu.jrsalata;
@@ -17,7 +17,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
 
     // create a statement from a string
     public void processStatement(String statement) throws InvalidAssemblyFileException {
-        if(statement.strip().equals(sicFlag)){
+        if (statement.strip().equals(sicFlag)) {
             return;
         }
         // define return statement

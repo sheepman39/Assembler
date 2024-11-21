@@ -1,4 +1,4 @@
-// Class: StatementFactoryBuilder
+// Class: AbstractStatementBuilder
 // This is an interface that will define the methods that concretions will use to create statements
 package edu.iu.jrsalata;
 
@@ -209,9 +209,9 @@ public abstract class AbstractStatementBuilder {
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
             // check if the arg is * first, meaning the label is the current location
-            if(args.equals("*")) {
+            if (args.equals("*")) {
                 SymTable.addSymbol(label, this.locctr);
-                
+
             } else {
                 SymTable.addSymbol(label, new HexNum(args, NumSystem.HEX));
             }
@@ -291,7 +291,7 @@ public abstract class AbstractStatementBuilder {
                 SymTable.addSymbol(tmpLiteral.getDirective(), this.locctr);
                 this.addStatement(tmpLiteral);
                 this.locctr = this.locctr.add(tmpLiteral.getSize());
-            }  
+            }
         }
     }
 
@@ -340,7 +340,7 @@ public abstract class AbstractStatementBuilder {
     }
 
     protected void addStatement(Statement statement) {
-        if(statement != null){
+        if (statement != null) {
             this.statements.add(statement);
         }
     }

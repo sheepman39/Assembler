@@ -66,11 +66,12 @@ public class StatementBuilderTest {
             fail("FATAL ERROR");
         }
     }
+
     @Parameterized.Parameters()
     public static Collection<String[]> files() {
         return Arrays.asList(new String[][] {
-            {"/testAsm2.asm", "/testAsm2.txt"},
-            {"/testAsm3.asm", "/testAsm3.txt"},
+                { "/testAsm2.asm", "/testAsm2.txt" },
+                { "/testAsm3.asm", "/testAsm3.txt" },
         });
     }
 }

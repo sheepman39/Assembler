@@ -139,11 +139,12 @@ public class ObjectWriterTest {
 
         return queue;
     }
-        @Parameterized.Parameters()
+
+    @Parameterized.Parameters()
     public static Collection<String[]> files() {
         return Arrays.asList(new String[][] {
-            {"/testAsm2.asm", "/testAsm2.obj"},
-            {"/testAsm3.asm", "/testAsm3.obj"},
+                { "/testAsm2.asm", "/testAsm2.obj" },
+                { "/testAsm3.asm", "/testAsm3.obj" },
         });
     }
 }
