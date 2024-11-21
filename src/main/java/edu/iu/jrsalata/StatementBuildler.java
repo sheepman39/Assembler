@@ -68,7 +68,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         this.locctr = this.locctr.add(newStatement.getSize());
-        this.statements.add(newStatement);
+        this.addStatement(newStatement);
     }
 
     @Override

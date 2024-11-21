@@ -289,7 +289,7 @@ public abstract class AbstractStatementBuilder {
             tmpLiteral = this.literals.poll();
             if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
                 SymTable.addSymbol(tmpLiteral.getDirective(), this.locctr);
-                this.statements.add(tmpLiteral);
+                this.addStatement(tmpLiteral);
                 this.locctr = this.locctr.add(tmpLiteral.getSize());
             }  
         }
@@ -337,6 +337,12 @@ public abstract class AbstractStatementBuilder {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         return returnVal;
+    }
+
+    protected void addStatement(Statement statement) {
+        if(statement != null){
+            this.statements.add(statement);
+        }
     }
 
     public abstract void processStatement(String statement) throws InvalidAssemblyFileException;

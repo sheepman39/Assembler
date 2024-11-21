@@ -2,7 +2,6 @@ package edu.iu.jrsalata;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.io.InputStream;

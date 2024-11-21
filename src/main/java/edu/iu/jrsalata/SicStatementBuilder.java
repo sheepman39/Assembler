@@ -7,6 +7,7 @@ package edu.iu.jrsalata;
 import java.util.logging.Logger;
 
 public class SicStatementBuilder extends AbstractStatementBuilder {
+    static final String sicFlag = "!USE SIC";
     Logger sicStatementLogger = Logger.getLogger(getClass().getName());
 
     // constructors
@@ -16,6 +17,9 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
 
     // create a statement from a string
     public void processStatement(String statement) throws InvalidAssemblyFileException {
+        if(statement.strip().equals(sicFlag)){
+            return;
+        }
         // define return statement
         Statement newStatement;
 
@@ -48,7 +52,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         this.locctr = this.locctr.add(newStatement.getSize());
-        this.statements.add(newStatement);
+        this.addStatement(newStatement);
     }
 
     private Statement createSicStatement(String mnemonic, String args) {
