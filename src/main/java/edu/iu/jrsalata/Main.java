@@ -1,6 +1,5 @@
 package edu.iu.jrsalata;
 
-import java.util.LinkedList;
 import java.util.Queue;
 import java.io.File;
 import java.util.Scanner;
@@ -11,9 +10,9 @@ class Main {
     static final String sicFlag = "!USE SIC";
 
     public static void main(String[] args) {
-        // Create an instance of the StatementFactory
+        // Create an instance of the AbstractStatementBuilder
         String inputFile = "input.asm";
-        AbstractStatementFactory factory;
+        AbstractStatementBuilder builder;
 
         // open up the inputFile and look at the first line
         // to determine which factory to use
@@ -26,19 +25,16 @@ class Main {
 
             // compare with the sicFlag defined above
             if (firstLine.strip().equals(sicFlag)) {
-                factory = new SicStatementFactory();
+                builder = new SicStatementBuilder();
                 logger.info("Using SIC Factory");
             } else {
-                factory = new StatementFactory();
+                builder = new StatementBuildler();
                 logger.info("Using SIC/XE Factory");
-
-                // reset the scanner to the beginning of the file
-                sc.close();
-                sc = new Scanner(file);
             }
-            Queue<Statement> queue = fileInput(sc, factory);
+
+            Queue<Statement> queue = fileInput(sc, builder);
             String fileName = "output.obj";
-            ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
+            ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
 
             // write the object file
             writer.execute();
@@ -55,27 +51,21 @@ class Main {
             logger.severe("Something went wrong...");
             logger.severe(e.getMessage());
         } finally {
-            if(sc != null){
+            if (sc != null) {
                 sc.close();
             }
             logger.info("Shutting down...");
         }
     }
 
-    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementFactory factory)
+    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementBuilder factory)
             throws InvalidAssemblyFileException, Exception {
-
-        // create the ArrayList that will be returned
-        Queue<Statement> queue = new LinkedList<>();
 
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
-            Statement statement = factory.processStatement(line);
-            if (statement != null) {
-                queue.add(statement);
-            }
+            factory.processStatement(line);
         }
 
-        return queue;
+        return factory.getStatements();
     }
 }

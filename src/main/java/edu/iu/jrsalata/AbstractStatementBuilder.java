@@ -1,4 +1,4 @@
-// Class: StatementFactoryInterface
+// Class: AbstractStatementBuilder
 // This is an interface that will define the methods that concretions will use to create statements
 package edu.iu.jrsalata;
 
@@ -8,12 +8,10 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.lang.model.element.ModuleElement.Directive;
-
 import java.util.Queue;
 import java.util.LinkedList;
 
-public abstract class AbstractStatementFactory {
+public abstract class AbstractStatementBuilder {
     Logger logger = Logger.getLogger(getClass().getName());
 
     // locctr keeps track of the current location of each statement
@@ -22,12 +20,13 @@ public abstract class AbstractStatementFactory {
     protected String name = "";
     protected int lineNum = 0;
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
+    protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> symbolTable;
     protected final HashMap<String, Format> formatTable;
     protected final HashMap<String, HexNum> registerTable;
 
     // constructor
-    protected AbstractStatementFactory() {
+    protected AbstractStatementBuilder() {
         this.symbolTable = new HashMap<>();
         this.formatTable = new HashMap<>();
         this.registerTable = new HashMap<>();
@@ -48,6 +47,10 @@ public abstract class AbstractStatementFactory {
         int lenStart = this.start.getDec();
         int lenEnd = this.locctr.getDec();
         return new HexNum(lenEnd - lenStart);
+    }
+
+    public Queue<Statement> getStatements() {
+        return this.statements;
     }
 
     public String getName() {
@@ -206,9 +209,9 @@ public abstract class AbstractStatementFactory {
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
             // check if the arg is * first, meaning the label is the current location
-            if(args.equals("*")) {
+            if (args.equals("*")) {
                 SymTable.addSymbol(label, this.locctr);
-                
+
             } else {
                 SymTable.addSymbol(label, new HexNum(args, NumSystem.HEX));
             }
@@ -278,24 +281,18 @@ public abstract class AbstractStatementFactory {
         }
     }
 
-    protected DirectiveStatement assembleLiterals() {
-        DirectiveStatement returnVal = new DirectiveStatement();
+    protected void assembleLiterals() {
         DirectiveStatement tmpLiteral;
-        StringBuilder objCode = new StringBuilder();
-        HexNum size = new HexNum();
         // loop to assemble each unique literal and add it to our SymTable for other
         // statements to use
         while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
             if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
                 SymTable.addSymbol(tmpLiteral.getDirective(), this.locctr);
-                objCode.append(tmpLiteral.assemble());
-                size = size.add(tmpLiteral.getSize());
+                this.addStatement(tmpLiteral);
+                this.locctr = this.locctr.add(tmpLiteral.getSize());
             }
         }
-        returnVal.setObjCode(objCode.toString());
-        returnVal.setSize(size);
-        return returnVal;
     }
 
     protected Statement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
@@ -309,7 +306,7 @@ public abstract class AbstractStatementFactory {
                 break;
             case "END":
                 // handle any remaining literals
-                returnVal = assembleLiterals();
+                assembleLiterals();
                 break;
             case "BYTE":
                 // move BYTE logic to other method for cleanliness
@@ -329,7 +326,7 @@ public abstract class AbstractStatementFactory {
                 returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
                 break;
             case "LTORG":
-                returnVal = assembleLiterals();
+                assembleLiterals();
                 break;
             case "EQU":
                 // EQU is handled in the handleLabels method
@@ -342,6 +339,12 @@ public abstract class AbstractStatementFactory {
         return returnVal;
     }
 
-    public abstract Statement processStatement(String statement) throws InvalidAssemblyFileException;
+    protected void addStatement(Statement statement) {
+        if (statement != null) {
+            this.statements.add(statement);
+        }
+    }
+
+    public abstract void processStatement(String statement) throws InvalidAssemblyFileException;
 
 }

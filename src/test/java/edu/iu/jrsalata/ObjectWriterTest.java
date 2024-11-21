@@ -8,22 +8,35 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.Queue;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedList;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
+@RunWith(Parameterized.class)
 public class ObjectWriterTest {
     Logger logger = Logger.getLogger(getClass().getName());
+    String assemblyFile;
+    String objectFile;
+
+    // constructor to help with parameterization
+    public ObjectWriterTest(String assemblyFile, String objectFile) {
+        this.assemblyFile = assemblyFile;
+        this.objectFile = objectFile;
+    }
 
     @Test
     public void testAsm1() {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        AbstractStatementFactory factory = new SicStatementFactory();
+        AbstractStatementBuilder builder = new SicStatementBuilder();
         InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
-        Queue<Statement> queue = fileInput(file, factory);
+        Queue<Statement> queue = fileInput(file, builder);
         String fileName = "test.obj";
-        ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
+        ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
 
         writer.execute();
 
@@ -63,8 +76,8 @@ public class ObjectWriterTest {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        AbstractStatementFactory factory = new StatementFactory();
-        InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
+        AbstractStatementBuilder factory = new StatementBuildler();
+        InputStream file = getClass().getResourceAsStream(assemblyFile);
         Queue<Statement> queue = fileInput(file, factory);
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
@@ -75,7 +88,7 @@ public class ObjectWriterTest {
         try {
 
             // read the original compare file
-            InputStream control = getClass().getResourceAsStream("/testAsm2.obj");
+            InputStream control = getClass().getResourceAsStream(objectFile);
 
             // read the generated file
             InputStream test = new FileInputStream(fileName);
@@ -101,7 +114,7 @@ public class ObjectWriterTest {
         }
     }
 
-    public static Queue<Statement> fileInput(InputStream filename, AbstractStatementFactory factory) {
+    public static Queue<Statement> fileInput(InputStream filename, AbstractStatementBuilder builder) {
 
         // create the ArrayList that will be returned
         Queue<Statement> queue = new LinkedList<Statement>();
@@ -114,12 +127,10 @@ public class ObjectWriterTest {
             Scanner sc = new Scanner(filename);
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-                Statement statement = factory.processStatement(line);
-                if (statement != null) {
-                    queue.add(statement);
-                }
+                builder.processStatement(line);
 
             }
+            queue = builder.getStatements();
             sc.close();
         } catch (Exception e) {
             System.out.println("File not found");
@@ -127,5 +138,13 @@ public class ObjectWriterTest {
         }
 
         return queue;
+    }
+
+    @Parameterized.Parameters()
+    public static Collection<String[]> files() {
+        return Arrays.asList(new String[][] {
+                { "/testAsm2.asm", "/testAsm2.obj" },
+                { "/testAsm3.asm", "/testAsm3.obj" },
+        });
     }
 }

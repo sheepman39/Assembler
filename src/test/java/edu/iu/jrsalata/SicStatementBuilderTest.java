@@ -2,13 +2,14 @@ package edu.iu.jrsalata;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.io.InputStream;
 import org.junit.Test;
 
-public class SicStatementFactoryTest {
+public class SicStatementBuilderTest {
 
     Logger logger = Logger.getLogger(getClass().getName());
 
@@ -17,8 +18,8 @@ public class SicStatementFactoryTest {
         // read the input file and create a list of statements
         // clear the symtable
         SymTable.clear();
-        ArrayList<Statement> statements = new ArrayList<Statement>();
-        AbstractStatementFactory statementFactory = new SicStatementFactory();
+        Queue<Statement> statements = new LinkedList<Statement>();
+        AbstractStatementBuilder statementBuilder = new SicStatementBuilder();
         try {
             InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
 
@@ -26,10 +27,9 @@ public class SicStatementFactoryTest {
             Scanner sc = new Scanner(file);
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-                Statement statement = statementFactory.processStatement(line);
-                statements.add(statement);
+                statementBuilder.processStatement(line);
             }
-
+            statements = statementBuilder.getStatements();
             // close the file
             sc.close();
 

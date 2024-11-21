@@ -167,12 +167,11 @@ public class ExtendedStatement extends BaseStatement {
             this.modification = modificationBuilder.toString();
         }
 
-
         return this.assembled;
     }
 
     // this will be used to set the displacement
-    private HexNum calculateDisp(HexNum targetAddress) throws InvalidAssemblyFileException{
+    private HexNum calculateDisp(HexNum targetAddress) throws InvalidAssemblyFileException {
         // now we calculate disp and if it is base or pc relative
         // if we are in F4, then keep it the same
         // otherwise assume pc relative first then base relative
@@ -195,7 +194,7 @@ public class ExtendedStatement extends BaseStatement {
                 if (this.base.length() > 0 && baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);
-                } else if (this.base.length() == 0){
+                } else if (this.base.length() == 0) {
                     throw new InvalidAssemblyFileException(-1, "MISSING BASE REGISTER");
                 }
             }

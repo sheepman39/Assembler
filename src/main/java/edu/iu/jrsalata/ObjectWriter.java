@@ -12,19 +12,19 @@ import java.util.logging.Logger;
 public class ObjectWriter implements ObjectWriterInterface {
     static Logger logger = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
-    protected AbstractStatementFactory factory;
+    protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
 
     // constructors
     public ObjectWriter() {
         this.fileName = "output.obj";
-        this.factory = new StatementFactory();
+        this.builder = new StatementBuildler();
         this.queue = new LinkedList<>();
     }
 
-    public ObjectWriter(String fileName, AbstractStatementFactory factory, Queue<Statement> queue) {
+    public ObjectWriter(String fileName, AbstractStatementBuilder builder, Queue<Statement> queue) {
         this.fileName = fileName;
-        this.factory = factory;
+        this.builder = builder;
         this.queue = queue;
     }
 
@@ -33,8 +33,8 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.fileName = fileName;
     }
 
-    public void setFactory(AbstractStatementFactory factory) {
-        this.factory = factory;
+    public void setBuilder(AbstractStatementBuilder builder) {
+        this.builder = builder;
     }
 
     public void setQueue(Queue<Statement> queue) {
@@ -47,9 +47,9 @@ public class ObjectWriter implements ObjectWriterInterface {
             // Create a file writter to be passed around to write each section of the obj
             // file
             FileWriter fileWriter = new FileWriter(this.fileName);
-            writeHeaderRecord(fileWriter, this.factory);
-            writeTextRecords(fileWriter, this.queue, this.factory);
-            writeEndRecord(fileWriter, this.factory);
+            writeHeaderRecord(fileWriter, this.builder);
+            writeTextRecords(fileWriter, this.queue, this.builder);
+            writeEndRecord(fileWriter, this.builder);
             fileWriter.close();
 
         } catch (Exception e) {
@@ -58,20 +58,20 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the Header Record to the given obj file
-    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementFactory factory) {
+    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementBuilder builder) {
         // Create the StringBuilder that will add each component
         // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
         headerRecord.append("H");
 
         // Col 2-7 is program name
-        headerRecord.append(factory.getName());
+        headerRecord.append(builder.getName());
 
         // Col 8-13 is the starting address
-        headerRecord.append(factory.getStart().toString(6));
+        headerRecord.append(builder.getStart().toString(6));
 
         // Col 14-19 is the length of the program
-        headerRecord.append(factory.getLen().toString(6));
+        headerRecord.append(builder.getLen().toString(6));
 
         try {
             // write the final string to the header file
@@ -84,10 +84,10 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // Write the Text Record to the given obj file
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            AbstractStatementFactory factory) throws InvalidAssemblyFileException{
+            AbstractStatementBuilder builder) throws InvalidAssemblyFileException {
 
         // store the start to handle sizes
-        HexNum start = new HexNum(factory.getStart().getDec());
+        HexNum start = new HexNum(builder.getStart().getDec());
         int tmpSize = 0;
 
         // Create the StringBuilder that will add each component
@@ -150,14 +150,14 @@ public class ObjectWriter implements ObjectWriterInterface {
 
         // after we are done writing the text records,
         // we need to write the modification records
-        // since the visitor is local here, we are going to simply pass it 
+        // since the visitor is local here, we are going to simply pass it
         // instead of making copies
         writeModificationRecords(fileWriter, visitor.getStrings());
     }
 
     public static void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications) {
         // loop through each modification and write it
-        while(!modifications.isEmpty()){
+        while (!modifications.isEmpty()) {
             try {
                 fileWriter.write(modifications.poll());
                 fileWriter.write('\n');
@@ -168,7 +168,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the End Record to the given obj file
-    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementFactory factory) {
+    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementBuilder builder) {
 
         // Create the StringBuilder that will add each component
         StringBuilder endRecord = new StringBuilder();
@@ -177,7 +177,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         endRecord.append("E");
 
         // Col 2-7 is the starting address
-        endRecord.append(factory.getStart().toString(6));
+        endRecord.append(builder.getStart().toString(6));
 
         try {
             // write the final string to the header file

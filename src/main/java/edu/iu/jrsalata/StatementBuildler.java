@@ -1,23 +1,23 @@
 // Class: StatementFactory
-// Extends: StatementFactoryInterfac e
+// Extends: StatementFactoryBuilder
 // This class will handle all of the statement parsing and statement creation, including setting flags and defining labels
 
 package edu.iu.jrsalata;
 
 import java.util.logging.Logger;
 
-public class StatementFactory extends AbstractStatementFactory {
+public class StatementBuildler extends AbstractStatementBuilder {
 
     protected String base = "";
     Logger statementLogger = Logger.getLogger(getClass().getName());
 
     // constructor
-    public StatementFactory() {
+    public StatementBuildler() {
         super();
     }
 
     // create a statement from a string
-    public Statement processStatement(String statement) throws InvalidAssemblyFileException {
+    public void processStatement(String statement) throws InvalidAssemblyFileException {
         // define return statement
         Statement newStatement;
 
@@ -35,7 +35,7 @@ public class StatementFactory extends AbstractStatementFactory {
         // check if mnemonic is empty
         // if so, return null
         if (mnemonic.equals("")) {
-            return null;
+            return;
         }
 
         // since some mnemonics may contain '+' at the beginning, we want to remove it
@@ -68,7 +68,7 @@ public class StatementFactory extends AbstractStatementFactory {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         this.locctr = this.locctr.add(newStatement.getSize());
-        return newStatement;
+        this.addStatement(newStatement);
     }
 
     @Override
