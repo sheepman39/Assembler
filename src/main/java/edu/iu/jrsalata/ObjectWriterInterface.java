@@ -8,7 +8,7 @@ import java.util.Queue;
 public interface ObjectWriterInterface {
     public void setFileName(String fileName);
 
-    public void setFactory(AbstractStatementFactory factory);
+    public void setFactory(AbstractStatementBuilder factory);
 
     public void setQueue(Queue<Statement> queue);
 

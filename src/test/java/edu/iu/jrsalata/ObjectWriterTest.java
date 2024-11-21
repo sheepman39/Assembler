@@ -19,11 +19,11 @@ public class ObjectWriterTest {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        AbstractStatementFactory factory = new SicStatementFactory();
+        AbstractStatementBuilder builder = new SicStatementBuilder();
         InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
-        Queue<Statement> queue = fileInput(file, factory);
+        Queue<Statement> queue = fileInput(file, builder);
         String fileName = "test.obj";
-        ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
+        ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
 
         writer.execute();
 
@@ -63,7 +63,7 @@ public class ObjectWriterTest {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        AbstractStatementFactory factory = new StatementFactory();
+        AbstractStatementBuilder factory = new StatementBuildler();
         InputStream file = getClass().getResourceAsStream("/testAsm2.asm");
         Queue<Statement> queue = fileInput(file, factory);
         String fileName = "test.obj";
@@ -101,7 +101,7 @@ public class ObjectWriterTest {
         }
     }
 
-    public static Queue<Statement> fileInput(InputStream filename, AbstractStatementFactory factory) {
+    public static Queue<Statement> fileInput(InputStream filename, AbstractStatementBuilder builder) {
 
         // create the ArrayList that will be returned
         Queue<Statement> queue = new LinkedList<Statement>();
@@ -114,12 +114,10 @@ public class ObjectWriterTest {
             Scanner sc = new Scanner(filename);
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-                Statement statement = factory.processStatement(line);
-                if (statement != null) {
-                    queue.add(statement);
-                }
+                builder.processStatement(line);
 
             }
+            queue = builder.getStatements();
             sc.close();
         } catch (Exception e) {
             System.out.println("File not found");

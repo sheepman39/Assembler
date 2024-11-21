@@ -12,17 +12,17 @@ import java.util.logging.Logger;
 public class ObjectWriter implements ObjectWriterInterface {
     static Logger logger = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
-    protected AbstractStatementFactory factory;
+    protected AbstractStatementBuilder factory;
     protected Queue<Statement> queue;
 
     // constructors
     public ObjectWriter() {
         this.fileName = "output.obj";
-        this.factory = new StatementFactory();
+        this.factory = new StatementBuildler();
         this.queue = new LinkedList<>();
     }
 
-    public ObjectWriter(String fileName, AbstractStatementFactory factory, Queue<Statement> queue) {
+    public ObjectWriter(String fileName, AbstractStatementBuilder factory, Queue<Statement> queue) {
         this.fileName = fileName;
         this.factory = factory;
         this.queue = queue;
@@ -33,7 +33,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.fileName = fileName;
     }
 
-    public void setFactory(AbstractStatementFactory factory) {
+    public void setFactory(AbstractStatementBuilder factory) {
         this.factory = factory;
     }
 
@@ -58,7 +58,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the Header Record to the given obj file
-    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementFactory factory) {
+    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementBuilder factory) {
         // Create the StringBuilder that will add each component
         // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
@@ -84,7 +84,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // Write the Text Record to the given obj file
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            AbstractStatementFactory factory) throws InvalidAssemblyFileException{
+            AbstractStatementBuilder factory) throws InvalidAssemblyFileException{
 
         // store the start to handle sizes
         HexNum start = new HexNum(factory.getStart().getDec());
@@ -168,7 +168,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the End Record to the given obj file
-    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementFactory factory) {
+    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementBuilder factory) {
 
         // Create the StringBuilder that will add each component
         StringBuilder endRecord = new StringBuilder();

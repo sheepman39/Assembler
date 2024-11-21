@@ -1,6 +1,5 @@
 package edu.iu.jrsalata;
 
-import java.util.LinkedList;
 import java.util.Queue;
 import java.io.File;
 import java.util.Scanner;
@@ -13,7 +12,7 @@ class Main {
     public static void main(String[] args) {
         // Create an instance of the StatementFactory
         String inputFile = "input.asm";
-        AbstractStatementFactory factory;
+        AbstractStatementBuilder factory;
 
         // open up the inputFile and look at the first line
         // to determine which factory to use
@@ -26,10 +25,10 @@ class Main {
 
             // compare with the sicFlag defined above
             if (firstLine.strip().equals(sicFlag)) {
-                factory = new SicStatementFactory();
+                factory = new SicStatementBuilder();
                 logger.info("Using SIC Factory");
             } else {
-                factory = new StatementFactory();
+                factory = new StatementBuildler();
                 logger.info("Using SIC/XE Factory");
 
                 // reset the scanner to the beginning of the file
@@ -62,20 +61,15 @@ class Main {
         }
     }
 
-    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementFactory factory)
+    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementBuilder factory)
             throws InvalidAssemblyFileException, Exception {
 
-        // create the ArrayList that will be returned
-        Queue<Statement> queue = new LinkedList<>();
 
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
-            Statement statement = factory.processStatement(line);
-            if (statement != null) {
-                queue.add(statement);
-            }
+            factory.processStatement(line);
         }
 
-        return queue;
+        return factory.getStatements();
     }
 }

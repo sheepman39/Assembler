@@ -1,21 +1,21 @@
 // Class: SicStatementFactory
-// Extends: StatementFactoryInterface
+// Extends: StatementFactoryBuilder
 // Uses sic specific instructions to assemble for SIC machines
 
 package edu.iu.jrsalata;
 
 import java.util.logging.Logger;
 
-public class SicStatementFactory extends AbstractStatementFactory {
+public class SicStatementBuilder extends AbstractStatementBuilder {
     Logger sicStatementLogger = Logger.getLogger(getClass().getName());
 
     // constructors
-    public SicStatementFactory() {
+    public SicStatementBuilder() {
         super();
     }
 
     // create a statement from a string
-    public Statement processStatement(String statement) throws InvalidAssemblyFileException {
+    public void processStatement(String statement) throws InvalidAssemblyFileException {
         // define return statement
         Statement newStatement;
 
@@ -30,7 +30,7 @@ public class SicStatementFactory extends AbstractStatementFactory {
         // check if mnemonic is empty
         // if so, return null
         if (mnemonic.equals("")) {
-            return null;
+            return;
         }
 
         // generate a new statement based on its format
@@ -48,7 +48,7 @@ public class SicStatementFactory extends AbstractStatementFactory {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
         this.locctr = this.locctr.add(newStatement.getSize());
-        return newStatement;
+        this.statements.add(newStatement);
     }
 
     private Statement createSicStatement(String mnemonic, String args) {
