@@ -8,13 +8,14 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+
 import java.util.Queue;
 import java.util.LinkedList;
 
-// JavaScript engine for evaluating expressions
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
 
 public abstract class AbstractStatementBuilder {
     Logger logger = Logger.getLogger(getClass().getName());
@@ -158,7 +159,7 @@ public abstract class AbstractStatementBuilder {
         }
     }
 
-    protected String[] splitStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
+    protected String[] splitStatement(String statement) throws InvalidAssemblyFileException {
         // First strip any unnecessary whitespace
         statement = statement.strip();
 
@@ -207,7 +208,7 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected HexNum handleExpression(String args) throws ScriptException {
+    protected HexNum handleExpression(String args) {
 
         // first split the string based on each section based on regex
         // the regex splits each section by the operators +, -, *, /
@@ -222,18 +223,19 @@ public abstract class AbstractStatementBuilder {
 
         // now that we have replaced all of the symbols with their values, we can
         // evaluate the expression
-        // using the JavaScript engine
-        // credit to
-        // https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form
-        ScriptEngineManager mgr = new ScriptEngineManager();
-        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+        // credit to 
+        // https://www.baeldung.com/java-evaluate-math-expression-string
+        // for guide on the library we are using
+        Expression expression = new ExpressionBuilder(args).build();
 
+        // note that we are type casting as int because we require a whole number
+        int result = (int) expression.evaluate();
         // evaluate the expression and return it as a string
-        return new HexNum(engine.eval(args).toString(), NumSystem.DEC);
+        return new HexNum(Integer.toString(result), NumSystem.DEC);
     }
 
     protected void handleLabels(String label, String mnemonic, String args)
-            throws InvalidAssemblyFileException, ScriptException {
+            throws InvalidAssemblyFileException {
         // We want to set the label to the current location when it is not in the symbol
         // table and one of the two conditions is true:
         // 1) mneomonic is not EQU
