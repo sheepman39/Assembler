@@ -6,6 +6,8 @@ package edu.iu.jrsalata;
 
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
 public class SicStatementBuilder extends AbstractStatementBuilder {
     static final String sicFlag = "!USE SIC";
     Logger sicStatementLogger = Logger.getLogger(getClass().getName());
@@ -16,7 +18,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
     }
 
     // create a statement from a string
-    public void processStatement(String statement) throws InvalidAssemblyFileException {
+    public void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
         if (statement.strip().equals(sicFlag)) {
             return;
         }

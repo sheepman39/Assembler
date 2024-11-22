@@ -6,6 +6,8 @@ package edu.iu.jrsalata;
 
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
 public class StatementBuildler extends AbstractStatementBuilder {
 
     protected String base = "";
@@ -17,7 +19,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
     }
 
     // create a statement from a string
-    public void processStatement(String statement) throws InvalidAssemblyFileException {
+    public void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
         // define return statement
         Statement newStatement;
 

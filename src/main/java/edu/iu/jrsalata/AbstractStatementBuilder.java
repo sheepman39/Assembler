@@ -11,6 +11,11 @@ import java.util.logging.Logger;
 import java.util.Queue;
 import java.util.LinkedList;
 
+// JavaScript engine for evaluating expressions
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+
 public abstract class AbstractStatementBuilder {
     Logger logger = Logger.getLogger(getClass().getName());
 
@@ -153,7 +158,7 @@ public abstract class AbstractStatementBuilder {
         }
     }
 
-    protected String[] splitStatement(String statement) throws InvalidAssemblyFileException {
+    protected String[] splitStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
         // First strip any unnecessary whitespace
         statement = statement.strip();
 
@@ -202,19 +207,45 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected void handleLabels(String label, String mnemonic, String args) throws InvalidAssemblyFileException {
-        // add the label with the to the symbol table
-        if (!SymTable.containsSymbol(label) && !mnemonic.equals("EQU")) {
+    protected HexNum handleExpression(String args) throws ScriptException {
+
+        // first split the string based on each section based on regex
+        String[] parts = args.split("[+\\-*/]");
+        for (String part : parts) {
+            // if the part is a symbol, replace it with the value
+            if (SymTable.containsSymbol(part)) {
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part).getDec()));
+            }
+        }
+
+        // now that we have replaced all of the symbols with their values, we can
+        // evaluate the expression
+        // using the JavaScript engine
+        // credit to
+        // https://stackoverflow.com/questions/3422673/how-to-evaluate-a-math-expression-given-in-string-form
+        ScriptEngineManager mgr = new ScriptEngineManager();
+        ScriptEngine engine = mgr.getEngineByName("JavaScript");
+
+        // evaluate the expression and return it as a string
+        return new HexNum(engine.eval(args).toString(), NumSystem.DEC);
+    }
+
+    protected void handleLabels(String label, String mnemonic, String args)
+            throws InvalidAssemblyFileException, ScriptException {
+        // We want to set the label to the current location when it is not in the symbol
+        // table and one of the two conditions is true:
+        // 1) mneomonic is not EQU
+        // 2) args is "*"
+        // because other symbols require their location to be stored or the "*"
+        // EQU requires the given value to be their stored value
+        if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
             SymTable.addSymbol(label, this.locctr);
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
+            // since args can potentially be an expression, we need to evaluate it
+            HexNum newArgs = handleExpression(args);
             // check if the arg is * first, meaning the label is the current location
-            if (args.equals("*")) {
-                SymTable.addSymbol(label, this.locctr);
-
-            } else {
-                SymTable.addSymbol(label, new HexNum(args, NumSystem.HEX));
-            }
+            SymTable.addSymbol(label, newArgs);
 
         } else {
             StringBuilder msg = new StringBuilder("Duplicate label: ");
@@ -345,6 +376,6 @@ public abstract class AbstractStatementBuilder {
         }
     }
 
-    public abstract void processStatement(String statement) throws InvalidAssemblyFileException;
+    public abstract void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException;
 
 }
