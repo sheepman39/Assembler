@@ -5,6 +5,8 @@ import java.io.File;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
 class Main {
     static Logger logger = Logger.getLogger(Main.class.getName());
     static final String sicFlag = "!USE SIC";
@@ -44,6 +46,13 @@ class Main {
             // inforamtive error message from our StatementFactory
             logger.severe("===========");
             logger.severe("ASSEMBLY FAILURE!!! Shutting down....");
+            logger.severe(e.getMessage());
+            logger.severe("===========");
+
+        } catch (ScriptException e) {
+            // inforamtive error message from our StatementFactory
+            logger.severe("===========");
+            logger.severe("EXPRESSION FAILURE!!! Shutting down....");
             logger.severe(e.getMessage());
             logger.severe("===========");
 

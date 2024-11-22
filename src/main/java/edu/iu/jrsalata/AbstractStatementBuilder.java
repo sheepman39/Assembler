@@ -8,8 +8,14 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.script.ScriptException;
+
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
+
 import java.util.Queue;
 import java.util.LinkedList;
+
 
 public abstract class AbstractStatementBuilder {
     Logger logger = Logger.getLogger(getClass().getName());
@@ -202,27 +208,58 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected void handleLabels(String label, String mnemonic, String args) throws InvalidAssemblyFileException {
-        // add the label with the to the symbol table
-        if (!SymTable.containsSymbol(label) && !mnemonic.equals("EQU")) {
+    protected HexNum handleExpression(String args) {
+
+        // first split the string based on each section based on regex
+        // the regex splits each section by the operators +, -, *, /
+        // this allows us to replace the defined symbols with our values
+        String[] parts = args.split("[+\\-*/]");
+        for (String part : parts) {
+            // if the part is a symbol, replace it with the decimal value as we need to do math in base 10
+            if (SymTable.containsSymbol(part)) {
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part).getDec()));
+            }
+        }
+
+        // now that we have replaced all of the symbols with their values, we can
+        // evaluate the expression
+        // credit to 
+        // https://www.baeldung.com/java-evaluate-math-expression-string
+        // for guide on the library we are using
+        Expression expression = new ExpressionBuilder(args).build();
+
+        // note that we are type casting as int because we require a whole number
+        int result = (int) expression.evaluate();
+        // evaluate the expression and return it as a string
+        return new HexNum(Integer.toString(result), NumSystem.DEC);
+    }
+
+    protected void handleLabels(String label, String mnemonic, String args)
+            throws InvalidAssemblyFileException {
+        // We want to set the label to the current location when it is not in the symbol
+        // table and one of the two conditions is true:
+        // 1) mneomonic is not EQU
+        // 2) args is "*"
+        // because other symbols require their location to be stored or the "*"
+        // EQU requires the given value to be their stored value
+        if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
             SymTable.addSymbol(label, this.locctr);
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
-            // check if the arg is * first, meaning the label is the current location
-            if (args.equals("*")) {
-                SymTable.addSymbol(label, this.locctr);
-
-            } else {
-                SymTable.addSymbol(label, new HexNum(args, NumSystem.HEX));
-            }
+            // since args can potentially be an expression, we need to evaluate it before adding it to the table
+            HexNum newArgs = handleExpression(args);
+            SymTable.addSymbol(label, newArgs);
 
         } else {
+
+            // we can't have duplicate labels so throw an exception
             StringBuilder msg = new StringBuilder("Duplicate label: ");
             msg.append(label);
             throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
 
-        // check if the mnemonic is START
+        // if the mnemonic is START, we need to set the name to it
+        // for the object code that will be generated later
         if (mnemonic.equals("START")) {
             this.name = label;
         }
@@ -230,7 +267,7 @@ public abstract class AbstractStatementBuilder {
 
     protected void handleLiteral(String args) throws InvalidAssemblyFileException {
 
-        // create a directive statement to hold the literal
+        // Set the directive to the args as it is the name of the symbol
         DirectiveStatement literal = new DirectiveStatement();
         literal.setDirective(args);
 
@@ -238,7 +275,6 @@ public abstract class AbstractStatementBuilder {
         // object code, we can interchange them here
         handleByte(args, literal);
 
-        // add the literal to the queue
         // this queue will be handled when LTORG is called or after END
         literals.add(literal);
     };
@@ -250,10 +286,11 @@ public abstract class AbstractStatementBuilder {
         // X represents an object code whose length is 1 and the object code is the arg
         if (args.charAt(0) == 'C') {
 
-            // remove the C and the ' at the end
+            // remove the C and the ' at the end for easier processing
             args = args.substring(2, args.length() - 1);
 
-            // set the size to the length of the string
+            // set the size to the length of the string as we need the space in the
+            // generated object code
             statement.setSize(new HexNum(args.length()));
 
             // set the object code to the ASCII value of each character
@@ -265,16 +302,17 @@ public abstract class AbstractStatementBuilder {
 
         } else if (args.charAt(0) == 'X') {
 
-            // remove the X and the ' at the end
+            // remove the X and the ' at the end for easier processing
             args = args.substring(2, args.length() - 1);
 
-            // set the size to 1
+            // set the size to 1 as the object code is the arg
             statement.setSize(new HexNum(1));
 
             // set the object code to the arg
             statement.setObjCode(args);
 
         } else {
+            // if there is an invalid argument, throw an exception
             StringBuilder msg = new StringBuilder("Invalid BYTE argument: ");
             msg.append(args);
             throw new InvalidAssemblyFileException(lineNum, msg.toString());
@@ -345,6 +383,6 @@ public abstract class AbstractStatementBuilder {
         }
     }
 
-    public abstract void processStatement(String statement) throws InvalidAssemblyFileException;
+    public abstract void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException;
 
 }
