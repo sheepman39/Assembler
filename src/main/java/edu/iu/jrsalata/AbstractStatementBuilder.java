@@ -369,6 +369,8 @@ public abstract class AbstractStatementBuilder {
             case "EQU":
                 // EQU is handled in the handleLabels method
                 break;
+            case "USE":
+                break;
             default:
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");
                 msg.append(mnemonic);
