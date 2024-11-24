@@ -71,7 +71,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         headerRecord.append(builder.getStart().toString(6));
 
         // Col 14-19 is the length of the program
-        headerRecord.append(builder.getLen().toString(6));
+        headerRecord.append(builder.getTotalLength().toString(6));
 
         try {
             // write the final string to the header file

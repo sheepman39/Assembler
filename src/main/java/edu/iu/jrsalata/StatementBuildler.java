@@ -69,7 +69,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
                 msg.append("' not found");
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
-        this.locctr = this.locctr.add(newStatement.getSize());
+        this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }
 
@@ -96,14 +96,14 @@ public class StatementBuildler extends AbstractStatementBuilder {
 
         // check to make sure that there is only one element in parts
         HexNum opcode = this.symbolTable.get(mnemonic);
-        return new SingleStatement(this.locctr, opcode);
+        return new SingleStatement(this.getLocctr(), opcode);
     }
 
     private Statement createRegStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
 
         // Statement to return
         RegisterStatement returnVal = new RegisterStatement();
-        returnVal.setLocation(this.locctr);
+        returnVal.setLocation(this.getLocctr());
 
         // find the opcode of the mnemonic
         HexNum opcode = this.symbolTable.get(mnemonic);
@@ -136,7 +136,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
         HexNum opcode = this.symbolTable.get(mnemonic);
 
         // create the ExtendedStatement
-        ExtendedStatement returnVal = new ExtendedStatement(this.locctr, opcode, args);
+        ExtendedStatement returnVal = new ExtendedStatement(this.getLocctr(), opcode, args);
 
         // if there is an eFlag, set it
         if (eFlag) {

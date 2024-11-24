@@ -53,7 +53,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
                 msg.append("' not found");
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
         }
-        this.locctr = this.locctr.add(newStatement.getSize());
+        this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }
 
@@ -63,6 +63,6 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
         HexNum opcode = this.symbolTable.get(mnemonic);
 
         // create and return the SICStatement
-        return new SicStatement(this.locctr, opcode, args);
+        return new SicStatement(this.getLocctr(), opcode, args);
     }
 }

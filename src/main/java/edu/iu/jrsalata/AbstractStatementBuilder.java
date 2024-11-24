@@ -18,41 +18,74 @@ import java.util.LinkedList;
 
 
 public abstract class AbstractStatementBuilder {
+    static final String DEFAULT_BLOCK = "DEFAULT";
     Logger logger = Logger.getLogger(getClass().getName());
 
-    // locctr keeps track of the current location of each statement
-    protected HexNum locctr;
-    protected HexNum start = new HexNum(0);
-    protected String name = "";
-    protected int lineNum = 0;
+    protected String name;
+    protected String block;
+    protected int lineNum;
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> symbolTable;
     protected final HashMap<String, Format> formatTable;
     protected final HashMap<String, HexNum> registerTable;
+    protected final HashMap<String, HexNum> locctrTable;
+    protected final HashMap<String, HexNum> startTable;
 
     // constructor
     protected AbstractStatementBuilder() {
         this.symbolTable = new HashMap<>();
         this.formatTable = new HashMap<>();
         this.registerTable = new HashMap<>();
-        this.locctr = new HexNum(0);
-        this.start = new HexNum();
         this.name = "";
+        this.lineNum = 0;
+        this.block = DEFAULT_BLOCK;
+
+        // since our locctr and start are not in the symbol table, we need to store them
+        // in a separate table
+        this.locctrTable = new HashMap<>();
+        this.startTable = new HashMap<>();
+
+        // add the default values to locctrTable and startTable
+        this.locctrTable.put(DEFAULT_BLOCK, new HexNum(0));
+        this.startTable.put(DEFAULT_BLOCK, new HexNum(0));
+
         loadInstructions("/instructions.txt");
         loadRegisters("/registers.txt");
     }
 
     // get the start location
     public HexNum getStart() {
-        return this.start;
+        return this.getStart(this.block);
+    }
+    public HexNum getStart(String block) {
+        return this.startTable.get(block);
     }
 
-    // get the length of the program
-    public HexNum getLen() {
-        int lenStart = this.start.getDec();
-        int lenEnd = this.locctr.getDec();
+    // get the length of the entire program
+    public HexNum getTotalLength(){
+        HexNum total = new HexNum();
+
+        for (String block : this.startTable.keySet()) {
+            total = total.add(this.getLen(block));
+        }
+
+        return total;
+    }
+    // get the length of a program block
+    public HexNum getLen(String block) {
+        int lenStart = this.startTable.get(block).getDec();
+        int lenEnd = this.locctrTable.get(block).getDec();
         return new HexNum(lenEnd - lenStart);
+    }
+
+    // get the location counter
+    public HexNum getLocctr() {
+        return this.getLocctr(this.block);
+    }
+
+    public HexNum getLocctr(String block) {
+        return this.locctrTable.get(block);
     }
 
     public Queue<Statement> getStatements() {
@@ -79,6 +112,22 @@ public abstract class AbstractStatementBuilder {
         } else {
             return this.name.toUpperCase();
         }
+    }
+
+    protected void setStart(String block, HexNum start) {
+        this.startTable.put(block, start);
+    }
+
+    protected void addLocctr(HexNum locctr) {
+        this.addLocctr(this.block, locctr);
+    }
+
+    protected void addLocctr(String block, HexNum locctr) {
+        
+        HexNum currentLocctr = this.locctrTable.get(block);
+        currentLocctr = currentLocctr.add(locctr);
+        this.locctrTable.put(block, currentLocctr);
+
     }
 
     protected void loadInstructions(String filename) {
@@ -243,7 +292,7 @@ public abstract class AbstractStatementBuilder {
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
         if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
-            SymTable.addSymbol(label, this.locctr);
+            SymTable.addSymbol(label, this.getLocctr(this.block));
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
             // since args can potentially be an expression, we need to evaluate it before adding it to the table
@@ -326,9 +375,9 @@ public abstract class AbstractStatementBuilder {
         while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
             if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
-                SymTable.addSymbol(tmpLiteral.getDirective(), this.locctr);
+                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr());
                 this.addStatement(tmpLiteral);
-                this.locctr = this.locctr.add(tmpLiteral.getSize());
+                this.addLocctr(this.block, tmpLiteral.getSize());
             }
         }
     }
@@ -339,8 +388,8 @@ public abstract class AbstractStatementBuilder {
         returnVal.setDirective(mnemonic);
         switch (mnemonic) {
             case "START":
-                this.locctr = new HexNum(args, NumSystem.HEX);
-                this.start = new HexNum(this.locctr.getDec());
+                this.addLocctr(DEFAULT_BLOCK, new HexNum(args, NumSystem.HEX));
+                this.setStart(DEFAULT_BLOCK, this.getStart(DEFAULT_BLOCK));
                 break;
             case "END":
                 // handle any remaining literals

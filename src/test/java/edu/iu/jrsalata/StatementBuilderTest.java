@@ -59,7 +59,7 @@ public class StatementBuilderTest {
                 }
             }
             sc.close();
-
+            
         } catch (Exception e) {
             logger.severe(e.getMessage());
             logger.severe(e.getStackTrace().toString());
