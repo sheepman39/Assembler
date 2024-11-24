@@ -4,6 +4,8 @@ package edu.iu.jrsalata;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -13,13 +15,10 @@ import javax.script.ScriptException;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-import java.util.Queue;
-import java.util.LinkedList;
-
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
-    Logger logger = Logger.getLogger(getClass().getName());
+    static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
 
     protected String name;
     protected String block;
@@ -66,8 +65,8 @@ public abstract class AbstractStatementBuilder {
     public HexNum getTotalLength(){
         HexNum total = new HexNum();
 
-        for (String block : this.startTable.keySet()) {
-            total = total.add(this.getLen(block));
+        for (String  programBlock: this.startTable.keySet()) {
+            total = total.add(this.getLen(programBlock));
         }
 
         return total;
@@ -130,7 +129,7 @@ public abstract class AbstractStatementBuilder {
 
     }
 
-    protected void loadInstructions(String filename) {
+    protected final void loadInstructions(String filename) {
         // add all of the opcodes to the table
         try {
 
@@ -142,67 +141,56 @@ public abstract class AbstractStatementBuilder {
             // for reading files within a jar
             InputStream file = getClass().getResourceAsStream(filename);
 
-            // read the file
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\s+");
-
-                // add the opcode and format to their respective tables
-                this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
-
-                // add the format to the format table
-                Format newFormat;
-                switch (parts[1]) {
-                    case "1":
-                        newFormat = Format.ONE;
-                        break;
-                    case "2":
-                        newFormat = Format.TWO;
-                        break;
-                    case "3":
-                        newFormat = Format.THREE;
-                        break;
-                    case "SIC":
-                        newFormat = Format.SIC;
-                        break;
-                    case "ASM":
-                        newFormat = Format.ASM;
-                        break;
-                    default:
-                        newFormat = Format.ASM;
-                        logger.log(Level.WARNING, "Error: Unexpected format '{}' in instructions.txt", parts[1]);
-                        break;
+            try ( // read the file
+                    Scanner sc = new Scanner(file)) {
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    String[] parts = line.split("\\s+");
+                    
+                    // add the opcode and format to their respective tables
+                    this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
+                    
+                    // add the format to the format table
+                    Format newFormat;
+                    switch (parts[1]) {
+                        case "1" -> newFormat = Format.ONE;
+                        case "2" -> newFormat = Format.TWO;
+                        case "3" -> newFormat = Format.THREE;
+                        case "SIC" -> newFormat = Format.SIC;
+                        case "ASM" -> newFormat = Format.ASM;
+                        default -> {
+                            newFormat = Format.ASM;
+                            logger.log(Level.WARNING, "Error: Unexpected format '{}' in instructions.txt", parts[1]);
+                        }
+                    }
+                    
+                    this.formatTable.put(parts[0], newFormat);
                 }
-
-                this.formatTable.put(parts[0], newFormat);
-
+                // close the scanner
             }
-            // close the scanner
-            sc.close();
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error: Could not find {}", filename);
             logger.warning(e.getMessage());
         }
     }
 
-    protected void loadRegisters(String filename) {
+    protected final void loadRegisters(String filename) {
         // add all of the registers to the table
-        try {
+        
             InputStream file = getClass().getResourceAsStream(filename);
 
-            // read the file
-            Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\s+");
-                HexNum reg = new HexNum(parts[1], NumSystem.HEX);
-                // add the register to the table
-                this.registerTable.put(parts[0], reg);
+            try ( // read the file
+                    Scanner sc = new Scanner(file)) {
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    String[] parts = line.split("\\s+");
+                    HexNum reg = new HexNum(parts[1], NumSystem.HEX);
+                    // add the register to the table
+                    this.registerTable.put(parts[0], reg);
+                }
+                // close the scanner
             }
-            // close the scanner
-            sc.close();
-        } catch (Exception e) {
+        catch (Exception e) {
             logger.log(Level.WARNING, "Error: Could not find {}", filename);
             logger.warning(e.getMessage());
         }
@@ -231,22 +219,21 @@ public abstract class AbstractStatementBuilder {
         // the number of arguments determines the position of each part
         String mnemonic = "";
         String args = "";
-        if (parts.length == 1) {
-            mnemonic = parts[0];
-        } else if (parts.length == 2) {
-            mnemonic = parts[0];
-            args = parts[1];
-        } else if (parts.length == 3) {
-
-            // if there are 3 parts, the 0 index is the label
-            String label = parts[0];
-            mnemonic = parts[1];
-            args = parts[2];
-            handleLabels(label, mnemonic, args);
-
-        } else {
-            // throw an exception
-            throw new InvalidAssemblyFileException(lineNum, "Invalid Number of Arguments");
+        switch (parts.length) {
+            case 1 -> mnemonic = parts[0];
+            case 2 -> {
+                mnemonic = parts[0];
+                args = parts[1];
+            }
+            case 3 -> {
+                // if there are 3 parts, the 0 index is the label
+                String label = parts[0];
+                mnemonic = parts[1];
+                args = parts[2];
+                handleLabels(label, mnemonic, args);
+            }
+            default -> // throw an exception
+                throw new InvalidAssemblyFileException(lineNum, "Invalid Number of Arguments");
         }
 
         // check for the '=' character meaning it is a literal value
@@ -333,38 +320,33 @@ public abstract class AbstractStatementBuilder {
         // C represents a constant string whose length is the length of the string
         // the object code of C is the ASCII value of each character in the string
         // X represents an object code whose length is 1 and the object code is the arg
-        if (args.charAt(0) == 'C') {
-
-            // remove the C and the ' at the end for easier processing
-            args = args.substring(2, args.length() - 1);
-
-            // set the size to the length of the string as we need the space in the
-            // generated object code
-            statement.setSize(new HexNum(args.length()));
-
-            // set the object code to the ASCII value of each character
-            StringBuilder objCode = new StringBuilder();
-            for (int i = 0; i < args.length(); i++) {
-                objCode.append(Integer.toHexString(args.charAt(i)));
+        switch (args.charAt(0)) {
+            case 'C' -> {
+                // remove the C and the ' at the end for easier processing
+                args = args.substring(2, args.length() - 1);
+                // set the size to the length of the string as we need the space in the
+                // generated object code
+                statement.setSize(new HexNum(args.length()));
+                // set the object code to the ASCII value of each character
+                StringBuilder objCode = new StringBuilder();
+                for (int i = 0; i < args.length(); i++) {
+                    objCode.append(Integer.toHexString(args.charAt(i)));
+                }   statement.setObjCode(objCode.toString());
             }
-            statement.setObjCode(objCode.toString());
-
-        } else if (args.charAt(0) == 'X') {
-
-            // remove the X and the ' at the end for easier processing
-            args = args.substring(2, args.length() - 1);
-
-            // set the size to 1 as the object code is the arg
-            statement.setSize(new HexNum(1));
-
-            // set the object code to the arg
-            statement.setObjCode(args);
-
-        } else {
-            // if there is an invalid argument, throw an exception
-            StringBuilder msg = new StringBuilder("Invalid BYTE argument: ");
-            msg.append(args);
-            throw new InvalidAssemblyFileException(lineNum, msg.toString());
+            case 'X' -> {
+                // remove the X and the ' at the end for easier processing
+                args = args.substring(2, args.length() - 1);
+                // set the size to 1 as the object code is the arg
+                statement.setSize(new HexNum(1));
+                // set the object code to the arg
+                statement.setObjCode(args);
+            }
+            default -> {
+                // if there is an invalid argument, throw an exception
+                StringBuilder msg = new StringBuilder("Invalid BYTE argument: ");
+                msg.append(args);
+                throw new InvalidAssemblyFileException(lineNum, msg.toString());
+            }
         }
     }
 
@@ -387,44 +369,35 @@ public abstract class AbstractStatementBuilder {
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
         switch (mnemonic) {
-            case "START":
+            case "START" -> {
                 this.addLocctr(DEFAULT_BLOCK, new HexNum(args, NumSystem.HEX));
                 this.setStart(DEFAULT_BLOCK, this.getStart(DEFAULT_BLOCK));
-                break;
-            case "END":
-                // handle any remaining literals
+            }
+            case "END" -> // handle any remaining literals
                 assembleLiterals();
-                break;
-            case "BYTE":
-                // move BYTE logic to other method for cleanliness
+            case "BYTE" -> // move BYTE logic to other method for cleanliness
                 handleByte(args, returnVal);
-                break;
-            case "WORD":
+            case "WORD" -> {
                 // set size to 3 and set the object code
                 returnVal.setSize(new HexNum(3));
                 returnVal.setObjCode(new HexNum(args, NumSystem.DEC).toString(6));
-                break;
-            case "RESB":
-                // set the args to the size
+            }
+            case "RESB" -> // set the args to the size
                 returnVal.setSize(new HexNum(args, NumSystem.DEC));
-                break;
-            case "RESW":
-                // set 3 * args to the size
+            case "RESW" -> // set 3 * args to the size
                 returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
-                break;
-            case "LTORG":
-                assembleLiterals();
-                break;
-            case "EQU":
-                // EQU is handled in the handleLabels method
-                break;
-            case "USE":
-                break;
-            default:
+            case "LTORG" -> assembleLiterals();
+            case "EQU" -> {
+            }
+            case "USE" -> {
+            }
+            default -> {
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");
                 msg.append(mnemonic);
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
+            }
         }
+        // EQU is handled in the handleLabels method
         return returnVal;
     }
 

@@ -1,24 +1,26 @@
 package edu.iu.jrsalata;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.LinkedList;
+import java.io.InputStream;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.InputStream;
+
+import javax.script.ScriptException;
+
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class SicStatementBuilderTest {
 
-    Logger logger = Logger.getLogger(getClass().getName());
+    static final Logger LOGGER = Logger.getLogger(SicStatementBuilderTest.class.getName());
 
     @Test
     public void testAsm1() {
         // read the input file and create a list of statements
         // clear the symtable
         SymTable.clear();
-        Queue<Statement> statements = new LinkedList<Statement>();
+        Queue<Statement> statements;
         AbstractStatementBuilder statementBuilder = new SicStatementBuilder();
         try {
             InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
@@ -44,8 +46,12 @@ public class SicStatementBuilderTest {
             }
             sc.close();
 
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
+        } catch (NullPointerException e) {
+            LOGGER.severe(e.getMessage());
+        } catch (InvalidAssemblyFileException e) {
+            LOGGER.log(Level.SEVERE, "Unexpected input error: {0}", e.getMessage());
+        } catch (ScriptException e) {
+            LOGGER.log(Level.SEVERE, "Unexpected script error: {0}", e.getMessage());
         }
     }
 }

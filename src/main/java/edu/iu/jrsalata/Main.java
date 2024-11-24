@@ -1,15 +1,15 @@
 package edu.iu.jrsalata;
 
-import java.util.Queue;
 import java.io.File;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.script.ScriptException;
 
 class Main {
-    static Logger logger = Logger.getLogger(Main.class.getName());
-    static final String sicFlag = "!USE SIC";
+    static final Logger logger = Logger.getLogger(Main.class.getName());
+    static final String SIC_FLAG = "!USE SIC";
 
     public static void main(String[] args) {
         // Create an instance of the AbstractStatementBuilder
@@ -26,7 +26,7 @@ class Main {
             String firstLine = sc.nextLine();
 
             // compare with the sicFlag defined above
-            if (firstLine.strip().equals(sicFlag)) {
+            if (firstLine.strip().equals(SIC_FLAG)) {
                 builder = new SicStatementBuilder();
                 logger.info("Using SIC Factory");
             } else {

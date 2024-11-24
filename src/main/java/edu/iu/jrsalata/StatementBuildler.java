@@ -4,14 +4,9 @@
 
 package edu.iu.jrsalata;
 
-import java.util.logging.Logger;
-
-import javax.script.ScriptException;
-
 public class StatementBuildler extends AbstractStatementBuilder {
 
     protected String base = "";
-    Logger statementLogger = Logger.getLogger(getClass().getName());
 
     // constructor
     public StatementBuildler() {
@@ -19,7 +14,8 @@ public class StatementBuildler extends AbstractStatementBuilder {
     }
 
     // create a statement from a string
-    public void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
+    @Override
+    public void processStatement(String statement) throws InvalidAssemblyFileException{
         // define return statement
         Statement newStatement;
 
@@ -48,26 +44,17 @@ public class StatementBuildler extends AbstractStatementBuilder {
         }
         // generate a new statement based on its format
         switch (this.formatTable.get(mnemonic)) {
-            case ONE:
-                newStatement = createStatement(mnemonic, args);
-                break;
-            case TWO:
-                newStatement = createRegStatement(mnemonic, args);
-                break;
-            case THREE:
-                newStatement = createExtStatement(mnemonic, args, eFlag);
-                break;
-            case SIC:
-                newStatement = createExtStatement(mnemonic, args, eFlag);
-                break;
-            case ASM:
-                newStatement = handleAsmStatement(mnemonic, args);
-                break;
-            default:
+            case ONE -> newStatement = createStatement(mnemonic);
+            case TWO -> newStatement = createRegStatement(mnemonic, args);
+            case THREE -> newStatement = createExtStatement(mnemonic, args, eFlag);
+            case SIC -> newStatement = createExtStatement(mnemonic, args, eFlag);
+            case ASM -> newStatement = handleAsmStatement(mnemonic, args);
+            default -> {
                 StringBuilder msg = new StringBuilder("Mnemonic '");
                 msg.append(mnemonic);
                 msg.append("' not found");
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
+            }
         }
         this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
@@ -92,7 +79,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
         return super.handleAsmStatement(mnemonic, args);
     }
 
-    private Statement createStatement(String mnemonic, String args) {
+    private Statement createStatement(String mnemonic) {
 
         // check to make sure that there is only one element in parts
         HexNum opcode = this.symbolTable.get(mnemonic);

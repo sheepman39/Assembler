@@ -5,12 +5,13 @@
 package edu.iu.jrsalata;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
 public class ObjectWriter implements ObjectWriterInterface {
-    static Logger logger = Logger.getLogger(ObjectWriter.class.getName());
+    static final Logger logger = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
     protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
@@ -29,30 +30,34 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // setters
+    @Override
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    @Override
     public void setBuilder(AbstractStatementBuilder builder) {
         this.builder = builder;
     }
 
+    @Override
     public void setQueue(Queue<Statement> queue) {
         this.queue = queue;
     }
 
     // execute the writing of the object file
+    @Override
     public void execute() {
-        try {
-            // Create a file writter to be passed around to write each section of the obj
+        
+            try ( // Create a file writter to be passed around to write each section of the obj
             // file
-            FileWriter fileWriter = new FileWriter(this.fileName);
-            writeHeaderRecord(fileWriter, this.builder);
-            writeTextRecords(fileWriter, this.queue, this.builder);
-            writeEndRecord(fileWriter, this.builder);
-            fileWriter.close();
+                    FileWriter fileWriter = new FileWriter(this.fileName)) {
+                writeHeaderRecord(fileWriter, this.builder);
+                writeTextRecords(fileWriter, this.queue, this.builder);
+                writeEndRecord(fileWriter, this.builder);
+            }
 
-        } catch (Exception e) {
+        catch (Exception e) {
             logger.severe(e.getMessage());
         }
     }
@@ -77,7 +82,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             // write the final string to the header file
             fileWriter.write(headerRecord.toString());
             fileWriter.write('\n');
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.severe(e.getMessage());
         }
     }
@@ -88,7 +93,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
         // store the start to handle sizes
         HexNum start = new HexNum(builder.getStart().getDec());
-        int tmpSize = 0;
+        int tmpSize;
 
         // Create the StringBuilder that will add each component
         StringBuilder textRecord = new StringBuilder();
@@ -140,7 +145,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             try {
                 fileWriter.write(textRecord.toString());
                 fileWriter.write('\n');
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.severe(e.getMessage());
             }
 
@@ -161,7 +166,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             try {
                 fileWriter.write(modifications.poll());
                 fileWriter.write('\n');
-            } catch (Exception e) {
+            } catch (IOException e) {
                 logger.severe(e.getMessage());
             }
         }
@@ -183,7 +188,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             // write the final string to the header file
             fileWriter.write(endRecord.toString());
             fileWriter.write('\n');
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.severe(e.getMessage());
         }
     }

@@ -1,25 +1,23 @@
 package edu.iu.jrsalata;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Scanner;
-import java.util.logging.Logger;
 import java.io.InputStream;
-import org.junit.runners.Parameterized;
-import org.junit.runner.RunWith;
-import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Scanner;
+import java.util.logging.Logger;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 // credit to this medium article for helping write paramterized tests:
 // https://medium.com/bliblidotcom-techblog/junit-4-reducing-test-code-duplication-using-parameterized-4d20ecec6f8a
 @RunWith(Parameterized.class)
 public class StatementBuilderTest {
-    Logger logger = Logger.getLogger(getClass().getName());
+    static final Logger LOGGER = Logger.getLogger(StatementBuilderTest.class.getName());
     String assemblyFile;
     String objectFile;
 
@@ -34,7 +32,7 @@ public class StatementBuilderTest {
         // read the input file and create a list of statements
         // clear the symtable
         SymTable.clear();
-        Queue<Statement> statements = new LinkedList<>();
+        Queue<Statement> statements;
         StatementBuildler statementFactory = new StatementBuildler();
         try {
             InputStream file = getClass().getResourceAsStream(assemblyFile);
@@ -60,9 +58,9 @@ public class StatementBuilderTest {
             }
             sc.close();
             
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
-            logger.severe(e.getStackTrace().toString());
+        } catch (InvalidAssemblyFileException e) {
+            LOGGER.severe(e.getMessage());
+            LOGGER.severe(Arrays.toString(e.getStackTrace()));
             fail("FATAL ERROR");
         }
     }
