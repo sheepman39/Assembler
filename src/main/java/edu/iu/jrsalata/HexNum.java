@@ -107,26 +107,28 @@ public class HexNum {
     private String convertToHex(String value, NumSystem numSystem) {
 
         String returnVal = "";
-        if (null != numSystem) switch (numSystem) {
-            case HEX -> returnVal = value;
-            case DEC -> returnVal = Integer.toHexString(Integer.parseInt(value));
-            case BIN -> returnVal = Integer.toHexString(Integer.parseInt(value, 2));
-            default -> {
+        if (null != numSystem)
+            switch (numSystem) {
+                case HEX -> returnVal = value;
+                case DEC -> returnVal = Integer.toHexString(Integer.parseInt(value));
+                case BIN -> returnVal = Integer.toHexString(Integer.parseInt(value, 2));
+                default -> {
+                }
             }
-        }
         return returnVal;
     }
 
     // private method for converting values to decimal
     private int convertToDec(String value, NumSystem numSystem) {
         int returnVal = 0;
-        if (null != numSystem) switch (numSystem) {
-            case HEX -> returnVal = Integer.parseInt(value, 16);
-            case DEC -> returnVal = Integer.parseInt(value);
-            case BIN -> returnVal = Integer.parseInt(value, 2);
-            default -> {
+        if (null != numSystem)
+            switch (numSystem) {
+                case HEX -> returnVal = Integer.parseInt(value, 16);
+                case DEC -> returnVal = Integer.parseInt(value);
+                case BIN -> returnVal = Integer.parseInt(value, 2);
+                default -> {
+                }
             }
-        }
         return returnVal;
     }
 }

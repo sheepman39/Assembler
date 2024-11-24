@@ -48,14 +48,14 @@ public class ObjectWriter implements ObjectWriterInterface {
     // execute the writing of the object file
     @Override
     public void execute() {
-        
-            try ( // Create a file writter to be passed around to write each section of the obj
-            // file
-                    FileWriter fileWriter = new FileWriter(this.fileName)) {
-                writeHeaderRecord(fileWriter, this.builder);
-                writeTextRecords(fileWriter, this.queue, this.builder);
-                writeEndRecord(fileWriter, this.builder);
-            }
+
+        try ( // Create a file writter to be passed around to write each section of the obj
+                // file
+                FileWriter fileWriter = new FileWriter(this.fileName)) {
+            writeHeaderRecord(fileWriter, this.builder);
+            writeTextRecords(fileWriter, this.queue, this.builder);
+            writeEndRecord(fileWriter, this.builder);
+        }
 
         catch (Exception e) {
             logger.severe(e.getMessage());

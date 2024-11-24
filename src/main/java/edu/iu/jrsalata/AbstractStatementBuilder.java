@@ -15,7 +15,6 @@ import javax.script.ScriptException;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
     static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
@@ -57,20 +56,22 @@ public abstract class AbstractStatementBuilder {
     public HexNum getStart() {
         return this.getStart(this.block);
     }
+
     public HexNum getStart(String block) {
         return this.startTable.get(block);
     }
 
     // get the length of the entire program
-    public HexNum getTotalLength(){
+    public HexNum getTotalLength() {
         HexNum total = new HexNum();
 
-        for (String  programBlock: this.startTable.keySet()) {
+        for (String programBlock : this.startTable.keySet()) {
             total = total.add(this.getLen(programBlock));
         }
 
         return total;
     }
+
     // get the length of a program block
     public HexNum getLen(String block) {
         int lenStart = this.startTable.get(block).getDec();
@@ -122,7 +123,7 @@ public abstract class AbstractStatementBuilder {
     }
 
     protected void addLocctr(String block, HexNum locctr) {
-        
+
         HexNum currentLocctr = this.locctrTable.get(block);
         currentLocctr = currentLocctr.add(locctr);
         this.locctrTable.put(block, currentLocctr);
@@ -146,10 +147,10 @@ public abstract class AbstractStatementBuilder {
                 while (sc.hasNextLine()) {
                     String line = sc.nextLine();
                     String[] parts = line.split("\\s+");
-                    
+
                     // add the opcode and format to their respective tables
                     this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
-                    
+
                     // add the format to the format table
                     Format newFormat;
                     switch (parts[1]) {
@@ -163,7 +164,7 @@ public abstract class AbstractStatementBuilder {
                             logger.log(Level.WARNING, "Error: Unexpected format '{}' in instructions.txt", parts[1]);
                         }
                     }
-                    
+
                     this.formatTable.put(parts[0], newFormat);
                 }
                 // close the scanner
@@ -176,21 +177,20 @@ public abstract class AbstractStatementBuilder {
 
     protected final void loadRegisters(String filename) {
         // add all of the registers to the table
-        
-            InputStream file = getClass().getResourceAsStream(filename);
 
-            try ( // read the file
-                    Scanner sc = new Scanner(file)) {
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    String[] parts = line.split("\\s+");
-                    HexNum reg = new HexNum(parts[1], NumSystem.HEX);
-                    // add the register to the table
-                    this.registerTable.put(parts[0], reg);
-                }
-                // close the scanner
+        InputStream file = getClass().getResourceAsStream(filename);
+
+        try ( // read the file
+                Scanner sc = new Scanner(file)) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                String[] parts = line.split("\\s+");
+                HexNum reg = new HexNum(parts[1], NumSystem.HEX);
+                // add the register to the table
+                this.registerTable.put(parts[0], reg);
             }
-        catch (Exception e) {
+            // close the scanner
+        } catch (Exception e) {
             logger.log(Level.WARNING, "Error: Could not find {}", filename);
             logger.warning(e.getMessage());
         }
@@ -251,7 +251,8 @@ public abstract class AbstractStatementBuilder {
         // this allows us to replace the defined symbols with our values
         String[] parts = args.split("[+\\-*/]");
         for (String part : parts) {
-            // if the part is a symbol, replace it with the decimal value as we need to do math in base 10
+            // if the part is a symbol, replace it with the decimal value as we need to do
+            // math in base 10
             if (SymTable.containsSymbol(part)) {
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part).getDec()));
             }
@@ -259,7 +260,7 @@ public abstract class AbstractStatementBuilder {
 
         // now that we have replaced all of the symbols with their values, we can
         // evaluate the expression
-        // credit to 
+        // credit to
         // https://www.baeldung.com/java-evaluate-math-expression-string
         // for guide on the library we are using
         Expression expression = new ExpressionBuilder(args).build();
@@ -282,7 +283,8 @@ public abstract class AbstractStatementBuilder {
             SymTable.addSymbol(label, this.getLocctr(this.block));
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
-            // since args can potentially be an expression, we need to evaluate it before adding it to the table
+            // since args can potentially be an expression, we need to evaluate it before
+            // adding it to the table
             HexNum newArgs = handleExpression(args);
             SymTable.addSymbol(label, newArgs);
 
@@ -331,7 +333,8 @@ public abstract class AbstractStatementBuilder {
                 StringBuilder objCode = new StringBuilder();
                 for (int i = 0; i < args.length(); i++) {
                     objCode.append(Integer.toHexString(args.charAt(i)));
-                }   statement.setObjCode(objCode.toString());
+                }
+                statement.setObjCode(objCode.toString());
             }
             case 'X' -> {
                 // remove the X and the ' at the end for easier processing

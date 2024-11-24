@@ -57,7 +57,7 @@ public class StatementBuilderTest {
                 }
             }
             sc.close();
-            
+
         } catch (InvalidAssemblyFileException e) {
             LOGGER.severe(e.getMessage());
             LOGGER.severe(Arrays.toString(e.getStackTrace()));

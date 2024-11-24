@@ -15,7 +15,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
 
     // create a statement from a string
     @Override
-    public void processStatement(String statement) throws InvalidAssemblyFileException{
+    public void processStatement(String statement) throws InvalidAssemblyFileException {
         // define return statement
         Statement newStatement;
 

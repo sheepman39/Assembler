@@ -44,37 +44,36 @@ public class ObjectWriterTest {
         writer.execute();
 
         // now compare the output between the two files
-        
 
-            // read the original compare file
-            InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
+        // read the original compare file
+        InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
 
-            try (// read the generated file
-            InputStream test = new FileInputStream(fileName)) {
-                Scanner scTest;
-                try ( // create a scanner for each file
-                        Scanner scControl = new Scanner(control)) {
-                    scTest = new Scanner(test);
-                    // compare the two files
-                    while (scControl.hasNextLine() && scTest.hasNextLine()) {
-                        String lineControl = scControl.nextLine();
-                        String lineTest = scTest.nextLine();
-                        assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
-                    }
-                
+        try (// read the generated file
+                InputStream test = new FileInputStream(fileName)) {
+            Scanner scTest;
+            try ( // create a scanner for each file
+                    Scanner scControl = new Scanner(control)) {
+                scTest = new Scanner(test);
+                // compare the two files
+                while (scControl.hasNextLine() && scTest.hasNextLine()) {
+                    String lineControl = scControl.nextLine();
+                    String lineTest = scTest.nextLine();
+                    assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+                }
+
                 scTest.close();
 
                 // delete the generated test file
                 new File(fileName).delete();
-      } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-                fail(e.getMessage());
-      }
-            } catch (IOException e) {
-                
+            } catch (Exception e) {
                 LOGGER.warning(e.getMessage());
                 fail(e.getMessage());
             }
+        } catch (IOException e) {
+
+            LOGGER.warning(e.getMessage());
+            fail(e.getMessage());
+        }
     }
 
     @Test
@@ -126,17 +125,16 @@ public class ObjectWriterTest {
 
         // open up a new file and read the string
         // parse the string and create a list of lines
-        
 
-            try ( // read the file
-                    Scanner sc = new Scanner(filename)) {
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    builder.processStatement(line);
-                    
-                }
-                queue = builder.getStatements();
-            
+        try ( // read the file
+                Scanner sc = new Scanner(filename)) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                builder.processStatement(line);
+
+            }
+            queue = builder.getStatements();
+
         } catch (Exception e) {
             System.out.println("File not found");
             System.err.println(e);
