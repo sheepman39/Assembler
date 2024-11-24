@@ -371,7 +371,7 @@ public abstract class AbstractStatementBuilder {
         switch (mnemonic) {
             case "START" -> {
                 this.addLocctr(DEFAULT_BLOCK, new HexNum(args, NumSystem.HEX));
-                this.setStart(DEFAULT_BLOCK, this.getStart(DEFAULT_BLOCK));
+                this.setStart(DEFAULT_BLOCK, this.getLocctr(DEFAULT_BLOCK));
             }
             case "END" -> // handle any remaining literals
                 assembleLiterals();
