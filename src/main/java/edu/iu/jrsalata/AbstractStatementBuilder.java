@@ -3,6 +3,7 @@
 package edu.iu.jrsalata;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -23,6 +24,7 @@ public abstract class AbstractStatementBuilder {
     protected String name;
     protected String block;
     protected int lineNum;
+    protected ArrayList<String> absoluteExpressions = new ArrayList<>();
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> instructionTable;
@@ -98,25 +100,31 @@ public abstract class AbstractStatementBuilder {
     public Queue<Statement> getStatements() {
 
         // now that the program is done with pass 1,
-        // calculate the length and relative start of each block 
+        // calculate the length and relative start of each block
         HexNum total = new HexNum();
         HexNum tmp;
         HexNum tmpStart;
-        for(String currentBlock : this.startTable.keySet()) {
+        for (String currentBlock : this.startTable.keySet()) {
             tmpStart = this.getStart(currentBlock);
             tmpStart = tmpStart.add(total);
             this.setStart(currentBlock, tmpStart);
             tmp = this.getLocctr(currentBlock);
             total = total.add(tmp);
-            
+
         }
 
-        // now modify the value of each symbol to be relative to the start of the program
+        // now modify the value of each symbol to be relative to the start of the
+        // program
         // instead of relative to the start of their block
         String symbolBlock;
         HexNum blockStart;
-        for(String currentSymbol : SymTable.getKeys()){
+        for (String currentSymbol : SymTable.getKeys()) {
 
+            // check if the currentSymbol is absolute first
+            // since the value doesn't depend on a program block, we don't need to modify it
+            if (this.absoluteExpressions.contains(currentSymbol)) {
+                continue;
+            }
             // first get the value of the symbol
             tmp = SymTable.getSymbol(currentSymbol);
 
@@ -132,7 +140,7 @@ public abstract class AbstractStatementBuilder {
             // place the new value in the symbol table
             SymTable.addSymbol(currentSymbol, tmp);
         }
-        
+
         return this.statements;
     }
 
@@ -288,20 +296,31 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected HexNum handleExpression(String args) {
+    protected HexNum handleExpression(String label, String args) {
 
         // first split the string based on each section based on regex
         // the regex splits each section by the operators +, -, *, /
         // this allows us to replace the defined symbols with our values
         String[] parts = args.split("[+\\-*/]");
+        boolean isAbsolute = true;
         for (String part : parts) {
             // if the part is a symbol, replace it with the decimal value as we need to do
             // math in base 10
             if (SymTable.containsSymbol(part)) {
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part).getDec()));
+            } else {
+                isAbsolute = false;
             }
+
         }
 
+        // add the symbol to the absoluteExpressions list if there are no hard-coded
+        // values
+        // this means that the value is always absolute at the time of assembly
+        // we need this for program block control
+        if (isAbsolute) {
+            this.absoluteExpressions.add(label);
+        }
         // now that we have replaced all of the symbols with their values, we can
         // evaluate the expression
         // credit to
@@ -329,7 +348,7 @@ public abstract class AbstractStatementBuilder {
 
             // since args can potentially be an expression, we need to evaluate it before
             // adding it to the table
-            HexNum newArgs = handleExpression(args);
+            HexNum newArgs = handleExpression(label, args);
             SymTable.addSymbol(label, newArgs, this.block);
 
         } else {
@@ -437,13 +456,15 @@ public abstract class AbstractStatementBuilder {
             case "EQU" -> {
             }
             case "USE" -> {
-                
-                // check if args is empty when blocks are switched back. If it is, set to default block
+
+                // check if args is empty when blocks are switched back. If it is, set to
+                // default block
                 if (args.equals("")) {
                     args = DEFAULT_BLOCK;
                 }
 
-                // since we can use blocks as many times as we want, we need to check if we need to create the block
+                // since we can use blocks as many times as we want, we need to check if we need
+                // to create the block
                 if (!this.locctrTable.containsKey(args)) {
                     this.locctrTable.put(args, new HexNum(0));
                     this.startTable.put(args, new HexNum(0));
