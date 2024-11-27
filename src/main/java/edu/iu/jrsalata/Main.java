@@ -34,6 +34,10 @@ class Main {
                 logger.info("Using SIC/XE Factory");
             }
 
+            // close the scanner and reopen it
+            sc.close();
+            sc = new Scanner(file);
+
             Queue<Statement> queue = fileInput(sc, builder);
             String fileName = "output.obj";
             ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
