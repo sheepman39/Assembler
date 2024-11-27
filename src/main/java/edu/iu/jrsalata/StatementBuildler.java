@@ -4,7 +4,7 @@
 
 package edu.iu.jrsalata;
 
-public class StatementBuildler extends instructionTable {
+public class StatementBuildler extends AbstractStatementBuilder {
 
     protected String base = "";
 
@@ -82,7 +82,7 @@ public class StatementBuildler extends instructionTable {
     private Statement createStatement(String mnemonic) {
 
         // check to make sure that there is only one element in parts
-        HexNum opcode = this.symbolTable.get(mnemonic);
+        HexNum opcode = this.instructionTable.get(mnemonic);
         return new SingleStatement(this.getLocctr(), opcode);
     }
 
@@ -93,7 +93,7 @@ public class StatementBuildler extends instructionTable {
         returnVal.setLocation(this.getLocctr());
 
         // find the opcode of the mnemonic
-        HexNum opcode = this.symbolTable.get(mnemonic);
+        HexNum opcode = this.instructionTable.get(mnemonic);
         returnVal.setOpcode(opcode);
 
         // find both of the registers in parts[1]
@@ -120,7 +120,7 @@ public class StatementBuildler extends instructionTable {
     private Statement createExtStatement(String mnemonic, String args, boolean eFlag) {
 
         // find the opcode of the mnemonic
-        HexNum opcode = this.symbolTable.get(mnemonic);
+        HexNum opcode = this.instructionTable.get(mnemonic);
 
         // create the ExtendedStatement
         ExtendedStatement returnVal = new ExtendedStatement(this.getLocctr(), opcode, args);

@@ -6,7 +6,7 @@ package edu.iu.jrsalata;
 
 import javax.script.ScriptException;
 
-public class SicStatementBuilder extends instructionTable {
+public class SicStatementBuilder extends AbstractStatementBuilder {
     static final String SIC_FLAG = "!USE SIC";
 
     // constructors
@@ -55,7 +55,7 @@ public class SicStatementBuilder extends instructionTable {
     private Statement createSicStatement(String mnemonic, String args) {
 
         // find the opcode of the mnemonic
-        HexNum opcode = this.symbolTable.get(mnemonic);
+        HexNum opcode = this.instructionTable.get(mnemonic);
 
         // create and return the SICStatement
         return new SicStatement(this.getLocctr(), opcode, args);

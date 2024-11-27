@@ -16,16 +16,16 @@ import javax.script.ScriptException;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-public abstract class instructionTable {
+public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
-    static final Logger logger = Logger.getLogger(instructionTable.class.getName());
+    static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
 
     protected String name;
     protected String block;
     protected int lineNum;
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
-    protected final HashMap<String, HexNum> symbolTable;
+    protected final HashMap<String, HexNum> instructionTable;
     protected final HashMap<String, Format> formatTable;
     protected final HashMap<String, HexNum> registerTable;
     protected final HashMap<String, HexNum> locctrTable;
@@ -37,8 +37,8 @@ public abstract class instructionTable {
     protected final LinkedHashMap<String, HexNum> startTable;
 
     // constructor
-    protected instructionTable() {
-        this.symbolTable = new HashMap<>();
+    protected AbstractStatementBuilder() {
+        this.instructionTable = new HashMap<>();
         this.formatTable = new HashMap<>();
         this.registerTable = new HashMap<>();
         this.name = "";
@@ -165,7 +165,7 @@ public abstract class instructionTable {
                     String[] parts = line.split("\\s+");
 
                     // add the opcode and format to their respective tables
-                    this.symbolTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
+                    this.instructionTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
 
                     // add the format to the format table
                     Format newFormat;

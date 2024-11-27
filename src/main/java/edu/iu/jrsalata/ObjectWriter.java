@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 public class ObjectWriter implements ObjectWriterInterface {
     static final Logger logger = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
-    protected instructionTable builder;
+    protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
 
     // constructors
@@ -23,7 +23,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.queue = new LinkedList<>();
     }
 
-    public ObjectWriter(String fileName, instructionTable builder, Queue<Statement> queue) {
+    public ObjectWriter(String fileName, AbstractStatementBuilder builder, Queue<Statement> queue) {
         this.fileName = fileName;
         this.builder = builder;
         this.queue = queue;
@@ -36,7 +36,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     @Override
-    public void setBuilder(instructionTable builder) {
+    public void setBuilder(AbstractStatementBuilder builder) {
         this.builder = builder;
     }
 
@@ -63,7 +63,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the Header Record to the given obj file
-    public static void writeHeaderRecord(FileWriter fileWriter, instructionTable builder) {
+    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementBuilder builder) {
         // Create the StringBuilder that will add each component
         // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
@@ -89,7 +89,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // Write the Text Record to the given obj file
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            instructionTable builder) throws InvalidAssemblyFileException {
+            AbstractStatementBuilder builder) throws InvalidAssemblyFileException {
 
         // store the start to handle sizes
         HexNum start = new HexNum(builder.getStart().getDec());
@@ -173,7 +173,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     // Write the End Record to the given obj file
-    public static void writeEndRecord(FileWriter fileWriter, instructionTable builder) {
+    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementBuilder builder) {
 
         // Create the StringBuilder that will add each component
         StringBuilder endRecord = new StringBuilder();
