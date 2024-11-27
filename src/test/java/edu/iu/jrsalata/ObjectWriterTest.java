@@ -2,7 +2,6 @@ package edu.iu.jrsalata;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -31,7 +30,7 @@ public class ObjectWriterTest {
     }
 
     @Test
-    public void testAsm1() {
+    public void testSicAsm() {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
@@ -41,15 +40,15 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
 
-        writer.execute();
-
         // now compare the output between the two files
+        try {
+            writer.execute();
+            // read the original compare file
+            InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
 
-        // read the original compare file
-        InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
+            // read the generated file
+            InputStream test = new FileInputStream(fileName);
 
-        try (// read the generated file
-                InputStream test = new FileInputStream(fileName)) {
             Scanner scTest;
             try ( // create a scanner for each file
                     Scanner scControl = new Scanner(control)) {
@@ -60,17 +59,13 @@ public class ObjectWriterTest {
                     String lineTest = scTest.nextLine();
                     assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
                 }
-
-                scTest.close();
-
-                // delete the generated test file
-                new File(fileName).delete();
-            } catch (Exception e) {
-                LOGGER.warning(e.getMessage());
-                fail(e.getMessage());
             }
-        } catch (IOException e) {
+            scTest.close();
 
+            // delete the generated test file
+            new File(fileName).delete();
+
+        } catch (InvalidAssemblyFileException | IOException e) {
             LOGGER.warning(e.getMessage());
             fail(e.getMessage());
         }
@@ -87,11 +82,10 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
-        writer.execute();
 
         // now compare the output between the two files
         try {
-
+            writer.execute();
             // read the original compare file
             InputStream control = getClass().getResourceAsStream(objectFile);
 
@@ -113,7 +107,8 @@ public class ObjectWriterTest {
 
             // delete the generated test file
             new File(fileName).delete();
-        } catch (FileNotFoundException e) {
+
+        } catch (InvalidAssemblyFileException | IOException e) {
             LOGGER.warning(e.getMessage());
             fail(e.getMessage());
         }

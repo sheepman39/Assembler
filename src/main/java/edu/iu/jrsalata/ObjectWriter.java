@@ -47,23 +47,19 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // execute the writing of the object file
     @Override
-    public void execute() {
+    public void execute() throws InvalidAssemblyFileException, IOException {
 
-        try ( // Create a file writter to be passed around to write each section of the obj
-              // file
-                FileWriter fileWriter = new FileWriter(this.fileName)) {
-            writeHeaderRecord(fileWriter, this.builder);
-            writeTextRecords(fileWriter, this.queue, this.builder);
-            writeEndRecord(fileWriter, this.builder);
-        }
+        // Create a file writter to be passed around to write each section of the obj
+        // file
+        FileWriter fileWriter = new FileWriter(this.fileName);
+        writeHeaderRecord(fileWriter, this.builder);
+        writeTextRecords(fileWriter, this.queue, this.builder);
+        writeEndRecord(fileWriter, this.builder);
 
-        catch (Exception e) {
-            logger.severe(e.getMessage());
-        }
     }
 
     // Write the Header Record to the given obj file
-    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementBuilder builder) {
+    public static void writeHeaderRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
         // Create the StringBuilder that will add each component
         // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
@@ -78,18 +74,15 @@ public class ObjectWriter implements ObjectWriterInterface {
         // Col 14-19 is the length of the program
         headerRecord.append(builder.getTotalLength().toString(6));
 
-        try {
-            // write the final string to the header file
-            fileWriter.write(headerRecord.toString());
-            fileWriter.write('\n');
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
+        // write the final string to the header file
+        fileWriter.write(headerRecord.toString());
+        fileWriter.write('\n');
+
     }
 
     // Write the Text Record to the given obj file
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            AbstractStatementBuilder builder) throws InvalidAssemblyFileException {
+            AbstractStatementBuilder builder) throws InvalidAssemblyFileException, IOException {
 
         // store the start to handle sizes
         HexNum start = new HexNum(builder.getStart().getDec());
@@ -107,7 +100,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         while (!queue.isEmpty()) {
             // Get the current block
             String currentBlock = queue.peek().getBlock();
-            
+
             // Col 1 is "T"
             textRecord.append("T");
 
@@ -120,7 +113,8 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // Col 10-69 is the text record
             tmpSize = textRecord.length();
-            while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70) && queue.peek().getBlock().equals(currentBlock)) {
+            while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70)
+                    && queue.peek().getBlock().equals(currentBlock)) {
                 statement = queue.poll();
                 textRecord.append(statement.assemble());
                 start = start.add(statement.getSize());
@@ -136,12 +130,9 @@ public class ObjectWriter implements ObjectWriterInterface {
             textRecord.replace(7, 9, size.toString(2));
 
             // Add the text record to the file
-            try {
-                fileWriter.write(textRecord.toString());
-                fileWriter.write('\n');
-            } catch (IOException e) {
-                logger.severe(e.getMessage());
-            }
+
+            fileWriter.write(textRecord.toString());
+            fileWriter.write('\n');
 
             // Clear the text record
             textRecord.setLength(0);
@@ -154,20 +145,18 @@ public class ObjectWriter implements ObjectWriterInterface {
         writeModificationRecords(fileWriter, visitor.getStrings());
     }
 
-    public static void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications) {
+    public static void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications) throws IOException {
         // loop through each modification and write it
         while (!modifications.isEmpty()) {
-            try {
-                fileWriter.write(modifications.poll());
-                fileWriter.write('\n');
-            } catch (IOException e) {
-                logger.severe(e.getMessage());
-            }
+
+            fileWriter.write(modifications.poll());
+            fileWriter.write('\n');
+
         }
     }
 
     // Write the End Record to the given obj file
-    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementBuilder builder) {
+    public static void writeEndRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
 
         // Create the StringBuilder that will add each component
         StringBuilder endRecord = new StringBuilder();
@@ -178,13 +167,10 @@ public class ObjectWriter implements ObjectWriterInterface {
         // Col 2-7 is the starting address
         endRecord.append(builder.getStart().toString(6));
 
-        try {
-            // write the final string to the header file
-            fileWriter.write(endRecord.toString());
-            fileWriter.write('\n');
-        } catch (IOException e) {
-            logger.severe(e.getMessage());
-        }
+        // write the final string to the header file
+        fileWriter.write(endRecord.toString());
+        fileWriter.write('\n');
+
     }
 
 }
