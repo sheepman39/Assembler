@@ -115,6 +115,7 @@ public class ObjectWriterTest {
             new File(fileName).delete();
         } catch (FileNotFoundException e) {
             LOGGER.warning(e.getMessage());
+            fail(e.getMessage());
         }
     }
 
@@ -136,8 +137,7 @@ public class ObjectWriterTest {
             queue = builder.getStatements();
 
         } catch (Exception e) {
-            System.out.println("File not found");
-            System.err.println(e);
+            fail(e.getMessage());
         }
 
         return queue;

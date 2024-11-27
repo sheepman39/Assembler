@@ -101,12 +101,16 @@ public abstract class AbstractStatementBuilder {
         // calculate the length and relative start of each block 
         HexNum total = new HexNum();
         HexNum tmp;
+        HexNum tmpStart;
         for(String currentBlock : this.startTable.keySet()) {
-            tmp = this.getLen(currentBlock);
+            tmpStart = this.getStart(currentBlock);
+            tmpStart = tmpStart.add(total);
+            this.setStart(currentBlock, tmpStart);
+            tmp = this.getLocctr(currentBlock);
             total = total.add(tmp);
+            
         }
 
-        
         // now modify the value of each symbol to be relative to the start of the program
         // instead of relative to the start of their block
         String symbolBlock;
