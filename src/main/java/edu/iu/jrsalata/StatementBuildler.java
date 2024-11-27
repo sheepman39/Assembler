@@ -4,7 +4,7 @@
 
 package edu.iu.jrsalata;
 
-public class StatementBuildler extends AbstractStatementBuilder {
+public class StatementBuildler extends instructionTable {
 
     protected String base = "";
 

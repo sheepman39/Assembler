@@ -6,7 +6,7 @@ package edu.iu.jrsalata;
 
 import javax.script.ScriptException;
 
-public class SicStatementBuilder extends AbstractStatementBuilder {
+public class SicStatementBuilder extends instructionTable {
     static final String SIC_FLAG = "!USE SIC";
 
     // constructors

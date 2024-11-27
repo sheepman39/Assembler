@@ -4,6 +4,7 @@ package edu.iu.jrsalata;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -15,9 +16,9 @@ import javax.script.ScriptException;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 
-public abstract class AbstractStatementBuilder {
+public abstract class instructionTable {
     static final String DEFAULT_BLOCK = "DEFAULT";
-    static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
+    static final Logger logger = Logger.getLogger(instructionTable.class.getName());
 
     protected String name;
     protected String block;
@@ -28,10 +29,15 @@ public abstract class AbstractStatementBuilder {
     protected final HashMap<String, Format> formatTable;
     protected final HashMap<String, HexNum> registerTable;
     protected final HashMap<String, HexNum> locctrTable;
-    protected final HashMap<String, HexNum> startTable;
+
+    // note that we are making startTable a LinkedHashMap
+    // this is so that we can maintain the order of each program block
+    // which is needed for calculating the relative start locations
+    // of each block
+    protected final LinkedHashMap<String, HexNum> startTable;
 
     // constructor
-    protected AbstractStatementBuilder() {
+    protected instructionTable() {
         this.symbolTable = new HashMap<>();
         this.formatTable = new HashMap<>();
         this.registerTable = new HashMap<>();
@@ -42,7 +48,7 @@ public abstract class AbstractStatementBuilder {
         // since our locctr and start are not in the symbol table, we need to store them
         // in a separate table
         this.locctrTable = new HashMap<>();
-        this.startTable = new HashMap<>();
+        this.startTable = new LinkedHashMap<>();
 
         // add the default values to locctrTable and startTable
         this.locctrTable.put(DEFAULT_BLOCK, new HexNum(0));
@@ -89,6 +95,16 @@ public abstract class AbstractStatementBuilder {
     }
 
     public Queue<Statement> getStatements() {
+
+        // now that the program is done with pass 1,
+        // calculate the length and relative start of each block 
+        HexNum total = new HexNum();
+        HexNum tmp;
+        for(String currentBlock : this.startTable.keySet()) {
+            tmp = this.getLen(currentBlock);
+            total = total.add(tmp);
+        }
+
         return this.statements;
     }
 
@@ -280,13 +296,13 @@ public abstract class AbstractStatementBuilder {
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
         if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
-            SymTable.addSymbol(label, this.getLocctr(this.block));
+            SymTable.addSymbol(label, this.getLocctr(this.block), this.block);
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
 
             // since args can potentially be an expression, we need to evaluate it before
             // adding it to the table
             HexNum newArgs = handleExpression(args);
-            SymTable.addSymbol(label, newArgs);
+            SymTable.addSymbol(label, newArgs, this.block);
 
         } else {
 
@@ -360,7 +376,7 @@ public abstract class AbstractStatementBuilder {
         while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
             if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
-                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr());
+                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr(), this.block);
                 this.addStatement(tmpLiteral);
                 this.addLocctr(this.block, tmpLiteral.getSize());
             }
@@ -393,6 +409,14 @@ public abstract class AbstractStatementBuilder {
             case "EQU" -> {
             }
             case "USE" -> {
+
+                // since we can use blocks as many times as we want, we need to check if we need to create the block
+                if (!this.locctrTable.containsKey(args)) {
+                    this.locctrTable.put(args, new HexNum(0));
+                    this.startTable.put(args, new HexNum(0));
+                }
+                // set the current block to the provided args
+                this.block = args;
             }
             default -> {
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");

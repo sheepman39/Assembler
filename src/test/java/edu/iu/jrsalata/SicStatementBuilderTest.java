@@ -21,7 +21,7 @@ public class SicStatementBuilderTest {
         // clear the symtable
         SymTable.clear();
         Queue<Statement> statements;
-        AbstractStatementBuilder statementBuilder = new SicStatementBuilder();
+        instructionsTable statementBuilder = new SicStatementBuilder();
         try {
             InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
 
