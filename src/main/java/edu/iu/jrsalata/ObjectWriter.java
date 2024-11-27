@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.logging.Logger;
 
 public class ObjectWriter implements ObjectWriterInterface {
-    static final Logger LOGGER = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
     protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
@@ -48,6 +46,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // execute the writing of the object file
     @Override
+    @SuppressWarnings("ConvertToTryWithResources")
     public void execute() throws InvalidAssemblyFileException, IOException {
 
         // Create a file writter to be passed around to write each section of the obj
@@ -107,7 +106,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         HashMap<String, HexNum> startTable = new HashMap<>();
         startTable.put(AbstractStatementBuilder.DEFAULT_BLOCK,
                 builder.getStart(AbstractStatementBuilder.DEFAULT_BLOCK));
-        HexNum currentStartLocctr = startTable.get(AbstractStatementBuilder.DEFAULT_BLOCK);
+        HexNum currentStartLocctr;
 
         while (!queue.isEmpty()) {
 
