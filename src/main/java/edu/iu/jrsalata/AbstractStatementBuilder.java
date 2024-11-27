@@ -62,7 +62,7 @@ public abstract class AbstractStatementBuilder {
 
     // get the start location
     public HexNum getStart() {
-        return this.getStart(this.block);
+        return this.getStart(DEFAULT_BLOCK);
     }
 
     public HexNum getStart(String block) {
@@ -72,20 +72,13 @@ public abstract class AbstractStatementBuilder {
     // get the length of the entire program
     public HexNum getTotalLength() {
         // remember to add the default starting location
-        HexNum total = this.getStart(DEFAULT_BLOCK);
+        HexNum total = new HexNum();
 
         for (String programBlock : this.startTable.keySet()) {
-            total = total.add(this.getLen(programBlock));
+            total = total.add(this.getLocctr(programBlock));
         }
 
         return total;
-    }
-
-    // get the length of a program block
-    public HexNum getLen(String block) {
-        int lenStart = this.startTable.get(block).getDec();
-        int lenEnd = this.locctrTable.get(block).getDec();
-        return new HexNum(lenEnd - lenStart);
     }
 
     // get the location counter

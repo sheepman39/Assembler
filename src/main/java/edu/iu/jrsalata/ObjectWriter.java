@@ -11,7 +11,7 @@ import java.util.Queue;
 import java.util.logging.Logger;
 
 public class ObjectWriter implements ObjectWriterInterface {
-    static final Logger logger = Logger.getLogger(ObjectWriter.class.getName());
+    static final Logger LOGGER = Logger.getLogger(ObjectWriter.class.getName());
     protected String fileName;
     protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
@@ -53,9 +53,12 @@ public class ObjectWriter implements ObjectWriterInterface {
         // file
         FileWriter fileWriter = new FileWriter(this.fileName);
         writeHeaderRecord(fileWriter, this.builder);
+        LOGGER.info("Wrote header");
         writeTextRecords(fileWriter, this.queue, this.builder);
+        LOGGER.info("Wrote text");
         writeEndRecord(fileWriter, this.builder);
-
+        LOGGER.info("Wrote end");
+        fileWriter.close();
     }
 
     // Write the Header Record to the given obj file

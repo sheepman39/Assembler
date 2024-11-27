@@ -30,7 +30,7 @@ public class ObjectWriterTest {
     }
 
     @Test
-    public void testSicAsm() {
+    public void testAsm1() {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
@@ -39,6 +39,8 @@ public class ObjectWriterTest {
         Queue<Statement> queue = fileInput(file, builder);
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
+
+        
 
         // now compare the output between the two files
         try {
@@ -64,9 +66,7 @@ public class ObjectWriterTest {
 
             // delete the generated test file
             new File(fileName).delete();
-
         } catch (InvalidAssemblyFileException | IOException e) {
-            LOGGER.warning(e.getMessage());
             fail(e.getMessage());
         }
     }
@@ -82,6 +82,7 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
+        
 
         // now compare the output between the two files
         try {
@@ -97,19 +98,20 @@ public class ObjectWriterTest {
                     Scanner scControl = new Scanner(control)) {
                 scTest = new Scanner(test);
                 // compare the two files
+
                 while (scControl.hasNextLine() && scTest.hasNextLine()) {
+                    
                     String lineControl = scControl.nextLine();
                     String lineTest = scTest.nextLine();
                     assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+                    
                 }
             }
             scTest.close();
 
             // delete the generated test file
             new File(fileName).delete();
-
         } catch (InvalidAssemblyFileException | IOException e) {
-            LOGGER.warning(e.getMessage());
             fail(e.getMessage());
         }
     }
@@ -122,15 +124,16 @@ public class ObjectWriterTest {
         // open up a new file and read the string
         // parse the string and create a list of lines
 
-        try ( // read the file
-                Scanner sc = new Scanner(filename)) {
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                builder.processStatement(line);
-
-            }
-            queue = builder.getStatements();
-
+            
+            try ( // read the file
+                    Scanner sc = new Scanner(filename)) {
+                while (sc.hasNextLine()) {
+                    String line = sc.nextLine();
+                    builder.processStatement(line);
+                    
+                }
+                queue = builder.getStatements();
+            
         } catch (Exception e) {
             fail(e.getMessage());
         }
