@@ -1,23 +1,25 @@
 package edu.iu.jrsalata;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.File;
-import java.util.Scanner;
-import java.util.logging.Logger;
-import java.util.Queue;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.logging.Logger;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ObjectWriterTest {
-    Logger logger = Logger.getLogger(getClass().getName());
+    static final Logger LOGGER = Logger.getLogger(ObjectWriterTest.class.getName());
     String assemblyFile;
     String objectFile;
 
@@ -38,36 +40,32 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
 
-        writer.execute();
-
         // now compare the output between the two files
         try {
-
+            writer.execute();
             // read the original compare file
             InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
 
             // read the generated file
             InputStream test = new FileInputStream(fileName);
 
-            // create a scanner for each file
-            Scanner scControl = new Scanner(control);
-            Scanner scTest = new Scanner(test);
-
-            // compare the two files
-            while (scControl.hasNextLine() && scTest.hasNextLine()) {
-                String lineControl = scControl.nextLine();
-                String lineTest = scTest.nextLine();
-                assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+            Scanner scTest;
+            try ( // create a scanner for each file
+                    Scanner scControl = new Scanner(control)) {
+                scTest = new Scanner(test);
+                // compare the two files
+                while (scControl.hasNextLine() && scTest.hasNextLine()) {
+                    String lineControl = scControl.nextLine();
+                    String lineTest = scTest.nextLine();
+                    assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+                }
             }
-
-            scControl.close();
             scTest.close();
 
             // delete the generated test file
             new File(fileName).delete();
-        } catch (Exception e) {
-            logger.warning(e.getMessage());
-            assertEquals(true, false);
+        } catch (InvalidAssemblyFileException | IOException e) {
+            fail(e.getMessage());
         }
     }
 
@@ -82,59 +80,57 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
-        writer.execute();
-
         // now compare the output between the two files
         try {
-
+            writer.execute();
             // read the original compare file
             InputStream control = getClass().getResourceAsStream(objectFile);
 
             // read the generated file
             InputStream test = new FileInputStream(fileName);
 
-            // create a scanner for each file
-            Scanner scControl = new Scanner(control);
-            Scanner scTest = new Scanner(test);
+            Scanner scTest;
+            try ( // create a scanner for each file
+                    Scanner scControl = new Scanner(control)) {
+                scTest = new Scanner(test);
+                // compare the two files
 
-            // compare the two files
-            while (scControl.hasNextLine() && scTest.hasNextLine()) {
-                String lineControl = scControl.nextLine();
-                String lineTest = scTest.nextLine();
-                assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+                while (scControl.hasNextLine() && scTest.hasNextLine()) {
+
+                    String lineControl = scControl.nextLine();
+                    String lineTest = scTest.nextLine();
+                    assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+
+                }
             }
-
-            scControl.close();
             scTest.close();
 
             // delete the generated test file
             new File(fileName).delete();
-        } catch (Exception e) {
-            logger.warning(e.getMessage());
+        } catch (InvalidAssemblyFileException | IOException e) {
+            fail(e.getMessage());
         }
     }
 
     public static Queue<Statement> fileInput(InputStream filename, AbstractStatementBuilder builder) {
 
         // create the ArrayList that will be returned
-        Queue<Statement> queue = new LinkedList<Statement>();
+        Queue<Statement> queue = new LinkedList<>();
 
         // open up a new file and read the string
         // parse the string and create a list of lines
-        try {
 
-            // read the file
-            Scanner sc = new Scanner(filename);
+        try ( // read the file
+                Scanner sc = new Scanner(filename)) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
                 builder.processStatement(line);
 
             }
             queue = builder.getStatements();
-            sc.close();
+
         } catch (Exception e) {
-            System.out.println("File not found");
-            System.err.println(e);
+            fail(e.getMessage());
         }
 
         return queue;
@@ -145,6 +141,7 @@ public class ObjectWriterTest {
         return Arrays.asList(new String[][] {
                 { "/testAsm2.asm", "/testAsm2.obj" },
                 { "/testAsm3.asm", "/testAsm3.obj" },
+                { "/testAsm4.asm", "/testAsm4.obj" },
         });
     }
 }

@@ -3,6 +3,7 @@
 
 package edu.iu.jrsalata;
 
+import java.io.IOException;
 import java.util.Queue;
 
 public interface ObjectWriterInterface {
@@ -12,5 +13,5 @@ public interface ObjectWriterInterface {
 
     public void setQueue(Queue<Statement> queue);
 
-    public void execute();
+    public void execute() throws InvalidAssemblyFileException, IOException;
 }

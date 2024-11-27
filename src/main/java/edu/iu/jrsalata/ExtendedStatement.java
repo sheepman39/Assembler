@@ -3,10 +3,7 @@
 // Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
 
-import java.util.logging.Logger;
-
 public class ExtendedStatement extends BaseStatement {
-    Logger logger = Logger.getLogger(getClass().getName());
 
     protected String args;
     protected String assembled = "";
@@ -113,20 +110,23 @@ public class ExtendedStatement extends BaseStatement {
         // '#' means immediate addressing
         // '@' means indirect addressing
         // if neither, assume direct addressing
-        if (processedArgs.charAt(0) == '#') {
-            this.setIFlag();
-            processedArgs = processedArgs.substring(1);
-
-        } else if (processedArgs.charAt(0) == '@') {
-            this.setNFlag();
-            processedArgs = processedArgs.substring(1);
-
-        } else {
-            this.setIFlag();
-            this.setNFlag();
+        switch (processedArgs.charAt(0)) {
+            case '#' -> {
+                this.setIFlag();
+                processedArgs = processedArgs.substring(1);
+            }
+            case '@' -> {
+                this.setNFlag();
+                processedArgs = processedArgs.substring(1);
+            }
+            default -> {
+                this.setIFlag();
+                this.setNFlag();
+            }
         }
 
         HexNum targetAddress;
+
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(processedArgs)) {
             targetAddress = SymTable.getSymbol(processedArgs);

@@ -24,6 +24,7 @@ public class HexNum {
         this.value = convertToHex(value, numSystem);
     }
 
+    @Override
     public String toString() {
         return this.value;
     }
@@ -106,26 +107,24 @@ public class HexNum {
     private String convertToHex(String value, NumSystem numSystem) {
 
         String returnVal = "";
-        if (numSystem == NumSystem.HEX) {
-            returnVal = value;
-        } else if (numSystem == NumSystem.DEC) {
-            returnVal = Integer.toHexString(Integer.parseInt(value));
-        } else if (numSystem == NumSystem.BIN) {
-            returnVal = Integer.toHexString(Integer.parseInt(value, 2));
-        }
+        if (null != numSystem)
+            switch (numSystem) {
+                case HEX -> returnVal = value;
+                case DEC -> returnVal = Integer.toHexString(Integer.parseInt(value));
+                case BIN -> returnVal = Integer.toHexString(Integer.parseInt(value, 2));
+            }
         return returnVal;
     }
 
     // private method for converting values to decimal
     private int convertToDec(String value, NumSystem numSystem) {
         int returnVal = 0;
-        if (numSystem == NumSystem.HEX) {
-            returnVal = Integer.parseInt(value, 16);
-        } else if (numSystem == NumSystem.DEC) {
-            returnVal = Integer.parseInt(value);
-        } else if (numSystem == NumSystem.BIN) {
-            returnVal = Integer.parseInt(value, 2);
-        }
+        if (null != numSystem)
+            switch (numSystem) {
+                case HEX -> returnVal = Integer.parseInt(value, 16);
+                case DEC -> returnVal = Integer.parseInt(value);
+                case BIN -> returnVal = Integer.parseInt(value, 2);
+            }
         return returnVal;
     }
 }

@@ -4,14 +4,9 @@
 
 package edu.iu.jrsalata;
 
-import java.util.logging.Logger;
-
-import javax.script.ScriptException;
-
 public class StatementBuildler extends AbstractStatementBuilder {
 
     protected String base = "";
-    Logger statementLogger = Logger.getLogger(getClass().getName());
 
     // constructor
     public StatementBuildler() {
@@ -19,7 +14,8 @@ public class StatementBuildler extends AbstractStatementBuilder {
     }
 
     // create a statement from a string
-    public void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
+    @Override
+    public void processStatement(String statement) throws InvalidAssemblyFileException {
         // define return statement
         Statement newStatement;
 
@@ -48,28 +44,19 @@ public class StatementBuildler extends AbstractStatementBuilder {
         }
         // generate a new statement based on its format
         switch (this.formatTable.get(mnemonic)) {
-            case ONE:
-                newStatement = createStatement(mnemonic, args);
-                break;
-            case TWO:
-                newStatement = createRegStatement(mnemonic, args);
-                break;
-            case THREE:
-                newStatement = createExtStatement(mnemonic, args, eFlag);
-                break;
-            case SIC:
-                newStatement = createExtStatement(mnemonic, args, eFlag);
-                break;
-            case ASM:
-                newStatement = handleAsmStatement(mnemonic, args);
-                break;
-            default:
+            case ONE -> newStatement = createStatement(mnemonic);
+            case TWO -> newStatement = createRegStatement(mnemonic, args);
+            case THREE -> newStatement = createExtStatement(mnemonic, args, eFlag);
+            case SIC -> newStatement = createExtStatement(mnemonic, args, eFlag);
+            case ASM -> newStatement = handleAsmStatement(mnemonic, args);
+            default -> {
                 StringBuilder msg = new StringBuilder("Mnemonic '");
                 msg.append(mnemonic);
                 msg.append("' not found");
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
+            }
         }
-        this.locctr = this.locctr.add(newStatement.getSize());
+        this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }
 
@@ -92,21 +79,21 @@ public class StatementBuildler extends AbstractStatementBuilder {
         return super.handleAsmStatement(mnemonic, args);
     }
 
-    private Statement createStatement(String mnemonic, String args) {
+    private Statement createStatement(String mnemonic) {
 
         // check to make sure that there is only one element in parts
-        HexNum opcode = this.symbolTable.get(mnemonic);
-        return new SingleStatement(this.locctr, opcode);
+        HexNum opcode = this.instructionTable.get(mnemonic);
+        return new SingleStatement(this.getLocctr(), opcode);
     }
 
     private Statement createRegStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
 
         // Statement to return
         RegisterStatement returnVal = new RegisterStatement();
-        returnVal.setLocation(this.locctr);
+        returnVal.setLocation(this.getLocctr());
 
         // find the opcode of the mnemonic
-        HexNum opcode = this.symbolTable.get(mnemonic);
+        HexNum opcode = this.instructionTable.get(mnemonic);
         returnVal.setOpcode(opcode);
 
         // find both of the registers in parts[1]
@@ -133,10 +120,10 @@ public class StatementBuildler extends AbstractStatementBuilder {
     private Statement createExtStatement(String mnemonic, String args, boolean eFlag) {
 
         // find the opcode of the mnemonic
-        HexNum opcode = this.symbolTable.get(mnemonic);
+        HexNum opcode = this.instructionTable.get(mnemonic);
 
         // create the ExtendedStatement
-        ExtendedStatement returnVal = new ExtendedStatement(this.locctr, opcode, args);
+        ExtendedStatement returnVal = new ExtendedStatement(this.getLocctr(), opcode, args);
 
         // if there is an eFlag, set it
         if (eFlag) {
