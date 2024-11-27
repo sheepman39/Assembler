@@ -5,7 +5,7 @@ package edu.iu.jrsalata;
 
 public abstract class Statement {
     protected HexNum size;
-    protected String block;    
+    protected String block;
 
     // constructors
     protected Statement() {
@@ -17,7 +17,7 @@ public abstract class Statement {
         this.size = size;
         this.block = "";
     }
-    
+
     protected Statement(HexNum size, String block) {
         this.size = size;
         this.block = block;
@@ -30,6 +30,7 @@ public abstract class Statement {
     public String getBlock() {
         return this.block;
     }
+
     public void setBlock(String block) {
         this.block = block;
     }

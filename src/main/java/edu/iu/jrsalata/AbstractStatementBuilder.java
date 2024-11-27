@@ -307,7 +307,6 @@ public abstract class AbstractStatementBuilder {
 
         }
 
-
         // now that we have replaced all of the symbols with their values, we can
         // evaluate the expression
         // credit to
@@ -329,7 +328,7 @@ public abstract class AbstractStatementBuilder {
         } else {
             SymTable.addSymbol(label, hexResult, this.block);
         }
-        
+
         // evaluate the expression and return it as a string
         return hexResult;
     }
@@ -350,7 +349,6 @@ public abstract class AbstractStatementBuilder {
             // adding it to the table
             // we will handle the expression and add it to the symbol table in that method
             handleExpression(label, args);
-    
 
         } else {
 

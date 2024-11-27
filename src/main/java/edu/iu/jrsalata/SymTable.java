@@ -38,7 +38,7 @@ public class SymTable {
         return symbolTable.get(symbol);
     }
 
-    public static Set<String> getKeys () {
+    public static Set<String> getKeys() {
         createIfNotExists();
         return symbolTable.keySet();
     }

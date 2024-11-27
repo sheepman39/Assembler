@@ -40,8 +40,6 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
 
-        
-
         // now compare the output between the two files
         try {
             writer.execute();
@@ -82,8 +80,6 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
         ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
-        
-
         // now compare the output between the two files
         try {
             writer.execute();
@@ -100,11 +96,11 @@ public class ObjectWriterTest {
                 // compare the two files
 
                 while (scControl.hasNextLine() && scTest.hasNextLine()) {
-                    
+
                     String lineControl = scControl.nextLine();
                     String lineTest = scTest.nextLine();
                     assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
-                    
+
                 }
             }
             scTest.close();
@@ -124,16 +120,15 @@ public class ObjectWriterTest {
         // open up a new file and read the string
         // parse the string and create a list of lines
 
-            
-            try ( // read the file
-                    Scanner sc = new Scanner(filename)) {
-                while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    builder.processStatement(line);
-                    
-                }
-                queue = builder.getStatements();
-            
+        try ( // read the file
+                Scanner sc = new Scanner(filename)) {
+            while (sc.hasNextLine()) {
+                String line = sc.nextLine();
+                builder.processStatement(line);
+
+            }
+            queue = builder.getStatements();
+
         } catch (Exception e) {
             fail(e.getMessage());
         }

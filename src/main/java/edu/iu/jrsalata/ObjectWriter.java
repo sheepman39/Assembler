@@ -120,7 +120,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             }
             // set the locctr
             currentStartLocctr = startTable.get(currentBlock);
-            
+
             // Clear the text record
             textRecord.setLength(0);
             assembledTextRecord.setLength(0);

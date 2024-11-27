@@ -126,7 +126,7 @@ public class ExtendedStatement extends BaseStatement {
         }
 
         HexNum targetAddress;
-        
+
         // look up if args is in the symbolTable
         if (SymTable.containsSymbol(processedArgs)) {
             targetAddress = SymTable.getSymbol(processedArgs);
