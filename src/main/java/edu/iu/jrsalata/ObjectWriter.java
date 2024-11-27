@@ -54,11 +54,8 @@ public class ObjectWriter implements ObjectWriterInterface {
         // file
         FileWriter fileWriter = new FileWriter(this.fileName);
         writeHeaderRecord(fileWriter, this.builder);
-        LOGGER.info("Wrote header");
         writeTextRecords(fileWriter, this.queue, this.builder);
-        LOGGER.info("Wrote text");
         writeEndRecord(fileWriter, this.builder);
-        LOGGER.info("Wrote end");
         fileWriter.close();
     }
 
@@ -88,43 +85,78 @@ public class ObjectWriter implements ObjectWriterInterface {
     public static void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
             AbstractStatementBuilder builder) throws InvalidAssemblyFileException, IOException {
 
-        // store the start to handle sizes
-        HexNum start = new HexNum(builder.getStart().getDec());
-
+        // hold the length of the current assembled text record
+        int tempRecordLength;
 
         // Create the StringBuilder that will add each component
         StringBuilder textRecord = new StringBuilder();
 
+        // assembledTextRecord will temporarily store the assembled byte code
+        // if none is produced, then we move on to the next block
+        StringBuilder assembledTextRecord = new StringBuilder();
 
         // Statement that will be read from the queue
         Statement statement;
 
         // create the visitor that will collect modification records
         VisitorInterface visitor = new ModificationVisitor();
-        
-        // to keep track of each block's location, we will use this hashmap
-        HashMap<String, HexNum> locctr = new HashMap<>();
+
+        // Create a hashmap to store the starting address of each block
+        // this is needed for each separate program block
+        // every time we switch blocks, we need to update the previous and current block
+        HashMap<String, HexNum> startTable = new HashMap<>();
+        startTable.put(AbstractStatementBuilder.DEFAULT_BLOCK,
+                builder.getStart(AbstractStatementBuilder.DEFAULT_BLOCK));
+        HexNum currentStartLocctr = startTable.get(AbstractStatementBuilder.DEFAULT_BLOCK);
 
         while (!queue.isEmpty()) {
 
             // Get the current block
             String currentBlock = queue.peek().getBlock();
 
-
-            // TODO: Figure out the setup for the creating writing text records
-            // and managing the locctr
+            // If the block is not in the start table, add it
+            if (!startTable.containsKey(currentBlock)) {
+                startTable.put(currentBlock, builder.getStart(currentBlock));
+            }
+            // set the locctr
+            currentStartLocctr = startTable.get(currentBlock);
+            
+            // Clear the text record
+            textRecord.setLength(0);
+            assembledTextRecord.setLength(0);
 
             // Col 1 is "T"
             textRecord.append("T");
 
             // Col 2-7 is the starting address
-            textRecord.append(start.toString(6));
+            textRecord.append(currentStartLocctr.toString(6));
 
             // Col 8-9 is the length of the record
             // We will put a placeholder here for now
             textRecord.append("--");
 
-            // TODO: Creating and writing the text records
+            // Col 10-69 is the text record
+            tempRecordLength = textRecord.length();
+            while (!queue.isEmpty() && (tempRecordLength + queue.peek().assemble().length() < 70)
+                    && queue.peek().getBlock().equals(currentBlock)) {
+                statement = queue.poll();
+                assembledTextRecord.append(statement.assemble());
+                currentStartLocctr = currentStartLocctr.add(statement.getSize());
+                tempRecordLength = tempRecordLength + statement.getSize().getDec() * 2;
+                statement.accept(visitor);
+            }
+
+            // update the currentStartLocctr
+            startTable.put(currentBlock, currentStartLocctr);
+
+            if (assembledTextRecord.length() == 0) {
+                // if the assembledTextRecord is empty, then we need to skip this block
+                // and move on to the next block
+                continue;
+            }
+
+            // append the assembled text record to the text record
+            textRecord.append(assembledTextRecord);
 
             // Update the length of the record
             // since it is needed in bytes, we need to divide by 2 and round up
@@ -137,6 +169,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             fileWriter.write(textRecord.toString());
             fileWriter.write('\n');
+
         }
 
         // after we are done writing the text records,
