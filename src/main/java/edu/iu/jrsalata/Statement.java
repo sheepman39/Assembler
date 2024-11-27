@@ -30,10 +30,9 @@ public abstract class Statement {
     public String getBlock() {
         return this.block;
     }
-    public void setString(String block) {
+    public void setBlock(String block) {
         this.block = block;
     }
-
 
     // entry point for visitors
     public abstract void accept(VisitorInterface visitor);

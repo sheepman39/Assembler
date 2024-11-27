@@ -103,7 +103,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         while (!queue.isEmpty()) {
             // Get the current block
             String currentBlock = queue.peek().getBlock();
-
+            LOGGER.info(currentBlock);
             // Col 1 is "T"
             textRecord.append("T");
 

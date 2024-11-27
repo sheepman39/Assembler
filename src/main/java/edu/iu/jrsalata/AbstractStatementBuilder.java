@@ -307,13 +307,7 @@ public abstract class AbstractStatementBuilder {
 
         }
 
-        // add the symbol to the absoluteExpressions list if there are no hard-coded
-        // values
-        // this means that the value is always absolute at the time of assembly
-        // we need this for program block control
-        if (isAbsolute) {
-            this.absoluteExpressions.add(label);
-        }
+
         // now that we have replaced all of the symbols with their values, we can
         // evaluate the expression
         // credit to
@@ -323,8 +317,21 @@ public abstract class AbstractStatementBuilder {
 
         // note that we are type casting as int because we require a whole number
         int result = (int) expression.evaluate();
+        HexNum hexResult = new HexNum(Integer.toString(result), NumSystem.DEC);
+
+        // add the symbol to the absoluteExpressions list if there are no hard-coded
+        // values
+        // this means that the value is always absolute at the time of assembly
+        // we need this for program block control
+        if (isAbsolute) {
+            this.absoluteExpressions.add(label);
+            SymTable.addSymbol(label, hexResult, "ABSOLUTE");
+        } else {
+            SymTable.addSymbol(label, hexResult, this.block);
+        }
+        
         // evaluate the expression and return it as a string
-        return new HexNum(Integer.toString(result), NumSystem.DEC);
+        return hexResult;
     }
 
     protected void handleLabels(String label, String mnemonic, String args)
@@ -341,8 +348,9 @@ public abstract class AbstractStatementBuilder {
 
             // since args can potentially be an expression, we need to evaluate it before
             // adding it to the table
-            HexNum newArgs = handleExpression(label, args);
-            SymTable.addSymbol(label, newArgs, this.block);
+            // we will handle the expression and add it to the symbol table in that method
+            handleExpression(label, args);
+    
 
         } else {
 
@@ -477,6 +485,7 @@ public abstract class AbstractStatementBuilder {
 
     protected void addStatement(Statement statement) {
         if (statement != null) {
+            statement.setBlock(this.block);
             this.statements.add(statement);
         }
     }
