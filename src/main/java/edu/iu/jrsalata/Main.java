@@ -14,7 +14,7 @@ class Main {
     public static void main(String[] args) {
         // Create an instance of the AbstractStatementBuilder
         String inputFile = "input.asm";
-        instructionTable builder;
+        AbstractStatementBuilder builder;
 
         // open up the inputFile and look at the first line
         // to determine which factory to use
@@ -67,7 +67,7 @@ class Main {
         }
     }
 
-    public static Queue<Statement> fileInput(Scanner sc, instructionTable factory)
+    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementBuilder factory)
             throws InvalidAssemblyFileException, Exception {
 
         while (sc.hasNextLine()) {

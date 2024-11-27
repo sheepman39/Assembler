@@ -69,7 +69,8 @@ public abstract class AbstractStatementBuilder {
 
     // get the length of the entire program
     public HexNum getTotalLength() {
-        HexNum total = new HexNum();
+        // remember to add the default starting location
+        HexNum total = this.getStart(DEFAULT_BLOCK);
 
         for (String programBlock : this.startTable.keySet()) {
             total = total.add(this.getLen(programBlock));
@@ -105,6 +106,29 @@ public abstract class AbstractStatementBuilder {
             total = total.add(tmp);
         }
 
+        
+        // now modify the value of each symbol to be relative to the start of the program
+        // instead of relative to the start of their block
+        String symbolBlock;
+        HexNum blockStart;
+        for(String currentSymbol : SymTable.getKeys()){
+
+            // first get the value of the symbol
+            tmp = SymTable.getSymbol(currentSymbol);
+
+            // then get the block of the symbol
+            symbolBlock = SymTable.getBlock(currentSymbol);
+
+            // then get the start of the block
+            blockStart = this.getStart(symbolBlock);
+
+            // then add the two values
+            tmp = tmp.add(blockStart);
+
+            // place the new value in the symbol table
+            SymTable.addSymbol(currentSymbol, tmp);
+        }
+        
         return this.statements;
     }
 
@@ -389,8 +413,8 @@ public abstract class AbstractStatementBuilder {
         returnVal.setDirective(mnemonic);
         switch (mnemonic) {
             case "START" -> {
-                this.addLocctr(DEFAULT_BLOCK, new HexNum(args, NumSystem.HEX));
-                this.setStart(DEFAULT_BLOCK, this.getLocctr(DEFAULT_BLOCK));
+                this.addLocctr(DEFAULT_BLOCK, new HexNum(0));
+                this.setStart(DEFAULT_BLOCK, new HexNum(args, NumSystem.HEX));
             }
             case "END" -> // handle any remaining literals
                 assembleLiterals();
@@ -409,6 +433,11 @@ public abstract class AbstractStatementBuilder {
             case "EQU" -> {
             }
             case "USE" -> {
+                
+                // check if args is empty when blocks are switched back. If it is, set to default block
+                if (args.equals("")) {
+                    args = DEFAULT_BLOCK;
+                }
 
                 // since we can use blocks as many times as we want, we need to check if we need to create the block
                 if (!this.locctrTable.containsKey(args)) {

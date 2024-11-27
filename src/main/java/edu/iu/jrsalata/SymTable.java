@@ -4,6 +4,7 @@
 package edu.iu.jrsalata;
 
 import java.util.HashMap;
+import java.util.Set;
 
 public class SymTable {
 
@@ -35,6 +36,11 @@ public class SymTable {
     public static HexNum getSymbol(String symbol) {
         createIfNotExists();
         return symbolTable.get(symbol);
+    }
+
+    public static Set<String> getKeys () {
+        createIfNotExists();
+        return symbolTable.keySet();
     }
 
     public static String getBlock(String symbol) {

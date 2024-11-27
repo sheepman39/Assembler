@@ -114,8 +114,8 @@ public class ObjectWriter implements ObjectWriterInterface {
             statement.accept(visitor);
             sizeQueue.add(statement.getSize());
         }
-
         while (!assembledQueue.isEmpty()) {
+
             // Col 1 is "T"
             textRecord.append("T");
 
