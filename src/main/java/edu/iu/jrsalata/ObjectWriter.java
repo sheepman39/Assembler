@@ -119,9 +119,8 @@ public class ObjectWriter implements ObjectWriterInterface {
             String currentBlock = queue.peek().getBlock();
 
             // If the block is not in the start table, add it
-            if (!startTable.containsKey(currentBlock)) {
-                startTable.put(currentBlock, builder.getStart(currentBlock));
-            }
+            startTable.putIfAbsent(currentBlock, builder.getStart(currentBlock));
+            
             // set the locctr
             currentStartLocctr = startTable.get(currentBlock);
 
