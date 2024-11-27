@@ -6,6 +6,7 @@ package edu.iu.jrsalata;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
@@ -89,21 +90,30 @@ public class ObjectWriter implements ObjectWriterInterface {
 
         // store the start to handle sizes
         HexNum start = new HexNum(builder.getStart().getDec());
-        int tmpSize;
+
 
         // Create the StringBuilder that will add each component
         StringBuilder textRecord = new StringBuilder();
+
 
         // Statement that will be read from the queue
         Statement statement;
 
         // create the visitor that will collect modification records
         VisitorInterface visitor = new ModificationVisitor();
+        
+        // to keep track of each block's location, we will use this hashmap
+        HashMap<String, HexNum> locctr = new HashMap<>();
 
         while (!queue.isEmpty()) {
+
             // Get the current block
             String currentBlock = queue.peek().getBlock();
-            LOGGER.info(currentBlock);
+
+
+            // TODO: Figure out the setup for the creating writing text records
+            // and managing the locctr
+
             // Col 1 is "T"
             textRecord.append("T");
 
@@ -114,16 +124,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             // We will put a placeholder here for now
             textRecord.append("--");
 
-            // Col 10-69 is the text record
-            tmpSize = textRecord.length();
-            while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70)
-                    && queue.peek().getBlock().equals(currentBlock)) {
-                statement = queue.poll();
-                textRecord.append(statement.assemble());
-                start = start.add(statement.getSize());
-                tmpSize = tmpSize + statement.getSize().getDec() * 2;
-                statement.accept(visitor);
-            }
+            // TODO: Creating and writing the text records
 
             // Update the length of the record
             // since it is needed in bytes, we need to divide by 2 and round up
@@ -136,9 +137,6 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             fileWriter.write(textRecord.toString());
             fileWriter.write('\n');
-
-            // Clear the text record
-            textRecord.setLength(0);
         }
 
         // after we are done writing the text records,
