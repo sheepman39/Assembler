@@ -453,6 +453,8 @@ public abstract class AbstractStatementBuilder {
                 returnVal.setSize(new HexNum(3 * Integer.parseInt(args)));
             case "LTORG" -> assembleLiterals();
             case "EQU" -> {
+                // handle EQU in the handleLabels method
+                // so this section just ensures that there is no error
             }
             case "USE" -> {
 
@@ -464,10 +466,9 @@ public abstract class AbstractStatementBuilder {
 
                 // since we can use blocks as many times as we want, we need to check if we need
                 // to create the block
-                if (!this.locctrTable.containsKey(args)) {
-                    this.locctrTable.put(args, new HexNum(0));
-                    this.startTable.put(args, new HexNum(0));
-                }
+                this.locctrTable.putIfAbsent(args, new HexNum(0));
+                this.startTable.putIfAbsent(args, new HexNum(0));
+
                 // set the current block to the provided args
                 this.block = args;
             }

@@ -112,8 +112,6 @@ public class HexNum {
                 case HEX -> returnVal = value;
                 case DEC -> returnVal = Integer.toHexString(Integer.parseInt(value));
                 case BIN -> returnVal = Integer.toHexString(Integer.parseInt(value, 2));
-                default -> {
-                }
             }
         return returnVal;
     }
@@ -126,8 +124,6 @@ public class HexNum {
                 case HEX -> returnVal = Integer.parseInt(value, 16);
                 case DEC -> returnVal = Integer.parseInt(value);
                 case BIN -> returnVal = Integer.parseInt(value, 2);
-                default -> {
-                }
             }
         return returnVal;
     }

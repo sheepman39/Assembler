@@ -46,16 +46,21 @@ public class ObjectWriter implements ObjectWriterInterface {
 
     // execute the writing of the object file
     @Override
-    @SuppressWarnings("ConvertToTryWithResources")
     public void execute() throws InvalidAssemblyFileException, IOException {
 
-        // Create a file writter to be passed around to write each section of the obj
-        // file
-        FileWriter fileWriter = new FileWriter(this.fileName);
-        writeHeaderRecord(fileWriter, this.builder);
-        writeTextRecords(fileWriter, this.queue, this.builder);
-        writeEndRecord(fileWriter, this.builder);
-        fileWriter.close();
+        try (
+                // Create a file writter to be passed around to write each section of the obj
+                // file
+                FileWriter fileWriter = new FileWriter(this.fileName)) {
+            writeHeaderRecord(fileWriter, this.builder);
+            writeTextRecords(fileWriter, this.queue, this.builder);
+            writeEndRecord(fileWriter, this.builder);
+
+        } catch (IOException e) {
+            // Caller will have to handle exceptions to ensure that the user knows
+            // an error has occureds
+            throw new IOException("Error writing to file: " + this.fileName);
+        }
     }
 
     // Write the Header Record to the given obj file
