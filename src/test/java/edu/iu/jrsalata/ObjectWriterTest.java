@@ -148,6 +148,7 @@ public class ObjectWriterTest {
         return Arrays.asList(new String[][] {
                 { "/testAsm2.asm", "/testAsm2.obj" },
                 { "/testAsm3.asm", "/testAsm3.obj" },
+                { "/testAsm4.asm", "/testAsm4.obj" },
         });
     }
 }

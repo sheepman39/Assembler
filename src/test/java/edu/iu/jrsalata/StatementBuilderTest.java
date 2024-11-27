@@ -70,6 +70,7 @@ public class StatementBuilderTest {
         return Arrays.asList(new String[][] {
                 { "/testAsm2.asm", "/testAsm2.txt" },
                 { "/testAsm3.asm", "/testAsm3.txt" },
+                { "/testAsm4.asm", "/testAsm4.txt" },
         });
     }
 }

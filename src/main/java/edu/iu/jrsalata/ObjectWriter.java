@@ -50,7 +50,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     public void execute() {
 
         try ( // Create a file writter to be passed around to write each section of the obj
-                // file
+              // file
                 FileWriter fileWriter = new FileWriter(this.fileName)) {
             writeHeaderRecord(fileWriter, this.builder);
             writeTextRecords(fileWriter, this.queue, this.builder);
@@ -101,21 +101,13 @@ public class ObjectWriter implements ObjectWriterInterface {
         // Statement that will be read from the queue
         Statement statement;
 
-        // create two queues to hold the assembled data and its respective size
-        Queue<String> assembledQueue = new LinkedList<>();
-        Queue<HexNum> sizeQueue = new LinkedList<>();
-
         // create the visitor that will collect modification records
         VisitorInterface visitor = new ModificationVisitor();
 
         while (!queue.isEmpty()) {
-            statement = queue.poll();
-            assembledQueue.add(statement.assemble());
-            statement.accept(visitor);
-            sizeQueue.add(statement.getSize());
-        }
-        while (!assembledQueue.isEmpty()) {
-
+            // Get the current block
+            String currentBlock = queue.peek().getBlock();
+            
             // Col 1 is "T"
             textRecord.append("T");
 
@@ -128,10 +120,12 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // Col 10-69 is the text record
             tmpSize = textRecord.length();
-            while (!assembledQueue.isEmpty() && (tmpSize + assembledQueue.peek().length() < 70)) {
-                textRecord.append(assembledQueue.poll());
-                start = start.add(sizeQueue.peek());
-                tmpSize = tmpSize + sizeQueue.poll().getDec() * 2;
+            while (!queue.isEmpty() && (tmpSize + queue.peek().assemble().length() < 70) && queue.peek().getBlock().equals(currentBlock)) {
+                statement = queue.poll();
+                textRecord.append(statement.assemble());
+                start = start.add(statement.getSize());
+                tmpSize = tmpSize + statement.getSize().getDec() * 2;
+                statement.accept(visitor);
             }
 
             // Update the length of the record
