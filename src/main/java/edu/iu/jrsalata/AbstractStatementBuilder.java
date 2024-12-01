@@ -19,6 +19,7 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
+    static final int MAX_LABEL_LEN = 6;
     static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
 
     protected String name;
@@ -138,20 +139,19 @@ public abstract class AbstractStatementBuilder {
     }
 
     public String getName() {
-
         // name needs to be exactly six characters long
-        return lengthCheck(this.name, 6, "OUTPUT")
+        return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
     }
 
     protected String lengthCheck(String string, int max){
         return lengthCheck(string, max, "OUTPUT");
     }
 
-    protected String lengthCheck(String string, int max, String default){
+    protected String lengthCheck(String string, int max, String defaultString){
         // since many different strings need to be exactly n characters long,
         // this function will set them to be n chars long
         if (string.equals("")) {
-            return default;
+            return defaultString;
         } else if (string.length() > max) {
             return string.substring(0, max).toUpperCase();
         } else if (string.length() < max) {
@@ -347,6 +347,7 @@ public abstract class AbstractStatementBuilder {
         // 2) args is "*"
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
+        label = lengthCheck(label, MAX_LABEL_LEN);
         if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
             SymTable.addSymbol(label, this.getLocctr(this.block), this.block);
         } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
