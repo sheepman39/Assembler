@@ -14,18 +14,20 @@ public class ObjectWriter implements ObjectWriterInterface {
     protected String fileName;
     protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
-
+    protected boolean previouslyUsed;
     // constructors
     public ObjectWriter() {
         this.fileName = "output.obj";
         this.builder = new StatementBuildler();
         this.queue = new LinkedList<>();
+        this.previouslyUsed = false;
     }
 
     public ObjectWriter(String fileName, AbstractStatementBuilder builder, Queue<Statement> queue) {
         this.fileName = fileName;
         this.builder = builder;
         this.queue = queue;
+        this.previouslyUsed = false;
     }
 
     // setters

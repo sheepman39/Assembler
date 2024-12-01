@@ -43,7 +43,7 @@ public class StatementBuilderTest {
                 String line = sc.nextLine();
                 statementFactory.processStatement(line);
             }
-            statements = statementFactory.getStatements();
+            statements = statementFactory.getStatements().pop();
             // close the file
             sc.close();
 

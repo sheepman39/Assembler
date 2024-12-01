@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +20,7 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ObjectWriterTest {
+    static final String SIC_FLAG = "!USE SIC";
     static final Logger LOGGER = Logger.getLogger(ObjectWriterTest.class.getName());
     String assemblyFile;
     String objectFile;
@@ -30,92 +32,81 @@ public class ObjectWriterTest {
     }
 
     @Test
-    public void testAsm1() {
+    public void testAsm() {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
         SymTable.clear();
-        AbstractStatementBuilder builder = new SicStatementBuilder();
-        InputStream file = getClass().getResourceAsStream("/testAsm1.asm");
-        Queue<Statement> queue = fileInput(file, builder);
-        String fileName = "test.obj";
-        ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
-
-        // now compare the output between the two files
-        try {
-            writer.execute();
-            // read the original compare file
-            InputStream control = getClass().getResourceAsStream("/testAsm1.obj");
-
-            // read the generated file
-            InputStream test = new FileInputStream(fileName);
-
-            Scanner scTest;
-            try ( // create a scanner for each file
-                    Scanner scControl = new Scanner(control)) {
-                scTest = new Scanner(test);
-                // compare the two files
-                while (scControl.hasNextLine() && scTest.hasNextLine()) {
-                    String lineControl = scControl.nextLine();
-                    String lineTest = scTest.nextLine();
-                    assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
-                }
-            }
-            scTest.close();
-
-            // delete the generated test file
-            new File(fileName).delete();
-        } catch (InvalidAssemblyFileException | IOException e) {
-            fail(e.getMessage());
-        }
-    }
-
-    @Test
-    public void testAsm2() {
-        // Create an instance of the StatementFactory
-        // clear out the symtable since it is used in previous tests
-        SymTable.clear();
-        AbstractStatementBuilder factory = new StatementBuildler();
+        AbstractStatementBuilder builder = choseBuilder();
         InputStream file = getClass().getResourceAsStream(assemblyFile);
-        Queue<Statement> queue = fileInput(file, factory);
+        Stack<Queue<Statement>> stack = fileInput(file, builder);
         String fileName = "test.obj";
-        ObjectWriterInterface writer = new ObjectWriter(fileName, factory, queue);
 
-        // now compare the output between the two files
-        try {
-            writer.execute();
-            // read the original compare file
-            InputStream control = getClass().getResourceAsStream(objectFile);
+        ObjectWriterInterface writer = new ObjectWriter();
+        writer.setBuilder(builder);
+        writer.setFileName(fileName);
+        testAsm(writer, stack, fileName);
+    }
+    public void testAsm(ObjectWriterInterface writer, Stack<Queue<Statement>> stack, String fileName){
+        while (!stack.isEmpty()) {  
+            writer.setQueue(stack.pop());
+            // now compare the output between the two files
+            try {
+                writer.execute();
+                // read the original compare file
+                InputStream control = getClass().getResourceAsStream(objectFile);
 
-            // read the generated file
-            InputStream test = new FileInputStream(fileName);
+                // read the generated file
+                InputStream test = new FileInputStream(fileName);
 
-            Scanner scTest;
-            try ( // create a scanner for each file
-                    Scanner scControl = new Scanner(control)) {
-                scTest = new Scanner(test);
-                // compare the two files
+                Scanner scTest;
+                try ( // create a scanner for each file
+                        Scanner scControl = new Scanner(control)) {
+                    scTest = new Scanner(test);
+                    // compare the two files
 
-                while (scControl.hasNextLine() && scTest.hasNextLine()) {
+                    while (scControl.hasNextLine() && scTest.hasNextLine()) {
 
-                    String lineControl = scControl.nextLine();
-                    String lineTest = scTest.nextLine();
-                    assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
+                        String lineControl = scControl.nextLine();
+                        String lineTest = scTest.nextLine();
+                        assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
 
+                    }
                 }
-            }
-            scTest.close();
+                scTest.close();
 
-            // delete the generated test file
-            new File(fileName).delete();
-        } catch (InvalidAssemblyFileException | IOException e) {
-            fail(e.getMessage());
+                // delete the generated test file
+                new File(fileName).delete();
+            } catch (InvalidAssemblyFileException | IOException e) {
+                fail(e.getMessage());
+            }
         }
     }
+    
+    public AbstractStatementBuilder choseBuilder(){
+        AbstractStatementBuilder builder = new StatementBuildler();
 
-    public static Queue<Statement> fileInput(InputStream filename, AbstractStatementBuilder builder) {
+        Scanner sc = null;
+        try {
+            InputStream file =  getClass().getResourceAsStream(assemblyFile);
+            sc = new Scanner(file);
 
-        // create the ArrayList that will be returned
-        Queue<Statement> queue = new LinkedList<>();
+            String firstLine = sc.nextLine();
+
+            // compare with the sicFlag defined above
+            if (firstLine.strip().equals(SIC_FLAG)) {
+                builder = new SicStatementBuilder();
+            }
+        } catch (Exception e){
+            fail(e.getMessage());
+        }
+        sc.close();
+        return builder;
+    }
+    
+    public static Stack<Queue<Statement>> fileInput(InputStream filename, AbstractStatementBuilder builder) {
+
+        // create the Stack that will be returned
+        Stack<Queue<Statement>> stack = new Stack<>();
 
         // open up a new file and read the string
         // parse the string and create a list of lines
@@ -127,13 +118,13 @@ public class ObjectWriterTest {
                 builder.processStatement(line);
 
             }
-            queue = builder.getStatements();
+            stack = builder.getStatements();
 
         } catch (Exception e) {
             fail(e.getMessage());
         }
 
-        return queue;
+        return stack;
     }
 
     @Parameterized.Parameters()

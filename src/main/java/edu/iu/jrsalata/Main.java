@@ -3,6 +3,7 @@ package edu.iu.jrsalata;
 import java.io.File;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.logging.Logger;
 
 import javax.script.ScriptException;
@@ -38,13 +39,19 @@ class Main {
             sc.close();
             sc = new Scanner(file);
 
-            Queue<Statement> queue = fileInput(sc, builder);
+            // to allow for files to be appended, we will create the writer out here and reset the queue each time
             String fileName = "output.obj";
-            ObjectWriterInterface writer = new ObjectWriter(fileName, builder, queue);
-
-            // write the object file
-            writer.execute();
-            logger.info("Object file successfully created");
+            ObjectWriterInterface writer = new ObjectWriter();
+            writer.setFileName(fileName);
+            writer.setBuilder(builder);
+            // Multiple control sections produces multiple Queues with statements
+            Stack<Queue<Statement>> stack = fileInput(sc, builder);
+            while (!stack.isEmpty()) {
+                writer.setQueue(stack.pop());
+                // write the object file
+                writer.execute();
+                logger.info("Object file successfully created");
+            }
 
         } catch (InvalidAssemblyFileException e) {
             // inforamtive error message from our StatementFactory
@@ -71,7 +78,7 @@ class Main {
         }
     }
 
-    public static Queue<Statement> fileInput(Scanner sc, AbstractStatementBuilder factory)
+    public static Stack<Queue<Statement>> fileInput(Scanner sc, AbstractStatementBuilder factory)
             throws InvalidAssemblyFileException, Exception {
 
         while (sc.hasNextLine()) {
