@@ -140,22 +140,28 @@ public abstract class AbstractStatementBuilder {
     public String getName() {
 
         // name needs to be exactly six characters long
-        // if we have no name, default is OBJECT
-        // if the name is longer than 6, truncate it
-        // if the name is shorter than 6, pad it with spaces at the end
-        // if the name is exactly 6, return it
-        if (this.name.equals("")) {
-            return "OUTPUT";
-        } else if (this.name.length() > 6) {
-            return this.name.substring(0, 6).toUpperCase();
-        } else if (this.name.length() < 6) {
-            StringBuilder sb = new StringBuilder(this.name);
-            for (int i = 0; i < 6 - this.name.length(); i++) {
+        return lengthCheck(this.name, 6, "OUTPUT")
+    }
+
+    protected String lengthCheck(String string, int max){
+        return lengthCheck(string, max, "OUTPUT");
+    }
+
+    protected String lengthCheck(String string, int max, String default){
+        // since many different strings need to be exactly n characters long,
+        // this function will set them to be n chars long
+        if (string.equals("")) {
+            return default;
+        } else if (string.length() > max) {
+            return string.substring(0, max).toUpperCase();
+        } else if (string.length() < max) {
+            StringBuilder sb = new StringBuilder(string);
+            for (int i = 0; i < max - this.name.length(); i++) {
                 sb.append(" ");
             }
             return sb.toString().toUpperCase();
         } else {
-            return this.name.toUpperCase();
+            return string.toUpperCase();
         }
     }
 
