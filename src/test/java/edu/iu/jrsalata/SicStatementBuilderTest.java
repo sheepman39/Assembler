@@ -31,7 +31,7 @@ public class SicStatementBuilderTest {
                 String line = sc.nextLine();
                 statementBuilder.processStatement(line);
             }
-            statements = statementBuilder.getStatements().pop();
+            statements = statementBuilder.getStatements();
             // close the file
             sc.close();
 

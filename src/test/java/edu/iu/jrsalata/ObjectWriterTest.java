@@ -6,9 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.Stack;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -35,18 +35,22 @@ public class ObjectWriterTest {
         SymTable.clear();
         AbstractStatementBuilder builder = choseBuilder();
         InputStream file = getClass().getResourceAsStream(assemblyFile);
-        Stack<Queue<Statement>> stack = fileInput(file, builder);
+        Queue<AbstractStatementBuilder> queue = fileInput(file, builder);
         String fileName = "test.obj";
 
         ObjectWriterInterface writer = new ObjectWriter();
         writer.setBuilder(builder);
         writer.setFileName(fileName);
-        testAsm(writer, stack, fileName);
+        testAsm(writer, queue, fileName);
     }
 
-    public void testAsm(ObjectWriterInterface writer, Stack<Queue<Statement>> stack, String fileName) {
-        while (!stack.isEmpty()) {
-            writer.setQueue(stack.pop());
+    public void testAsm(ObjectWriterInterface writer, Queue<AbstractStatementBuilder> queue, String fileName) {
+        
+        AbstractStatementBuilder builder;
+        while (!queue.isEmpty()) {
+            builder = queue.poll();
+            writer.setBuilder(builder);
+            writer.setQueue(builder.getStatements());
             // now compare the output between the two files
             try {
                 writer.execute();
@@ -104,28 +108,29 @@ public class ObjectWriterTest {
         return builder;
     }
 
-    public static Stack<Queue<Statement>> fileInput(InputStream filename, AbstractStatementBuilder builder) {
+    public static Queue<AbstractStatementBuilder> fileInput(InputStream filename, AbstractStatementBuilder builder) {
+        
+        Queue<AbstractStatementBuilder> queue = new LinkedList<>();
 
-        // create the Stack that will be returned
-        Stack<Queue<Statement>> stack = new Stack<>();
-
-        // open up a new file and read the string
-        // parse the string and create a list of lines
-
-        try ( // read the file
-                Scanner sc = new Scanner(filename)) {
+        // since we want to be able to keep the type of builder consistent, check if the builder passed is an instance of the SIC builder
+        boolean isSIC = builder instanceof SicStatementBuilder;
+        try (Scanner sc = new Scanner(filename)) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
+                
+                // check if we are at the beginning of a control section
+                // in order to create a new builder to handle it
+                if (line.contains("CSECT")){
+                    queue.add(builder);
+                    builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+                }
                 builder.processStatement(line);
-
             }
-            stack = builder.getStatements();
-
-        } catch (Exception e) {
+            queue.add(builder);
+        } catch (Exception e){
             fail(e.getMessage());
-        }
-
-        return stack;
+        } 
+        return queue;
     }
 
     @Parameterized.Parameters()

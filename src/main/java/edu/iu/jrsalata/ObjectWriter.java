@@ -54,11 +54,14 @@ public class ObjectWriter implements ObjectWriterInterface {
         try (
                 // Create a file writter to be passed around to write each section of the obj
                 // file
-                FileWriter fileWriter = new FileWriter(this.fileName)) {
+                FileWriter fileWriter = new FileWriter(this.fileName, this.previouslyUsed)) {
             writeHeaderRecord(fileWriter, this.builder);
             writeTextRecords(fileWriter, this.queue, this.builder);
             writeEndRecord(fileWriter, this.builder);
-
+            
+            // set previously used to true to indicate we want to append in the future
+            this.previouslyUsed = true;
+            
         } catch (IOException e) {
             // Caller will have to handle exceptions to ensure that the user knows
             // an error has occureds

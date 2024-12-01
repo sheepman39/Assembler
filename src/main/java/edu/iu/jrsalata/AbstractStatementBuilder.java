@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,7 +92,7 @@ public abstract class AbstractStatementBuilder {
         return this.locctrTable.get(block);
     }
 
-    public Stack<Queue<Statement>> getStatements() {
+    public Queue<Statement> getStatements() {
 
         // now that the program is done with pass 1,
         // calculate the length and relative start of each block
@@ -136,9 +135,7 @@ public abstract class AbstractStatementBuilder {
             // place the new value in the symbol table
             SymTable.addSymbol(currentSymbol, tmp);
         }
-        Stack<Queue<Statement>> returnVal = new Stack<>();
-        returnVal.add(this.statements);
-        return returnVal;
+        return this.statements;
     }
 
     public String getName() {

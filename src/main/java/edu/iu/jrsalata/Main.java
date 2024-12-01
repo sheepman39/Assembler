@@ -1,9 +1,9 @@
 package edu.iu.jrsalata;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.logging.Logger;
 
 import javax.script.ScriptException;
@@ -29,7 +29,7 @@ class Main {
             // this also ensures that after we read the first line, we can reuse the entire file
             File file = new File(inputFile);
             sc = new Scanner(file);
-            AbstractStatementBuilder builder = choseBuilder(inputFile, sc);
+            AbstractStatementBuilder builder = choseBuilder(sc);
             sc = new Scanner(file);
 
             // to allow for files to be appended, we will create the writer out here and
@@ -37,11 +37,15 @@ class Main {
             String fileName = "output.obj";
             ObjectWriterInterface writer = new ObjectWriter();
             writer.setFileName(fileName);
-            writer.setBuilder(builder);
+
             // Multiple control sections produces multiple Queues with statements
-            Stack<Queue<Statement>> stack = fileInput(sc, builder);
-            while (!stack.isEmpty()) {
-                writer.setQueue(stack.pop());
+            Queue<AbstractStatementBuilder> queue = fileInput(sc, builder);
+
+            // go through the queue of builders and write the object files
+            while (!queue.isEmpty()) {
+                builder = queue.poll();
+                writer.setBuilder(builder);
+                writer.setQueue(builder.getStatements());
                 // write the object file
                 writer.execute();
                 logger.info("Object file successfully created");
@@ -72,18 +76,30 @@ class Main {
         }
     }
 
-    public static Stack<Queue<Statement>> fileInput(Scanner sc, AbstractStatementBuilder factory)
+    public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
             throws InvalidAssemblyFileException, Exception {
+        
+        Queue<AbstractStatementBuilder> queue = new LinkedList<>();
+
+        // since we want to be able to keep the type of builder consistent, check if the builder passed is an instance of the SIC builder
+        boolean isSIC = builder instanceof SicStatementBuilder;
 
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
-            factory.processStatement(line);
-        }
 
-        return factory.getStatements();
+            // check if we are at the beginning of a control section
+            // in order to create a new builder to handle it
+            if (line.contains("CSECT")){
+                queue.add(builder);
+                builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+            }
+            builder.processStatement(line);
+        }
+        queue.add(builder);
+        return queue;
     }
 
-    public static AbstractStatementBuilder choseBuilder(String inputFile, Scanner sc) {
+    public static AbstractStatementBuilder choseBuilder(Scanner sc) {
         AbstractStatementBuilder builder = new StatementBuildler();
 
         try {
