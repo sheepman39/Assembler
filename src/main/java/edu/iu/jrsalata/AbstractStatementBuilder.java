@@ -27,6 +27,7 @@ public abstract class AbstractStatementBuilder {
     protected String block;
     protected int lineNum;
     protected ArrayList<String> absoluteExpressions = new ArrayList<>();
+    protected ArrayList<String> externalDefinitions = new ArrayList<>();
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> instructionTable;

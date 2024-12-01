@@ -13,30 +13,23 @@ class Main {
     static final String SIC_FLAG = "!USE SIC";
 
     public static void main(String[] args) {
-        // Create an instance of the AbstractStatementBuilder
-        String inputFile = "input.asm";
-        AbstractStatementBuilder builder;
+        
 
         // open up the inputFile and look at the first line
         // to determine which factory to use
         Scanner sc = null;
         try {
+            // Create an instance of the AbstractStatementBuilder
+
+            String inputFile = "input.asm";
+
+            // open up the input file and create a scanner to select the builder
+            // note that we have to create a new scanner since chooseBuilder will close
+            // the scanner given to it
+            // this also ensures that after we read the first line, we can reuse the entire file
             File file = new File(inputFile);
             sc = new Scanner(file);
-
-            String firstLine = sc.nextLine();
-
-            // compare with the sicFlag defined above
-            if (firstLine.strip().equals(SIC_FLAG)) {
-                builder = new SicStatementBuilder();
-                logger.info("Using SIC Factory");
-            } else {
-                builder = new StatementBuildler();
-                logger.info("Using SIC/XE Factory");
-            }
-
-            // close the scanner and reopen it
-            sc.close();
+            AbstractStatementBuilder builder = choseBuilder(inputFile, sc);
             sc = new Scanner(file);
 
             // to allow for files to be appended, we will create the writer out here and
@@ -88,5 +81,26 @@ class Main {
         }
 
         return factory.getStatements();
+    }
+
+    public static AbstractStatementBuilder choseBuilder(String inputFile, Scanner sc) {
+        AbstractStatementBuilder builder = new StatementBuildler();
+
+        try {
+
+            String firstLine = sc.nextLine();
+
+            // compare with the sicFlag defined above
+            if (firstLine.strip().equals(SIC_FLAG)) {
+                builder = new SicStatementBuilder();
+            }
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+        } finally{
+            if (sc != null) {
+                sc.close();
+            }
+        }
+        return builder;
     }
 }
