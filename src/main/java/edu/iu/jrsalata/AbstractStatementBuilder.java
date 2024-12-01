@@ -145,11 +145,11 @@ public abstract class AbstractStatementBuilder {
         return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
     }
 
-    protected String lengthCheck(String string, int max){
+    protected String lengthCheck(String string, int max) {
         return lengthCheck(string, max, "OUTPUT");
     }
 
-    protected String lengthCheck(String string, int max, String defaultString){
+    protected String lengthCheck(String string, int max, String defaultString) {
         // since many different strings need to be exactly n characters long,
         // this function will set them to be n chars long
         if (string.equals("")) {

@@ -15,6 +15,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     protected AbstractStatementBuilder builder;
     protected Queue<Statement> queue;
     protected boolean previouslyUsed;
+
     // constructors
     public ObjectWriter() {
         this.fileName = "output.obj";
@@ -122,7 +123,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // If the block is not in the start table, add it
             startTable.putIfAbsent(currentBlock, builder.getStart(currentBlock));
-            
+
             // set the locctr
             currentStartLocctr = startTable.get(currentBlock);
 

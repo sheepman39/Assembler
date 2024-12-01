@@ -39,7 +39,8 @@ class Main {
             sc.close();
             sc = new Scanner(file);
 
-            // to allow for files to be appended, we will create the writer out here and reset the queue each time
+            // to allow for files to be appended, we will create the writer out here and
+            // reset the queue each time
             String fileName = "output.obj";
             ObjectWriterInterface writer = new ObjectWriter();
             writer.setFileName(fileName);

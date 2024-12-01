@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -21,7 +19,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class ObjectWriterTest {
     static final String SIC_FLAG = "!USE SIC";
-    static final Logger LOGGER = Logger.getLogger(ObjectWriterTest.class.getName());
     String assemblyFile;
     String objectFile;
 
@@ -46,8 +43,9 @@ public class ObjectWriterTest {
         writer.setFileName(fileName);
         testAsm(writer, stack, fileName);
     }
-    public void testAsm(ObjectWriterInterface writer, Stack<Queue<Statement>> stack, String fileName){
-        while (!stack.isEmpty()) {  
+
+    public void testAsm(ObjectWriterInterface writer, Stack<Queue<Statement>> stack, String fileName) {
+        while (!stack.isEmpty()) {
             writer.setQueue(stack.pop());
             // now compare the output between the two files
             try {
@@ -81,13 +79,13 @@ public class ObjectWriterTest {
             }
         }
     }
-    
-    public AbstractStatementBuilder choseBuilder(){
+
+    public AbstractStatementBuilder choseBuilder() {
         AbstractStatementBuilder builder = new StatementBuildler();
 
         Scanner sc = null;
         try {
-            InputStream file =  getClass().getResourceAsStream(assemblyFile);
+            InputStream file = getClass().getResourceAsStream(assemblyFile);
             sc = new Scanner(file);
 
             String firstLine = sc.nextLine();
@@ -96,13 +94,16 @@ public class ObjectWriterTest {
             if (firstLine.strip().equals(SIC_FLAG)) {
                 builder = new SicStatementBuilder();
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             fail(e.getMessage());
+        } finally{
+            if (sc != null) {
+                sc.close();
+            }
         }
-        sc.close();
         return builder;
     }
-    
+
     public static Stack<Queue<Statement>> fileInput(InputStream filename, AbstractStatementBuilder builder) {
 
         // create the Stack that will be returned
@@ -130,6 +131,7 @@ public class ObjectWriterTest {
     @Parameterized.Parameters()
     public static Collection<String[]> files() {
         return Arrays.asList(new String[][] {
+                { "/testAsm1.asm", "/testAsm1.obj" },
                 { "/testAsm2.asm", "/testAsm2.obj" },
                 { "/testAsm3.asm", "/testAsm3.obj" },
                 { "/testAsm4.asm", "/testAsm4.obj" },
