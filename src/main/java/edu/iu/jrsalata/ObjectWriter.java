@@ -107,7 +107,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             // each name/address pair is always 12 columns
             // so we can can continue the loop while the length is less than or equal to
             // 60 (73 -12[per pair] -1[for D])
-            while(!queue.isEmpty() && defineRecord.length() <= 6) {
+            while(!queue.isEmpty() && defineRecord.length() <= 60) {
 
                 // Col 2-7 is the name of the external symbol
                 symbol = queue.poll();
