@@ -26,7 +26,8 @@ public abstract class AbstractStatementBuilder {
     protected String block;
     protected int lineNum;
     protected ArrayList<String> absoluteExpressions = new ArrayList<>();
-    protected ArrayList<String> externalDefinitions = new ArrayList<>();
+    protected Queue<String> externalDefinitions = new LinkedList<>();
+    protected Queue<String> externalReferences = new LinkedList<>();
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> instructionTable;
@@ -143,6 +144,14 @@ public abstract class AbstractStatementBuilder {
         return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
     }
 
+    public Queue<String> getExternalDefinitions() {
+        return this.externalDefinitions;
+    }
+
+    public Queue<String> getExternalReferences() {
+        return this.externalReferences;
+    }
+    
     protected String lengthCheck(String string, int max) {
         return lengthCheck(string, max, "OUTPUT");
     }
@@ -478,6 +487,22 @@ public abstract class AbstractStatementBuilder {
 
                 // set the current block to the provided args
                 this.block = args;
+            }
+            case "EXTDEF" -> {
+                // split the args by commas in order to get each 
+                String[] defList = args.trim().split(",");
+                for (String def : defList) {
+                    def = lengthCheck(def, MAX_LABEL_LEN);
+                    this.externalDefinitions.add(def);
+                }
+            }
+            case "EXTREF" -> {
+                // split the args by commas in order to get each 
+                String[] refList = args.trim().split(",");
+                for (String ref : refList) {
+                    ref = lengthCheck(ref, MAX_LABEL_LEN);
+                    this.externalReferences.add(ref);
+                }
             }
             default -> {
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");
