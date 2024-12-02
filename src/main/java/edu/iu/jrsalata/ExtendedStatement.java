@@ -9,6 +9,7 @@ public class ExtendedStatement extends BaseStatement {
     protected String assembled = "";
     protected String base = "";
     protected String modification = "";
+    protected boolean hasExternalSymbol = false;
     protected boolean nFlag = false;
     protected boolean iFlag = false;
     protected boolean xFlag = false;
@@ -62,6 +63,10 @@ public class ExtendedStatement extends BaseStatement {
 
     public void setBase(String base) {
         this.base = base;
+    }
+
+    public void setExternalSymbol() {
+        this.hasExternalSymbol = true;
     }
 
     // this will be used by the factory to clean up the args. It will also handle
@@ -164,6 +169,12 @@ public class ExtendedStatement extends BaseStatement {
             modificationBuilder.append(this.location.add(1).toString(6));
             modificationBuilder.append("0");
             modificationBuilder.append(argSize);
+
+            // if the args is defined in an external symbol, we need to specify that here
+            if(this.hasExternalSymbol) {
+                modificationBuilder.append("+");
+                modificationBuilder.append(processedArgs);
+            }
             this.modification = modificationBuilder.toString();
         }
 
