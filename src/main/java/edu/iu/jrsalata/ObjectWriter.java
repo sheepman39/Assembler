@@ -56,6 +56,8 @@ public class ObjectWriter implements ObjectWriterInterface {
                 // file
                 FileWriter fileWriter = new FileWriter(this.fileName, this.previouslyUsed)) {
             writeHeaderRecord(fileWriter, this.builder);
+            writeDefineRecord(fileWriter, this.builder);
+            writeReferRecords(fileWriter, this.builder);
             writeTextRecords(fileWriter, this.queue, this.builder);
             writeEndRecord(fileWriter, this.builder);
             
@@ -89,6 +91,70 @@ public class ObjectWriter implements ObjectWriterInterface {
         fileWriter.write(headerRecord.toString());
         fileWriter.write('\n');
 
+    }
+
+    public static void writeDefineRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
+        
+        Queue<String> queue = builder.getExternalDefinitions();
+        String symbol;
+        while(!queue.isEmpty()) {
+            // Create the StringBuilder that will add each component
+            // Start with the 'D'
+            StringBuilder defineRecord = new StringBuilder();
+            defineRecord.append("D");
+
+            // define records has a max length of 73 columns
+            // each name/address pair is always 12 columns
+            // so we can can continue the loop while the length is less than or equal to
+            // 60 (73 -12[per pair] -1[for D])
+            while(!queue.isEmpty() && defineRecord.length() <= 6) {
+
+                // Col 2-7 is the name of the external symbol
+                symbol = queue.poll();
+                defineRecord.append(symbol);
+
+                // Col 8-13 is the address of the external symbol
+                defineRecord.append(SymTable.getSymbol(symbol).toString(6));
+            }
+
+            // write the final string to the object file
+            fileWriter.write(defineRecord.toString());
+            fileWriter.write('\n');
+
+            // clear the StringBuilder to reset it for the next record
+            defineRecord.setLength(0);
+        }   
+    }
+
+    public static void writeReferRecords(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
+        
+        Queue<String> queue = builder.getExternalReferences();
+        String symbol;
+        while(!queue.isEmpty()) {
+            // Create the StringBuilder that will add each component
+            // Start with the 'R'
+            StringBuilder referRecord = new StringBuilder();
+            referRecord.append("R");
+
+            // refer records has a max length of 73 columns
+            // each name is always 6 columns
+            // so we can can continue the loop while the length is less than or equal to
+            // 66 (73 -6[per name] -1[for R])
+            while(!queue.isEmpty() && referRecord.length() < 66) {
+
+                // Col 2-7 is the name of the external symbol
+                symbol = queue.poll();
+                referRecord.append(symbol);
+
+            }
+
+            // write the final string to the object file
+            fileWriter.write(referRecord.toString());
+            fileWriter.write('\n');
+
+            // clear the StringBuilder to reset it for the next record
+            referRecord.setLength(0);
+        }   
     }
 
     // Write the Text Record to the given obj file
