@@ -71,6 +71,7 @@ public class StatementBuilderTest {
                 { "/testAsm2.asm", "/testAsm2.txt" },
                 { "/testAsm3.asm", "/testAsm3.txt" },
                 { "/testAsm4.asm", "/testAsm4.txt" },
+                { "/testAsm5.asm", "/testAsm5.txt" }
         });
     }
 }
