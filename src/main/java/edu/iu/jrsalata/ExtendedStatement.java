@@ -136,9 +136,11 @@ public class ExtendedStatement extends BaseStatement {
         if (SymTable.containsSymbol(processedArgs, this.controlSection)) {
             targetAddress = SymTable.getSymbol(processedArgs, this.controlSection);
             targetAddress = this.calculateDisp(targetAddress);
-        } else {
+        } else if (!hasExternalSymbol){
             // if not, assume it is a hex number
             targetAddress = new HexNum(processedArgs, NumSystem.DEC);
+        } else {
+            targetAddress = new HexNum("0", NumSystem.DEC);
         }
 
         // Get the values of each individual flag

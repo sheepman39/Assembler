@@ -169,7 +169,7 @@ public abstract class AbstractStatementBuilder {
             return string.substring(0, max).toUpperCase();
         } else if (string.length() < max) {
             StringBuilder sb = new StringBuilder(string);
-            for (int i = 0; i < max - this.name.length(); i++) {
+            for (int i = 0; i < max - string.length(); i++) {
                 sb.append(" ");
             }
             return sb.toString().toUpperCase();
@@ -306,6 +306,29 @@ public abstract class AbstractStatementBuilder {
             handleLiteral(args);
         }
         return new String[] { mnemonic, args };
+    }
+
+    protected String evaluateExpression(String args){
+        String[] parts = args.split("[+\\-*/]");
+
+        // if there are no parts, return the original string
+        // since that will represent the value of the expression
+        if(parts.length < 2){
+            return args;
+        }
+        for(String part : parts){
+            if(SymTable.containsSymbol(part, this.name)){
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
+            } else if (this.externalReferences.contains(part)){
+                args = args.replace(part, "0");
+            }
+        }
+
+        Expression expression = new ExpressionBuilder(args).build();
+
+        // note that we are type casting as int because we require a whole number
+        int result = (int) expression.evaluate();
+        return Integer.toString(result);
     }
 
     protected HexNum handleExpression(String label, String args) {
@@ -457,6 +480,7 @@ public abstract class AbstractStatementBuilder {
 
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
+        args = evaluateExpression(args);
         switch (mnemonic) {
             case "START" -> {
                 this.addLocctr(DEFAULT_BLOCK, new HexNum(0));
