@@ -92,6 +92,11 @@ class Main {
             if (line.contains("CSECT")){
                 queue.add(builder);
                 builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+
+                // handle setting the new name of the builder
+                String[] parts = line.split(" ");
+                builder.setName(parts[0]);
+                continue;
             }
             builder.processStatement(line);
         }

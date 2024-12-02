@@ -144,6 +144,10 @@ public abstract class AbstractStatementBuilder {
         return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public Queue<String> getExternalDefinitions() {
         return this.externalDefinitions;
     }
