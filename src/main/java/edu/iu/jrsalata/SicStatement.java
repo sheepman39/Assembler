@@ -65,8 +65,8 @@ public class SicStatement extends BaseStatement {
 
         // If an argument is given, find it in the symbol table
         HexNum argValue;
-        if (SymTable.containsSymbol(this.args)) {
-            argValue = SymTable.getSymbol(this.args);
+        if (SymTable.containsSymbol(this.args, this.controlSection)) {
+            argValue = SymTable.getSymbol(this.args, this.controlSection);
         } else {
             argValue = new HexNum(this.args, NumSystem.HEX);
         }

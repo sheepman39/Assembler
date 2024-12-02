@@ -114,7 +114,7 @@ public class ObjectWriter implements ObjectWriterInterface {
                 defineRecord.append(symbol);
 
                 // Col 8-13 is the address of the external symbol
-                defineRecord.append(SymTable.getSymbol(symbol).toString(6));
+                defineRecord.append(SymTable.getSymbol(symbol, builder.getName()).toString(6));
             }
 
             // write the final string to the object file

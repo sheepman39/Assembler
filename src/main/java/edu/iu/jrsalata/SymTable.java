@@ -9,53 +9,50 @@ import java.util.Set;
 public class SymTable {
 
     // static symbol table can be used across each instance of the class
-    private static HashMap<String, HexNum> symbolTable;
-    private static HashMap<String, String> blockTable;
-
+    private static HashMap<String, HashMap<String, HexNum>> symbolTable;
+    private static HashMap<String, HashMap<String, String>> blockTable;
     // constructor
     // private because we don't need to instantiate this class
     private SymTable() {
     }
 
-    public static void addSymbol(String symbol, HexNum location) {
-        createIfNotExists();
-        symbolTable.put(symbol, location);
+
+    public static void addSymbol(String symbol, HexNum location, String block, String controlSection) {
+        createIfNotExists(controlSection);
+        symbolTable.putIfAbsent(controlSection, new HashMap<>());
+        symbolTable.get(controlSection).put(symbol, location);
+        SymTable.addBlock(symbol, block, controlSection);
     }
 
-    public static void addSymbol(String symbol, HexNum location, String block) {
-        createIfNotExists();
-        symbolTable.put(symbol, location);
-        SymTable.addBlock(symbol, block);
+    public static void addBlock(String symbol, String block, String controlSection) {
+        createIfNotExists(controlSection);
+        blockTable.putIfAbsent(controlSection, new HashMap<>());
+        blockTable.get(controlSection).put(symbol, block);
     }
 
-    public static void addBlock(String symbol, String block) {
-        createIfNotExists();
-        blockTable.put(symbol, block);
+    public static HexNum getSymbol(String symbol, String controlSection) {
+        createIfNotExists(controlSection);
+        return symbolTable.get(controlSection).get(symbol);
     }
 
-    public static HexNum getSymbol(String symbol) {
-        createIfNotExists();
-        return symbolTable.get(symbol);
+    public static Set<String> getKeys(String controlSection) {
+        createIfNotExists(controlSection);
+        return symbolTable.get(controlSection).keySet();
     }
 
-    public static Set<String> getKeys() {
-        createIfNotExists();
-        return symbolTable.keySet();
+    public static String getBlock(String symbol, String controlSection) {
+        createIfNotExists(controlSection);
+        return blockTable.get(controlSection).get(symbol);
     }
 
-    public static String getBlock(String symbol) {
-        createIfNotExists();
-        return blockTable.get(symbol);
+    public static boolean containsSymbol(String symbol, String controlSection) {
+        createIfNotExists(controlSection);
+        return symbolTable.get(controlSection).containsKey(symbol);
     }
 
-    public static boolean containsSymbol(String symbol) {
-        createIfNotExists();
-        return symbolTable.containsKey(symbol);
-    }
-
-    public static boolean containsBlock(String symbol) {
-        createIfNotExists();
-        return blockTable.containsKey(symbol);
+    public static boolean containsBlock(String symbol, String controlSection) {
+        createIfNotExists(controlSection);
+        return blockTable.get(controlSection).containsKey(symbol);
     }
 
     public static void clear() {
@@ -71,5 +68,16 @@ public class SymTable {
         if (blockTable == null) {
             blockTable = new HashMap<>();
         }
+    }
+
+    private static void createIfNotExists(String controlSection) {
+        if (symbolTable == null) {
+            symbolTable = new HashMap<>();
+        }
+        if (blockTable == null) {
+            blockTable = new HashMap<>();
+        }
+        symbolTable.putIfAbsent(controlSection, new HashMap<>());
+        blockTable.putIfAbsent(controlSection, new HashMap<>());
     }
 }

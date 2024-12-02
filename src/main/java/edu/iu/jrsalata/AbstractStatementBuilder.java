@@ -114,7 +114,7 @@ public abstract class AbstractStatementBuilder {
         // instead of relative to the start of their block
         String symbolBlock;
         HexNum blockStart;
-        for (String currentSymbol : SymTable.getKeys()) {
+        for (String currentSymbol : SymTable.getKeys(this.name)) {
 
             // check if the currentSymbol is absolute first
             // since the value doesn't depend on a program block, we don't need to modify it
@@ -122,10 +122,10 @@ public abstract class AbstractStatementBuilder {
                 continue;
             }
             // first get the value of the symbol
-            tmp = SymTable.getSymbol(currentSymbol);
+            tmp = SymTable.getSymbol(currentSymbol, this.name);
 
             // then get the block of the symbol
-            symbolBlock = SymTable.getBlock(currentSymbol);
+            symbolBlock = SymTable.getBlock(currentSymbol, this.name);
 
             // then get the start of the block
             blockStart = this.getStart(symbolBlock);
@@ -134,7 +134,7 @@ public abstract class AbstractStatementBuilder {
             tmp = tmp.add(blockStart);
 
             // place the new value in the symbol table
-            SymTable.addSymbol(currentSymbol, tmp);
+            SymTable.addSymbol(currentSymbol, tmp, this.block, this.name);
         }
         return this.statements;
     }
@@ -318,9 +318,13 @@ public abstract class AbstractStatementBuilder {
         for (String part : parts) {
             // if the part is a symbol, replace it with the decimal value as we need to do
             // math in base 10
-            if (SymTable.containsSymbol(part)) {
-                args = args.replace(part, Integer.toString(SymTable.getSymbol(part).getDec()));
-            } else {
+            if (SymTable.containsSymbol(part, this.name)) {
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
+            } else if (this.externalReferences.contains(part)) {
+                // if the part is an external reference, we need to set the value to 0
+                args = args.replace(part, "0");
+
+            }else {
                 isAbsolute = false;
             }
 
@@ -343,9 +347,9 @@ public abstract class AbstractStatementBuilder {
         // we need this for program block control
         if (isAbsolute) {
             this.absoluteExpressions.add(label);
-            SymTable.addSymbol(label, hexResult, "ABSOLUTE");
+            SymTable.addSymbol(label, hexResult, "ABSOLUTE", this.name);
         } else {
-            SymTable.addSymbol(label, hexResult, this.block);
+            SymTable.addSymbol(label, hexResult, this.block, this.name);
         }
 
         // evaluate the expression and return it as a string
@@ -361,9 +365,9 @@ public abstract class AbstractStatementBuilder {
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
         label = lengthCheck(label, MAX_LABEL_LEN);
-        if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
-            SymTable.addSymbol(label, this.getLocctr(this.block), this.block);
-        } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
+        if (!SymTable.containsSymbol(label, this.name) && (!mnemonic.equals("EQU") || args.equals("*"))) {
+            SymTable.addSymbol(label, this.getLocctr(this.block), this.block, this.name);
+        } else if (!SymTable.containsSymbol(label, this.name) && mnemonic.equals("EQU")) {
 
             // since args can potentially be an expression, we need to evaluate it before
             // adding it to the table
@@ -441,8 +445,8 @@ public abstract class AbstractStatementBuilder {
         // statements to use
         while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
-            if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
-                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr(), this.block);
+            if (!SymTable.containsSymbol(tmpLiteral.getDirective(), this.name)) {
+                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr(), this.block, this.name);
                 this.addStatement(tmpLiteral);
                 this.addLocctr(this.block, tmpLiteral.getSize());
             }
@@ -521,6 +525,7 @@ public abstract class AbstractStatementBuilder {
     protected void addStatement(Statement statement) {
         if (statement != null) {
             statement.setBlock(this.block);
+            statement.setControlSection(this.name);
             this.statements.add(statement);
         }
     }

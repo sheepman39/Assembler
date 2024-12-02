@@ -133,8 +133,8 @@ public class ExtendedStatement extends BaseStatement {
         HexNum targetAddress;
 
         // look up if args is in the symbolTable
-        if (SymTable.containsSymbol(processedArgs)) {
-            targetAddress = SymTable.getSymbol(processedArgs);
+        if (SymTable.containsSymbol(processedArgs, this.controlSection)) {
+            targetAddress = SymTable.getSymbol(processedArgs, this.controlSection);
             targetAddress = this.calculateDisp(targetAddress);
         } else {
             // if not, assume it is a hex number
@@ -200,7 +200,7 @@ public class ExtendedStatement extends BaseStatement {
                 disp = new HexNum(pcRelative);
             } else {
                 // if pc relative is not possible, try base relative
-                int baseInt = SymTable.getSymbol(this.base).getDec();
+                int baseInt = SymTable.getSymbol(this.base, this.controlSection).getDec();
                 int baseRelative = targetAddress.getDec() - baseInt;
                 if (this.base.length() > 0 && baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
