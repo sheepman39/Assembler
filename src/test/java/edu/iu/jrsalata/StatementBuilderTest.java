@@ -3,6 +3,7 @@ package edu.iu.jrsalata;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -39,26 +40,28 @@ public class StatementBuilderTest {
 
             // read the file
             Scanner sc = new Scanner(file);
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                statementFactory.processStatement(line);
-            }
-            statements = statementFactory.getStatements();
-            // close the file
-            sc.close();
+            Queue<AbstractStatementBuilder> queue = fileInput(sc, statementFactory);
 
             // read the object code file and compare assembled results
             file = getClass().getResourceAsStream(objectFile);
             sc = new Scanner(file);
-            for (Statement statement : statements) {
-                if (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
+            while(!queue.isEmpty()){
+                AbstractStatementBuilder builder = queue.poll();
+                statements = builder.getStatements();
+                for (Statement statement : statements) {
+                    if (sc.hasNextLine()) {
+                        String line = sc.nextLine();
+                        assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
+                    }
                 }
             }
             sc.close();
 
         } catch (InvalidAssemblyFileException e) {
+            LOGGER.severe(e.getMessage());
+            LOGGER.severe(Arrays.toString(e.getStackTrace()));
+            fail("FATAL ERROR");
+        } catch (Exception e) {
             LOGGER.severe(e.getMessage());
             LOGGER.severe(Arrays.toString(e.getStackTrace()));
             fail("FATAL ERROR");
@@ -73,5 +76,33 @@ public class StatementBuilderTest {
                 { "/testAsm4.asm", "/testAsm4.txt" },
                 { "/testAsm5.asm", "/testAsm5.txt" }
         });
+    }
+
+public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
+            throws InvalidAssemblyFileException, Exception {
+        
+        Queue<AbstractStatementBuilder> queue = new LinkedList<>();
+
+        // since we want to be able to keep the type of builder consistent, check if the builder passed is an instance of the SIC builder
+        boolean isSIC = builder instanceof SicStatementBuilder;
+
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+
+            // check if we are at the beginning of a control section
+            // in order to create a new builder to handle it
+            if (line.contains("CSECT")){
+                queue.add(builder);
+                builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+
+                // handle setting the new name of the builder
+                String[] parts = line.split(" ");
+                builder.setName(parts[0]);
+                continue;
+            }
+            builder.processStatement(line);
+        }
+        queue.add(builder);
+        return queue;
     }
 }
