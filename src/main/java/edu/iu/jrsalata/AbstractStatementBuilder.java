@@ -28,6 +28,7 @@ public abstract class AbstractStatementBuilder {
     protected ArrayList<String> absoluteExpressions = new ArrayList<>();
     protected Queue<String> externalDefinitions = new LinkedList<>();
     protected Queue<String> externalReferences = new LinkedList<>();
+    protected ArrayList<String> referenceModifications = new ArrayList<>();
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> instructionTable;
@@ -154,6 +155,10 @@ public abstract class AbstractStatementBuilder {
 
     public Queue<String> getExternalReferences() {
         return this.externalReferences;
+    }
+
+    public ArrayList<String> getReferenceModifications() {
+        return this.referenceModifications;
     }
     
     protected String lengthCheck(String string, int max) {
@@ -320,6 +325,23 @@ public abstract class AbstractStatementBuilder {
             if(SymTable.containsSymbol(part, this.name)){
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
             } else if (this.externalReferences.contains(part)){
+                                // if the part is an external reference, we need to set the value to 0 and add a modification record
+                // this is because the value is not known at assembly time
+                StringBuilder modification = new StringBuilder();
+                modification.append("M");
+                modification.append(this.getLocctr().toString(6));
+                // we are appending the length of the modification, which is an entire word or 06
+                modification.append("06");
+
+                // then we add if we are adding or subtracting its value
+                // TODO: check for - sign
+                modification.append("+");
+
+                // then append the external reference
+                modification.append(part);
+
+                // append it to the external reference
+                this.referenceModifications.add(modification.toString());
                 args = args.replace(part, "0");
             }
         }
@@ -344,7 +366,23 @@ public abstract class AbstractStatementBuilder {
             if (SymTable.containsSymbol(part, this.name)) {
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
             } else if (this.externalReferences.contains(part)) {
-                // if the part is an external reference, we need to set the value to 0
+                // if the part is an external reference, we need to set the value to 0 and add a modification record
+                // this is because the value is not known at assembly time
+                StringBuilder modification = new StringBuilder();
+                modification.append("M");
+                modification.append(this.getLocctr().toString(6));
+                // we are appending the length of the modification, which is an entire word or 06
+                modification.append("06");
+
+                // then we add if we are adding or subtracting its value
+                // TODO: check for - sign
+                modification.append("+");
+
+                // then append the external reference
+                modification.append(part);
+
+                // append it to the external reference
+                this.referenceModifications.add(modification.toString());
                 args = args.replace(part, "0");
 
             }else {

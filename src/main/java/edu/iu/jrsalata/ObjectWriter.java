@@ -6,6 +6,7 @@ package edu.iu.jrsalata;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -60,10 +61,10 @@ public class ObjectWriter implements ObjectWriterInterface {
             writeReferRecords(fileWriter, this.builder);
             writeTextRecords(fileWriter, this.queue, this.builder);
             writeEndRecord(fileWriter, this.builder);
-            
+
             // set previously used to true to indicate we want to append in the future
             this.previouslyUsed = true;
-            
+
         } catch (IOException e) {
             // Caller will have to handle exceptions to ensure that the user knows
             // an error has occureds
@@ -94,10 +95,10 @@ public class ObjectWriter implements ObjectWriterInterface {
     }
 
     public void writeDefineRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
-        
+
         Queue<String> builderQueue = builder.getExternalDefinitions();
         String symbol;
-        while(!builderQueue.isEmpty()) {
+        while (!builderQueue.isEmpty()) {
             // Create the StringBuilder that will add each component
             // Start with the 'D'
             StringBuilder defineRecord = new StringBuilder();
@@ -107,7 +108,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             // each name/address pair is always 12 columns
             // so we can can continue the loop while the length is less than or equal to
             // 60 (73 -12[per pair] -1[for D])
-            while(!builderQueue.isEmpty() && defineRecord.length() <= 60) {
+            while (!builderQueue.isEmpty() && defineRecord.length() <= 60) {
 
                 // Col 2-7 is the name of the external symbol
                 symbol = builderQueue.poll();
@@ -123,14 +124,14 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // clear the StringBuilder to reset it for the next record
             defineRecord.setLength(0);
-        }   
+        }
     }
 
     public void writeReferRecords(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
-        
+
         Queue<String> builderQueue = builder.getExternalReferences();
         String symbol;
-        while(!builderQueue.isEmpty()) {
+        while (!builderQueue.isEmpty()) {
             // Create the StringBuilder that will add each component
             // Start with the 'R'
             StringBuilder referRecord = new StringBuilder();
@@ -140,7 +141,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             // each name is always 6 columns
             // so we can can continue the loop while the length is less than or equal to
             // 66 (73 -6[per name] -1[for R])
-            while(!builderQueue.isEmpty() && referRecord.length() < 66) {
+            while (!builderQueue.isEmpty() && referRecord.length() < 66) {
 
                 // Col 2-7 is the name of the external symbol
                 symbol = builderQueue.poll();
@@ -154,7 +155,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
             // clear the StringBuilder to reset it for the next record
             referRecord.setLength(0);
-        }   
+        }
     }
 
     // Write the Text Record to the given obj file
@@ -251,16 +252,24 @@ public class ObjectWriter implements ObjectWriterInterface {
         // we need to write the modification records
         // since the visitor is local here, we are going to simply pass it
         // instead of making copies
-        writeModificationRecords(fileWriter, visitor.getStrings());
+        writeModificationRecords(fileWriter, visitor.getStrings(), builder);
     }
 
-    public void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications) throws IOException {
+    public void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications,
+            AbstractStatementBuilder builder) throws IOException {
         // loop through each modification and write it
         while (!modifications.isEmpty()) {
 
             fileWriter.write(modifications.poll());
             fileWriter.write('\n');
 
+        }
+
+        // write any modification records that were stored in the builder
+        ArrayList<String> modificationRecords = builder.getReferenceModifications();
+        for (String record : modificationRecords) {
+            fileWriter.write(record);
+            fileWriter.write('\n');
         }
     }
 
@@ -272,19 +281,19 @@ public class ObjectWriter implements ObjectWriterInterface {
 
         // Col 1 is "E"
         endRecord.append("E");
-        
+
         // only write starting address if this is the first output
         // since everything else depends on the first
-        if(!this.previouslyUsed) {
-            
-        
+        if (!this.previouslyUsed) {
+
             // Col 2-7 is the starting address
             endRecord.append(builder.getStart().toString(6));
 
-            // write the final string to the header file
-            fileWriter.write(endRecord.toString());
-            fileWriter.write('\n');
         }
-    }   
+
+        // write the final string to the header file
+        fileWriter.write(endRecord.toString());
+        fileWriter.write('\n');
+    }
 
 }
