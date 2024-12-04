@@ -324,7 +324,6 @@ public abstract class AbstractStatementBuilder {
             return args;
         }
         for(String part : parts){
-            copyArgs = copyArgs.trim().replace(part, "");
             if(SymTable.containsSymbol(part, this.name)){
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
             } else if (this.externalReferences.contains(part)){
@@ -337,8 +336,8 @@ public abstract class AbstractStatementBuilder {
                 modification.append("06");
 
                 // then we add if we are adding or subtracting its value
-                // TODO: check for - sign
-                modification.append(copyArgs.charAt(0));
+                char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
+                modification.append(sign);
                 copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
                 
                 // then append the external reference
@@ -348,6 +347,11 @@ public abstract class AbstractStatementBuilder {
                 this.referenceModifications.add(modification.toString());
                 args = args.replace(part, "0");
             }
+
+                        // now we remove the first word from our copy args in order
+            // to find the next sign for modification symbols, if necessary
+            copyArgs = copyArgs.trim().replace(part, "");
+
         }
 
         Expression expression = new ExpressionBuilder(args).build();
@@ -366,8 +370,6 @@ public abstract class AbstractStatementBuilder {
         String copyArgs = args;
         boolean isAbsolute = true;
         for (String part : parts) {
-            copyArgs = copyArgs.trim().replace(part, "");
-
             // if the part is a symbol, replace it with the decimal value as we need to do
             // math in base 10
             if (SymTable.containsSymbol(part, this.name)) {
@@ -382,8 +384,8 @@ public abstract class AbstractStatementBuilder {
                 modification.append("06");
 
                 // then we add if we are adding or subtracting its value
-                // TODO: check for - sign
-                modification.append(copyArgs.charAt(0));
+                char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
+                modification.append(sign);
                 copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
 
                 // then append the external reference
@@ -396,6 +398,10 @@ public abstract class AbstractStatementBuilder {
             }else {
                 isAbsolute = false;
             }
+
+            // now we remove the first word from our copy args in order
+            // to find the next sign for modification symbols, if necessary
+            copyArgs = copyArgs.trim().replace(part, "");
 
         }
 
