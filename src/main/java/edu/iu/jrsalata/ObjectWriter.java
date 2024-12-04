@@ -186,10 +186,16 @@ public class ObjectWriter implements ObjectWriterInterface {
                 builder.getStart(AbstractStatementBuilder.DEFAULT_BLOCK));
         HexNum currentStartLocctr;
 
+        // in order to ensure that nothing is assembled after a blank space, we will use a boolean to track the current status of the blanks
+        boolean blankSpace;
+
         while (!queue.isEmpty()) {
 
             // Get the current block
             String currentBlock = queue.peek().getBlock();
+
+            // reset blankSpace
+            blankSpace = false;
 
             // If the block is not in the start table, add it
             startTable.putIfAbsent(currentBlock, builder.getStart(currentBlock));
@@ -214,12 +220,20 @@ public class ObjectWriter implements ObjectWriterInterface {
             // Col 10-69 is the text record
             tempRecordLength = textRecord.length();
             while (!queue.isEmpty() && (tempRecordLength + queue.peek().assemble().length() < 70)
-                    && queue.peek().getBlock().equals(currentBlock)) {
+                    && queue.peek().getBlock().equals(currentBlock)
+                    && !blankSpace) {
                 statement = queue.poll();
                 assembledTextRecord.append(statement.assemble());
                 currentStartLocctr = currentStartLocctr.add(statement.getSize());
                 tempRecordLength = tempRecordLength + statement.getSize().getDec() * 2;
                 statement.accept(visitor);
+
+                // if the assembled value is a blank space, then we need to set the blankSpace flag to true
+                if (statement.assemble().equals("") && statement.getSize().getDec() > 0) {
+                    blankSpace = true;
+                } else {
+                    blankSpace = false;
+                }
             }
 
             // update the currentStartLocctr
