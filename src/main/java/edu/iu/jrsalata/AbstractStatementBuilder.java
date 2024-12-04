@@ -315,6 +315,8 @@ public abstract class AbstractStatementBuilder {
 
     protected String evaluateExpression(String args){
         String[] parts = args.split("[+\\-*/]");
+        String copyArgs = args;
+
 
         // if there are no parts, return the original string
         // since that will represent the value of the expression
@@ -322,6 +324,7 @@ public abstract class AbstractStatementBuilder {
             return args;
         }
         for(String part : parts){
+            copyArgs = copyArgs.trim().replace(part, "");
             if(SymTable.containsSymbol(part, this.name)){
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
             } else if (this.externalReferences.contains(part)){
@@ -335,8 +338,9 @@ public abstract class AbstractStatementBuilder {
 
                 // then we add if we are adding or subtracting its value
                 // TODO: check for - sign
-                modification.append("+");
-
+                modification.append(copyArgs.charAt(0));
+                copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
+                
                 // then append the external reference
                 modification.append(part);
 
@@ -359,8 +363,11 @@ public abstract class AbstractStatementBuilder {
         // the regex splits each section by the operators +, -, *, /
         // this allows us to replace the defined symbols with our values
         String[] parts = args.split("[+\\-*/]");
+        String copyArgs = args;
         boolean isAbsolute = true;
         for (String part : parts) {
+            copyArgs = copyArgs.trim().replace(part, "");
+
             // if the part is a symbol, replace it with the decimal value as we need to do
             // math in base 10
             if (SymTable.containsSymbol(part, this.name)) {
@@ -376,7 +383,8 @@ public abstract class AbstractStatementBuilder {
 
                 // then we add if we are adding or subtracting its value
                 // TODO: check for - sign
-                modification.append("+");
+                modification.append(copyArgs.charAt(0));
+                copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
 
                 // then append the external reference
                 modification.append(part);
