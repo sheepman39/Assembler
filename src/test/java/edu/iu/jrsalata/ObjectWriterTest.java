@@ -39,48 +39,56 @@ public class ObjectWriterTest {
         String fileName = "test.obj";
 
         ObjectWriterInterface writer = new ObjectWriter();
-        writer.setBuilder(builder);
-        writer.setFileName(fileName);
         testAsm(writer, queue, fileName);
     }
 
     public void testAsm(ObjectWriterInterface writer, Queue<AbstractStatementBuilder> queue, String fileName) {
-        
+
+        // lets first write the object file
         AbstractStatementBuilder builder;
         while (!queue.isEmpty()) {
+
             builder = queue.poll();
             writer.setBuilder(builder);
             writer.setQueue(builder.getStatements());
-            // now compare the output between the two files
+            writer.setFileName(fileName);
             try {
+
                 writer.execute();
-                // read the original compare file
-                InputStream control = getClass().getResourceAsStream(objectFile);
 
-                // read the generated file
-                InputStream test = new FileInputStream(fileName);
-
-                Scanner scTest;
-                try ( // create a scanner for each file
-                        Scanner scControl = new Scanner(control)) {
-                    scTest = new Scanner(test);
-                    // compare the two files
-
-                    while (scControl.hasNextLine() && scTest.hasNextLine()) {
-
-                        String lineControl = scControl.nextLine();
-                        String lineTest = scTest.nextLine();
-                        assertEquals(lineControl.toLowerCase(), lineTest.toLowerCase());
-
-                    }
-                }
-                scTest.close();
-
-                // delete the generated test file
-                new File(fileName).delete();
             } catch (InvalidAssemblyFileException | IOException e) {
                 fail(e.getMessage());
             }
+        }
+
+        // now compare the output between the two files
+        try {
+            // read the original compare file
+            InputStream control = getClass().getResourceAsStream(objectFile);
+
+            // read the generated file
+            InputStream test = new FileInputStream(fileName);
+
+            Scanner scTest;
+            try ( // create a scanner for each file
+                    Scanner scControl = new Scanner(control)) {
+                scTest = new Scanner(test);
+                // compare the two files
+
+                while (scControl.hasNextLine() && scTest.hasNextLine()) {
+
+                    String lineControl = scControl.nextLine();
+                    String lineTest = scTest.nextLine();
+                    assertEquals(lineControl.trim().toLowerCase(), lineTest.trim().toLowerCase());
+
+                }
+            }
+            scTest.close();
+
+            // delete the generated test file
+            new File(fileName).delete();
+        } catch (IOException e) {
+            fail(e.getMessage());
         }
     }
 
@@ -100,7 +108,7 @@ public class ObjectWriterTest {
             }
         } catch (Exception e) {
             fail(e.getMessage());
-        } finally{
+        } finally {
             if (sc != null) {
                 sc.close();
             }
@@ -109,27 +117,33 @@ public class ObjectWriterTest {
     }
 
     public static Queue<AbstractStatementBuilder> fileInput(InputStream filename, AbstractStatementBuilder builder) {
-        
+
         Queue<AbstractStatementBuilder> queue = new LinkedList<>();
 
-        // since we want to be able to keep the type of builder consistent, check if the builder passed is an instance of the SIC builder
+        // since we want to be able to keep the type of builder consistent, check if the
+        // builder passed is an instance of the SIC builder
         boolean isSIC = builder instanceof SicStatementBuilder;
         try (Scanner sc = new Scanner(filename)) {
             while (sc.hasNextLine()) {
                 String line = sc.nextLine();
-                
+
                 // check if we are at the beginning of a control section
                 // in order to create a new builder to handle it
-                if (line.contains("CSECT")){
+                if (line.contains("CSECT")) {
                     queue.add(builder);
                     builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+
+                    // handle setting the new name of the builder
+                    String[] parts = line.split(" ");
+                    builder.setName(parts[0]);
+                    continue;
                 }
                 builder.processStatement(line);
             }
             queue.add(builder);
-        } catch (Exception e){
+        } catch (Exception e) {
             fail(e.getMessage());
-        } 
+        }
         return queue;
     }
 
@@ -140,7 +154,7 @@ public class ObjectWriterTest {
                 { "/testAsm2.asm", "/testAsm2.obj" },
                 { "/testAsm3.asm", "/testAsm3.obj" },
                 { "/testAsm4.asm", "/testAsm4.obj" },
-                // { "/testAsm5.asm", "/testAsm5.obj" },
+                { "/testAsm5.asm", "/testAsm5.obj" },
         });
     }
 }
