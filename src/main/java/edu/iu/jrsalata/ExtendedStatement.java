@@ -100,7 +100,7 @@ public class ExtendedStatement extends BaseStatement {
         String processedArgs = this.args;
 
         // if the args is empty, assume it is 000
-        if (processedArgs.length() == 0) {
+        if (processedArgs.isEmpty()) {
             processedArgs = "000";
         }
 
@@ -204,10 +204,10 @@ public class ExtendedStatement extends BaseStatement {
                 // if pc relative is not possible, try base relative
                 int baseInt = SymTable.getSymbol(this.base, this.controlSection).getDec();
                 int baseRelative = targetAddress.getDec() - baseInt;
-                if (this.base.length() > 0 && baseRelative >= 0 && baseRelative <= 4095) {
+                if (!this.base.isEmpty() && baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);
-                } else if (this.base.length() == 0) {
+                } else if (this.base.isEmpty()) {
                     throw new InvalidAssemblyFileException(-1, "MISSING BASE REGISTER");
                 }
             }
