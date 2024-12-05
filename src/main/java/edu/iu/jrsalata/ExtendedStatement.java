@@ -9,6 +9,7 @@ public class ExtendedStatement extends BaseStatement {
     protected String assembled = "";
     protected String base = "";
     protected String modification = "";
+    protected boolean hasExternalSymbol = false;
     protected boolean nFlag = false;
     protected boolean iFlag = false;
     protected boolean xFlag = false;
@@ -64,6 +65,10 @@ public class ExtendedStatement extends BaseStatement {
         this.base = base;
     }
 
+    public void setExternalSymbol() {
+        this.hasExternalSymbol = true;
+    }
+
     // this will be used by the factory to clean up the args. It will also handle
     // setting the flags
     public void setArgs(String args) {
@@ -95,7 +100,7 @@ public class ExtendedStatement extends BaseStatement {
         String processedArgs = this.args;
 
         // if the args is empty, assume it is 000
-        if (processedArgs.length() == 0) {
+        if (processedArgs.isEmpty()) {
             processedArgs = "000";
         }
 
@@ -128,12 +133,14 @@ public class ExtendedStatement extends BaseStatement {
         HexNum targetAddress;
 
         // look up if args is in the symbolTable
-        if (SymTable.containsSymbol(processedArgs)) {
-            targetAddress = SymTable.getSymbol(processedArgs);
+        if (SymTable.containsSymbol(processedArgs, this.controlSection)) {
+            targetAddress = SymTable.getSymbol(processedArgs, this.controlSection);
             targetAddress = this.calculateDisp(targetAddress);
-        } else {
+        } else if (!hasExternalSymbol) {
             // if not, assume it is a hex number
             targetAddress = new HexNum(processedArgs, NumSystem.DEC);
+        } else {
+            targetAddress = new HexNum("0", NumSystem.DEC);
         }
 
         // Get the values of each individual flag
@@ -164,6 +171,12 @@ public class ExtendedStatement extends BaseStatement {
             modificationBuilder.append(this.location.add(1).toString(6));
             modificationBuilder.append("0");
             modificationBuilder.append(argSize);
+
+            // if the args is defined in an external symbol, we need to specify that here
+            if (this.hasExternalSymbol) {
+                modificationBuilder.append("+");
+                modificationBuilder.append(processedArgs);
+            }
             this.modification = modificationBuilder.toString();
         }
 
@@ -189,12 +202,12 @@ public class ExtendedStatement extends BaseStatement {
                 disp = new HexNum(pcRelative);
             } else {
                 // if pc relative is not possible, try base relative
-                int baseInt = SymTable.getSymbol(this.base).getDec();
+                int baseInt = SymTable.getSymbol(this.base, this.controlSection).getDec();
                 int baseRelative = targetAddress.getDec() - baseInt;
-                if (this.base.length() > 0 && baseRelative >= 0 && baseRelative <= 4095) {
+                if (!this.base.isEmpty() && baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);
-                } else if (this.base.length() == 0) {
+                } else if (this.base.isEmpty()) {
                     throw new InvalidAssemblyFileException(-1, "MISSING BASE REGISTER");
                 }
             }

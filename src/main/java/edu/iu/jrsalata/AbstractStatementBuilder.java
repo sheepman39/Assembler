@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -19,12 +20,16 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
+    static final int MAX_LABEL_LEN = 6;
     static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
 
     protected String name;
     protected String block;
     protected int lineNum;
     protected ArrayList<String> absoluteExpressions = new ArrayList<>();
+    protected Queue<String> externalDefinitions = new LinkedList<>();
+    protected Queue<String> externalReferences = new LinkedList<>();
+    protected ArrayList<String> referenceModifications = new ArrayList<>();
     protected Queue<DirectiveStatement> literals = new LinkedList<>();
     protected Queue<Statement> statements = new LinkedList<>();
     protected final HashMap<String, HexNum> instructionTable;
@@ -111,7 +116,7 @@ public abstract class AbstractStatementBuilder {
         // instead of relative to the start of their block
         String symbolBlock;
         HexNum blockStart;
-        for (String currentSymbol : SymTable.getKeys()) {
+        for (String currentSymbol : SymTable.getKeys(this.name)) {
 
             // check if the currentSymbol is absolute first
             // since the value doesn't depend on a program block, we don't need to modify it
@@ -119,10 +124,10 @@ public abstract class AbstractStatementBuilder {
                 continue;
             }
             // first get the value of the symbol
-            tmp = SymTable.getSymbol(currentSymbol);
+            tmp = SymTable.getSymbol(currentSymbol, this.name);
 
             // then get the block of the symbol
-            symbolBlock = SymTable.getBlock(currentSymbol);
+            symbolBlock = SymTable.getBlock(currentSymbol, this.name);
 
             // then get the start of the block
             blockStart = this.getStart(symbolBlock);
@@ -131,31 +136,53 @@ public abstract class AbstractStatementBuilder {
             tmp = tmp.add(blockStart);
 
             // place the new value in the symbol table
-            SymTable.addSymbol(currentSymbol, tmp);
+            SymTable.addSymbol(currentSymbol, tmp, this.block, this.name);
         }
-
         return this.statements;
     }
 
     public String getName() {
-
         // name needs to be exactly six characters long
-        // if we have no name, default is OBJECT
-        // if the name is longer than 6, truncate it
-        // if the name is shorter than 6, pad it with spaces at the end
-        // if the name is exactly 6, return it
-        if (this.name.equals("")) {
-            return "OUTPUT";
-        } else if (this.name.length() > 6) {
-            return this.name.substring(0, 6).toUpperCase();
-        } else if (this.name.length() < 6) {
-            StringBuilder sb = new StringBuilder(this.name);
-            for (int i = 0; i < 6 - this.name.length(); i++) {
+        return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Queue<String> getExternalDefinitions() {
+        return this.externalDefinitions;
+    }
+
+    public Queue<String> getExternalReferences() {
+        return this.externalReferences;
+    }
+
+    public List<String> getReferenceModifications() {
+        return this.referenceModifications;
+    }
+
+    protected String lengthCheck(String string, int max) {
+        return lengthCheck(string, max, "OUTPUT");
+    }
+
+    protected String lengthCheck(String string, int max, String defaultString) {
+        // since many different strings need to be exactly n characters long,
+        // this function will set them to be n chars long
+        string = string.trim();
+        string = string.replace("\t", " ");
+        if (string.equals("")) {
+            return defaultString;
+        } else if (string.length() > max) {
+            return string.substring(0, max).toUpperCase();
+        } else if (string.length() < max) {
+            StringBuilder sb = new StringBuilder(string);
+            for (int i = 0; i < max - string.length(); i++) {
                 sb.append(" ");
             }
             return sb.toString().toUpperCase();
         } else {
-            return this.name.toUpperCase();
+            return string.toUpperCase();
         }
     }
 
@@ -282,11 +309,66 @@ public abstract class AbstractStatementBuilder {
         }
 
         // check for the '=' character meaning it is a literal value
-        if (args.length() > 0 && args.charAt(0) == '=') {
+        if (!args.isEmpty() && args.charAt(0) == '=') {
             args = args.substring(1);
             handleLiteral(args);
         }
         return new String[] { mnemonic, args };
+    }
+
+    protected String handleModification(String copyArgs, String part){
+        // if the part is an external reference, we need to set the value to 0 and add a
+                // modification record
+                // this is because the value is not known at assembly time
+                StringBuilder modification = new StringBuilder();
+                modification.append("M");
+                modification.append(this.getLocctr().toString(6));
+                // we are appending the length of the modification, which is an entire word or
+                // 06
+                modification.append("06");
+
+                // then we add if we are adding or subtracting its value
+                char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
+                modification.append(sign);
+                copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
+
+                // then append the external reference
+                modification.append(part);
+
+                // append it to the external reference
+                this.referenceModifications.add(modification.toString());
+                return copyArgs;
+    }
+
+    protected String evaluateExpression(String args) {
+        String[] parts = args.split("[+\\-*/]");
+        String copyArgs = args;
+
+        // if there are no parts, return the original string
+        // since that will represent the value of the expression
+        if (parts.length < 2) {
+            return args;
+        }
+        for (String part : parts) {
+            if (SymTable.containsSymbol(part, this.name)) {
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
+            } else if (this.externalReferences.contains(part)) {
+                copyArgs = handleModification(copyArgs, part);
+                args = args.replace(part, "0");
+                
+            }
+
+            // now we remove the first word from our copy args in order
+            // to find the next sign for modification symbols, if necessary
+            copyArgs = copyArgs.trim().replace(part, "");
+
+        }
+
+        Expression expression = new ExpressionBuilder(args).build();
+
+        // note that we are type casting as int because we require a whole number
+        int result = (int) expression.evaluate();
+        return Integer.toString(result);
     }
 
     protected HexNum handleExpression(String label, String args) {
@@ -295,16 +377,24 @@ public abstract class AbstractStatementBuilder {
         // the regex splits each section by the operators +, -, *, /
         // this allows us to replace the defined symbols with our values
         String[] parts = args.split("[+\\-*/]");
+        String copyArgs = args;
         boolean isAbsolute = true;
         for (String part : parts) {
             // if the part is a symbol, replace it with the decimal value as we need to do
             // math in base 10
-            if (SymTable.containsSymbol(part)) {
-                args = args.replace(part, Integer.toString(SymTable.getSymbol(part).getDec()));
+            if (SymTable.containsSymbol(part, this.name)) {
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
+            } else if (this.externalReferences.contains(part)) {
+                copyArgs = handleModification(copyArgs, part);
+                args = args.replace(part, "0");
+
             } else {
                 isAbsolute = false;
             }
 
+            // now we remove the first word from our copy args in order
+            // to find the next sign for modification symbols, if necessary
+            copyArgs = copyArgs.trim().replace(part, "");
         }
 
         // now that we have replaced all of the symbols with their values, we can
@@ -324,9 +414,9 @@ public abstract class AbstractStatementBuilder {
         // we need this for program block control
         if (isAbsolute) {
             this.absoluteExpressions.add(label);
-            SymTable.addSymbol(label, hexResult, "ABSOLUTE");
+            SymTable.addSymbol(label, hexResult, "ABSOLUTE", this.name);
         } else {
-            SymTable.addSymbol(label, hexResult, this.block);
+            SymTable.addSymbol(label, hexResult, this.block, this.name);
         }
 
         // evaluate the expression and return it as a string
@@ -341,9 +431,10 @@ public abstract class AbstractStatementBuilder {
         // 2) args is "*"
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
-        if (!SymTable.containsSymbol(label) && (!mnemonic.equals("EQU") || args.equals("*"))) {
-            SymTable.addSymbol(label, this.getLocctr(this.block), this.block);
-        } else if (!SymTable.containsSymbol(label) && mnemonic.equals("EQU")) {
+        label = lengthCheck(label, MAX_LABEL_LEN);
+        if (!SymTable.containsSymbol(label, this.name) && (!mnemonic.equals("EQU") || args.equals("*"))) {
+            SymTable.addSymbol(label, this.getLocctr(this.block), this.block, this.name);
+        } else if (!SymTable.containsSymbol(label, this.name) && mnemonic.equals("EQU")) {
 
             // since args can potentially be an expression, we need to evaluate it before
             // adding it to the table
@@ -421,8 +512,8 @@ public abstract class AbstractStatementBuilder {
         // statements to use
         while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
-            if (!SymTable.containsSymbol(tmpLiteral.getDirective())) {
-                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr(), this.block);
+            if (!SymTable.containsSymbol(tmpLiteral.getDirective(), this.name)) {
+                SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr(), this.block, this.name);
                 this.addStatement(tmpLiteral);
                 this.addLocctr(this.block, tmpLiteral.getSize());
             }
@@ -433,6 +524,7 @@ public abstract class AbstractStatementBuilder {
 
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
+        args = evaluateExpression(args);
         switch (mnemonic) {
             case "START" -> {
                 this.addLocctr(DEFAULT_BLOCK, new HexNum(0));
@@ -472,6 +564,22 @@ public abstract class AbstractStatementBuilder {
                 // set the current block to the provided args
                 this.block = args;
             }
+            case "EXTDEF" -> {
+                // split the args by commas in order to get each
+                String[] defList = args.trim().split(",");
+                for (String def : defList) {
+                    def = lengthCheck(def, MAX_LABEL_LEN);
+                    this.externalDefinitions.add(def);
+                }
+            }
+            case "EXTREF" -> {
+                // split the args by commas in order to get each
+                String[] refList = args.trim().split(",");
+                for (String ref : refList) {
+                    ref = lengthCheck(ref, MAX_LABEL_LEN);
+                    this.externalReferences.add(ref);
+                }
+            }
             default -> {
                 StringBuilder msg = new StringBuilder("Invalid SIC ASM mnemonic: ");
                 msg.append(mnemonic);
@@ -485,6 +593,7 @@ public abstract class AbstractStatementBuilder {
     protected void addStatement(Statement statement) {
         if (statement != null) {
             statement.setBlock(this.block);
+            statement.setControlSection(this.name);
             this.statements.add(statement);
         }
     }

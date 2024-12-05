@@ -55,7 +55,7 @@ public class SicStatement extends BaseStatement {
 
         // check the addressing mode of the args
         // We are just going to slice the args apart
-        if (this.args.length() == 0) {
+        if (this.args.isEmpty()) {
             return this.opcode.toString(2) + "0000";
         } else if (this.args.charAt(0) == '#') {
             this.args = this.args.substring(1);
@@ -65,8 +65,8 @@ public class SicStatement extends BaseStatement {
 
         // If an argument is given, find it in the symbol table
         HexNum argValue;
-        if (SymTable.containsSymbol(this.args)) {
-            argValue = SymTable.getSymbol(this.args);
+        if (SymTable.containsSymbol(this.args, this.controlSection)) {
+            argValue = SymTable.getSymbol(this.args, this.controlSection);
         } else {
             argValue = new HexNum(this.args, NumSystem.HEX);
         }

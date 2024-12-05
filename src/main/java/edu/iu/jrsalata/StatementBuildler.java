@@ -129,6 +129,12 @@ public class StatementBuildler extends AbstractStatementBuilder {
         if (eFlag) {
             returnVal.setEFlag();
         }
+
+        // check if the args is in an external reference
+        if (this.externalReferences.contains(lengthCheck(args, MAX_LABEL_LEN))) {
+            returnVal.setExternalSymbol();
+        }
+
         returnVal.setBase(this.base);
 
         return returnVal;
