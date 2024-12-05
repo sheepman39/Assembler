@@ -136,7 +136,7 @@ public class ExtendedStatement extends BaseStatement {
         if (SymTable.containsSymbol(processedArgs, this.controlSection)) {
             targetAddress = SymTable.getSymbol(processedArgs, this.controlSection);
             targetAddress = this.calculateDisp(targetAddress);
-        } else if (!hasExternalSymbol){
+        } else if (!hasExternalSymbol) {
             // if not, assume it is a hex number
             targetAddress = new HexNum(processedArgs, NumSystem.DEC);
         } else {
@@ -173,7 +173,7 @@ public class ExtendedStatement extends BaseStatement {
             modificationBuilder.append(argSize);
 
             // if the args is defined in an external symbol, we need to specify that here
-            if(this.hasExternalSymbol) {
+            if (this.hasExternalSymbol) {
                 modificationBuilder.append("+");
                 modificationBuilder.append(processedArgs);
             }

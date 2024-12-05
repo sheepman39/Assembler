@@ -45,7 +45,7 @@ public class StatementBuilderTest {
             // read the object code file and compare assembled results
             file = getClass().getResourceAsStream(objectFile);
             sc = new Scanner(file);
-            while(!queue.isEmpty()){
+            while (!queue.isEmpty()) {
                 AbstractStatementBuilder builder = queue.poll();
                 statements = builder.getStatements();
                 for (Statement statement : statements) {
@@ -78,12 +78,13 @@ public class StatementBuilderTest {
         });
     }
 
-public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
+    public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
             throws InvalidAssemblyFileException, Exception {
-        
+
         Queue<AbstractStatementBuilder> queue = new LinkedList<>();
 
-        // since we want to be able to keep the type of builder consistent, check if the builder passed is an instance of the SIC builder
+        // since we want to be able to keep the type of builder consistent, check if the
+        // builder passed is an instance of the SIC builder
         boolean isSIC = builder instanceof SicStatementBuilder;
 
         while (sc.hasNextLine()) {
@@ -91,7 +92,7 @@ public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStat
 
             // check if we are at the beginning of a control section
             // in order to create a new builder to handle it
-            if (line.contains("CSECT")){
+            if (line.contains("CSECT")) {
                 queue.add(builder);
                 builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
 

@@ -186,8 +186,10 @@ public class ObjectWriter implements ObjectWriterInterface {
                 builder.getStart(AbstractStatementBuilder.DEFAULT_BLOCK));
         HexNum currentStartLocctr;
 
-        // in order to ensure that nothing is assembled after a blank space, we will use a boolean to track the current status of the blanks
-        // blankSpace recognizes when an assembled value has a size, but no generated object code
+        // in order to ensure that nothing is assembled after a blank space, we will use
+        // a boolean to track the current status of the blanks
+        // blankSpace recognizes when an assembled value has a size, but no generated
+        // object code
         // when that happens, start a new line
         boolean blankSpace;
 
@@ -230,7 +232,8 @@ public class ObjectWriter implements ObjectWriterInterface {
                 tempRecordLength = tempRecordLength + statement.getSize().getDec() * 2;
                 statement.accept(visitor);
 
-                // if the assembled value is a blank space and it generates some space, then we need to set the blankSpace flag to true
+                // if the assembled value is a blank space and it generates some space, then we
+                // need to set the blankSpace flag to true
                 blankSpace = statement.assemble().equals("") && statement.getSize().getDec() > 0;
             }
 

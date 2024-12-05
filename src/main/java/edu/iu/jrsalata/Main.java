@@ -13,7 +13,6 @@ class Main {
     static final String SIC_FLAG = "!USE SIC";
 
     public static void main(String[] args) {
-        
 
         // open up the inputFile and look at the first line
         // to determine which factory to use
@@ -26,7 +25,8 @@ class Main {
             // open up the input file and create a scanner to select the builder
             // note that we have to create a new scanner since chooseBuilder will close
             // the scanner given to it
-            // this also ensures that after we read the first line, we can reuse the entire file
+            // this also ensures that after we read the first line, we can reuse the entire
+            // file
             File file = new File(inputFile);
             sc = new Scanner(file);
             AbstractStatementBuilder builder = choseBuilder(sc);
@@ -78,10 +78,11 @@ class Main {
 
     public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
             throws InvalidAssemblyFileException, Exception {
-        
+
         Queue<AbstractStatementBuilder> queue = new LinkedList<>();
 
-        // since we want to be able to keep the type of builder consistent, check if the builder passed is an instance of the SIC builder
+        // since we want to be able to keep the type of builder consistent, check if the
+        // builder passed is an instance of the SIC builder
         boolean isSIC = builder instanceof SicStatementBuilder;
 
         while (sc.hasNextLine()) {
@@ -89,7 +90,7 @@ class Main {
 
             // check if we are at the beginning of a control section
             // in order to create a new builder to handle it
-            if (line.contains("CSECT")){
+            if (line.contains("CSECT")) {
                 queue.add(builder);
                 builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
 
@@ -117,7 +118,7 @@ class Main {
             }
         } catch (Exception e) {
             logger.severe(e.getMessage());
-        } finally{
+        } finally {
             if (sc != null) {
                 sc.close();
             }

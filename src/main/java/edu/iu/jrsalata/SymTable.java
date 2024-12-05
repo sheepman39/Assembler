@@ -11,11 +11,11 @@ public class SymTable {
     // static symbol table can be used across each instance of the class
     private static HashMap<String, HashMap<String, HexNum>> symbolTable;
     private static HashMap<String, HashMap<String, String>> blockTable;
+
     // constructor
     // private because we don't need to instantiate this class
     private SymTable() {
     }
-
 
     public static void addSymbol(String symbol, HexNum location, String block, String controlSection) {
         createIfNotExists(controlSection);
@@ -87,7 +87,7 @@ public class SymTable {
 
     private static String lengthCheck(String symbol) {
         int max = 6;
-                // since many different strings need to be exactly n characters long,
+        // since many different strings need to be exactly n characters long,
         // this function will set them to be n chars long
         if (symbol.equals("")) {
             return symbol;
