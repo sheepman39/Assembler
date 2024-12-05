@@ -95,10 +95,10 @@ public class ObjectWriterTest {
     public AbstractStatementBuilder choseBuilder() {
         AbstractStatementBuilder builder = new StatementBuildler();
 
-        Scanner sc = null;
-        try {
-            InputStream file = getClass().getResourceAsStream(assemblyFile);
-            sc = new Scanner(file);
+        InputStream file = getClass().getResourceAsStream(assemblyFile);
+
+        try (
+            Scanner sc = new Scanner(file);){
 
             String firstLine = sc.nextLine();
 
@@ -108,10 +108,6 @@ public class ObjectWriterTest {
             }
         } catch (Exception e) {
             fail(e.getMessage());
-        } finally {
-            if (sc != null) {
-                sc.close();
-            }
         }
         return builder;
     }

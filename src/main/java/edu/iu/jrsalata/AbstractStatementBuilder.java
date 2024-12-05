@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -157,7 +158,7 @@ public abstract class AbstractStatementBuilder {
         return this.externalReferences;
     }
 
-    public ArrayList<String> getReferenceModifications() {
+    public List<String> getReferenceModifications() {
         return this.referenceModifications;
     }
 
@@ -308,7 +309,7 @@ public abstract class AbstractStatementBuilder {
         }
 
         // check for the '=' character meaning it is a literal value
-        if (args.length() > 0 && args.charAt(0) == '=') {
+        if (!args.isEmpty() && args.charAt(0) == '=') {
             args = args.substring(1);
             handleLiteral(args);
         }

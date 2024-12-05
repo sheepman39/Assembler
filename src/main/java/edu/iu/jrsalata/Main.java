@@ -108,7 +108,7 @@ class Main {
     public static AbstractStatementBuilder choseBuilder(Scanner sc) {
         AbstractStatementBuilder builder = new StatementBuildler();
 
-        try {
+        try (sc) {
 
             String firstLine = sc.nextLine();
 
@@ -118,10 +118,6 @@ class Main {
             }
         } catch (Exception e) {
             logger.severe(e.getMessage());
-        } finally {
-            if (sc != null) {
-                sc.close();
-            }
         }
         return builder;
     }
