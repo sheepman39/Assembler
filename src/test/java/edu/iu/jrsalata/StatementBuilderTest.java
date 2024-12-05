@@ -59,11 +59,9 @@ public class StatementBuilderTest {
 
         } catch (InvalidAssemblyFileException e) {
             LOGGER.severe(e.getMessage());
-            LOGGER.severe(Arrays.toString(e.getStackTrace()));
-            fail("FATAL ERROR");
+            fail("FATAL ASSEMBLY FILE ERROR");
         } catch (Exception e) {
             LOGGER.severe(e.getMessage());
-            LOGGER.severe(Arrays.toString(e.getStackTrace()));
             fail("FATAL ERROR");
         }
     }
