@@ -55,7 +55,7 @@ public class SicStatement extends BaseStatement {
 
         // check the addressing mode of the args
         // We are just going to slice the args apart
-        if (this.args.length() == 0) {
+        if (this.args.isEmpty()) {
             return this.opcode.toString(2) + "0000";
         } else if (this.args.charAt(0) == '#') {
             this.args = this.args.substring(1);
