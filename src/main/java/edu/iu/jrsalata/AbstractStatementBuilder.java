@@ -315,20 +315,8 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected String evaluateExpression(String args) {
-        String[] parts = args.split("[+\\-*/]");
-        String copyArgs = args;
-
-        // if there are no parts, return the original string
-        // since that will represent the value of the expression
-        if (parts.length < 2) {
-            return args;
-        }
-        for (String part : parts) {
-            if (SymTable.containsSymbol(part, this.name)) {
-                args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
-            } else if (this.externalReferences.contains(part)) {
-                // if the part is an external reference, we need to set the value to 0 and add a
+    protected String handleModification(String copyArgs, String part){
+        // if the part is an external reference, we need to set the value to 0 and add a
                 // modification record
                 // this is because the value is not known at assembly time
                 StringBuilder modification = new StringBuilder();
@@ -348,7 +336,25 @@ public abstract class AbstractStatementBuilder {
 
                 // append it to the external reference
                 this.referenceModifications.add(modification.toString());
+                return copyArgs;
+    }
+
+    protected String evaluateExpression(String args) {
+        String[] parts = args.split("[+\\-*/]");
+        String copyArgs = args;
+
+        // if there are no parts, return the original string
+        // since that will represent the value of the expression
+        if (parts.length < 2) {
+            return args;
+        }
+        for (String part : parts) {
+            if (SymTable.containsSymbol(part, this.name)) {
+                args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
+            } else if (this.externalReferences.contains(part)) {
+                copyArgs = handleModification(copyArgs, part);
                 args = args.replace(part, "0");
+                
             }
 
             // now we remove the first word from our copy args in order
@@ -378,26 +384,7 @@ public abstract class AbstractStatementBuilder {
             if (SymTable.containsSymbol(part, this.name)) {
                 args = args.replace(part, Integer.toString(SymTable.getSymbol(part, this.name).getDec()));
             } else if (this.externalReferences.contains(part)) {
-                // if the part is an external reference, we need to set the value to 0 and add a
-                // modification record
-                // this is because the value is not known at assembly time
-                StringBuilder modification = new StringBuilder();
-                modification.append("M");
-                modification.append(this.getLocctr().toString(6));
-                // we are appending the length of the modification, which is an entire word or
-                // 06
-                modification.append("06");
-
-                // then we add if we are adding or subtracting its value
-                char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
-                modification.append(sign);
-                copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
-
-                // then append the external reference
-                modification.append(part);
-
-                // append it to the external reference
-                this.referenceModifications.add(modification.toString());
+                copyArgs = handleModification(copyArgs, part);
                 args = args.replace(part, "0");
 
             } else {
@@ -407,7 +394,6 @@ public abstract class AbstractStatementBuilder {
             // now we remove the first word from our copy args in order
             // to find the next sign for modification symbols, if necessary
             copyArgs = copyArgs.trim().replace(part, "");
-
         }
 
         // now that we have replaced all of the symbols with their values, we can
