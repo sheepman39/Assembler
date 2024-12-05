@@ -77,7 +77,7 @@ public class StatementBuilderTest {
     }
 
     public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
-            throws InvalidAssemblyFileException, Exception {
+            throws Exception {
 
         Queue<AbstractStatementBuilder> queue = new LinkedList<>();
 
