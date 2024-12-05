@@ -168,6 +168,8 @@ public abstract class AbstractStatementBuilder {
     protected String lengthCheck(String string, int max, String defaultString) {
         // since many different strings need to be exactly n characters long,
         // this function will set them to be n chars long
+        string = string.trim();
+        string = string.replace("\t", " ");
         if (string.equals("")) {
             return defaultString;
         } else if (string.length() > max) {
