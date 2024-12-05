@@ -6,9 +6,9 @@ package edu.iu.jrsalata;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class ObjectWriter implements ObjectWriterInterface {
@@ -281,9 +281,9 @@ public class ObjectWriter implements ObjectWriterInterface {
         }
 
         // write any modification records that were stored in the builder
-        ArrayList<String> modificationRecords = builder.getReferenceModifications();
-        for (String record : modificationRecords) {
-            fileWriter.write(record);
+        List<String> modificationRecords = builder.getReferenceModifications();
+        for (String records : modificationRecords) {
+            fileWriter.write(records);
             fileWriter.write('\n');
         }
     }
