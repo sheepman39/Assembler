@@ -34,14 +34,15 @@ public class StatementBuilderTest {
         // clear the symtable
         SymTable.clear();
         Queue<Statement> statements;
-        StatementBuilder statementFactory = new StatementBuilder();
         try {
             InputStream file = getClass().getResourceAsStream(assemblyFile);
 
             AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
+            builderBuilder.setInputFile(assemblyFile);
             builderBuilder.execute(file);
 
             Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
+            LOGGER.info(Integer.toString(queue.size()));
 
             // read the object code file and compare assembled results
             file = getClass().getResourceAsStream(objectFile);
@@ -70,6 +71,7 @@ public class StatementBuilderTest {
     @Parameterized.Parameters()
     public static Collection<String[]> files() {
         return Arrays.asList(new String[][] {
+                { "/testAsm1.asm", "/testAsm1.txt" },
                 { "/testAsm2.asm", "/testAsm2.txt" },
                 { "/testAsm3.asm", "/testAsm3.txt" },
                 { "/testAsm4.asm", "/testAsm4.txt" },
