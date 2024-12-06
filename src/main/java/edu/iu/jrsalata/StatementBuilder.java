@@ -4,12 +4,12 @@
 
 package edu.iu.jrsalata;
 
-public class StatementBuildler extends AbstractStatementBuilder {
+public class StatementBuilder extends AbstractStatementBuilder {
 
     protected String base = "";
 
     // constructor
-    public StatementBuildler() {
+    public StatementBuilder() {
         super();
     }
 
@@ -131,7 +131,7 @@ public class StatementBuildler extends AbstractStatementBuilder {
         }
 
         // check if the args is in an external reference
-        if (this.externalReferences.contains(lengthCheck(args, MAX_LABEL_LEN))) {
+        if (this.externalReferences.contains(SymTable.lengthCheck(args))) {
             returnVal.setExternalSymbol();
         }
 

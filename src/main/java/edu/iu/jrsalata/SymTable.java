@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 public class SymTable {
-
+    public static final int MAX_LEN = 6;
     // static symbol table can be used across each instance of the class
     private static HashMap<String, HashMap<String, HexNum>> symbolTable;
     private static HashMap<String, HashMap<String, String>> blockTable;
@@ -85,17 +85,17 @@ public class SymTable {
         blockTable.putIfAbsent(controlSection, new HashMap<>());
     }
 
-    private static String lengthCheck(String symbol) {
-        int max = 6;
+    public static String lengthCheck(String symbol) {
         // since many different strings need to be exactly n characters long,
         // this function will set them to be n chars long
+        symbol = symbol.replace("\t", " ").trim();
         if (symbol.equals("")) {
             return symbol;
-        } else if (symbol.length() > max) {
-            return symbol.substring(0, max).toUpperCase();
-        } else if (symbol.length() < max) {
+        } else if (symbol.length() > MAX_LEN) {
+            return symbol.substring(0, MAX_LEN).toUpperCase();
+        } else if (symbol.length() < MAX_LEN) {
             StringBuilder sb = new StringBuilder(symbol);
-            for (int i = 0; i < max - symbol.length(); i++) {
+            for (int i = 0; i < MAX_LEN - symbol.length(); i++) {
                 sb.append(" ");
             }
             return sb.toString().toUpperCase();

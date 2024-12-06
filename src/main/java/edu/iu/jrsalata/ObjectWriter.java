@@ -20,7 +20,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     // constructors
     public ObjectWriter() {
         this.fileName = "output.obj";
-        this.builder = new StatementBuildler();
+        this.builder = new StatementBuilder();
         this.queue = new LinkedList<>();
         this.previouslyUsed = false;
     }
@@ -53,7 +53,7 @@ public class ObjectWriter implements ObjectWriterInterface {
     public void execute() throws InvalidAssemblyFileException, IOException {
 
         try (
-                // Create a file writter to be passed around to write each section of the obj
+                // Create a file writer to be passed around to write each section of the obj
                 // file
                 FileWriter fileWriter = new FileWriter(this.fileName, this.previouslyUsed)) {
             writeHeaderRecord(fileWriter, this.builder);
@@ -67,7 +67,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
         } catch (IOException e) {
             // Caller will have to handle exceptions to ensure that the user knows
-            // an error has occureds
+            // an error has happened
             throw new IOException("Error writing to file: " + this.fileName);
         }
     }

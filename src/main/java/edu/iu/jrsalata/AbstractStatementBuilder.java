@@ -20,7 +20,6 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
-    static final int MAX_LABEL_LEN = 6;
     static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
 
     protected String name;
@@ -143,7 +142,7 @@ public abstract class AbstractStatementBuilder {
 
     public String getName() {
         // name needs to be exactly six characters long
-        return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
+        return SymTable.lengthCheck(!this.name.isEmpty() ? this.name : "OUTPUT");
     }
 
     public void setName(String name) {
@@ -160,30 +159,6 @@ public abstract class AbstractStatementBuilder {
 
     public List<String> getReferenceModifications() {
         return this.referenceModifications;
-    }
-
-    protected String lengthCheck(String string, int max) {
-        return lengthCheck(string, max, "OUTPUT");
-    }
-
-    protected String lengthCheck(String string, int max, String defaultString) {
-        // since many different strings need to be exactly n characters long,
-        // this function will set them to be n chars long
-        string = string.trim();
-        string = string.replace("\t", " ");
-        if (string.equals("")) {
-            return defaultString;
-        } else if (string.length() > max) {
-            return string.substring(0, max).toUpperCase();
-        } else if (string.length() < max) {
-            StringBuilder sb = new StringBuilder(string);
-            for (int i = 0; i < max - string.length(); i++) {
-                sb.append(" ");
-            }
-            return sb.toString().toUpperCase();
-        } else {
-            return string.toUpperCase();
-        }
     }
 
     protected void setStart(String block, HexNum start) {
@@ -316,28 +291,28 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected String handleModification(String copyArgs, String part){
+    protected String handleModification(String copyArgs, String part) {
         // if the part is an external reference, we need to set the value to 0 and add a
-                // modification record
-                // this is because the value is not known at assembly time
-                StringBuilder modification = new StringBuilder();
-                modification.append("M");
-                modification.append(this.getLocctr().toString(6));
-                // we are appending the length of the modification, which is an entire word or
-                // 06
-                modification.append("06");
+        // modification record
+        // this is because the value is not known at assembly time
+        StringBuilder modification = new StringBuilder();
+        modification.append("M");
+        modification.append(this.getLocctr().toString(6));
+        // we are appending the length of the modification, which is an entire word or
+        // 06
+        modification.append("06");
 
-                // then we add if we are adding or subtracting its value
-                char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
-                modification.append(sign);
-                copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
+        // then we add if we are adding or subtracting its value
+        char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
+        modification.append(sign);
+        copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
 
-                // then append the external reference
-                modification.append(part);
+        // then append the external reference
+        modification.append(part);
 
-                // append it to the external reference
-                this.referenceModifications.add(modification.toString());
-                return copyArgs;
+        // append it to the external reference
+        this.referenceModifications.add(modification.toString());
+        return copyArgs;
     }
 
     protected String evaluateExpression(String args) {
@@ -355,7 +330,7 @@ public abstract class AbstractStatementBuilder {
             } else if (this.externalReferences.contains(part)) {
                 copyArgs = handleModification(copyArgs, part);
                 args = args.replace(part, "0");
-                
+
             }
 
             // now we remove the first word from our copy args in order
@@ -431,7 +406,7 @@ public abstract class AbstractStatementBuilder {
         // 2) args is "*"
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
-        label = lengthCheck(label, MAX_LABEL_LEN);
+        label = SymTable.lengthCheck(label);
         if (!SymTable.containsSymbol(label, this.name) && (!mnemonic.equals("EQU") || args.equals("*"))) {
             SymTable.addSymbol(label, this.getLocctr(this.block), this.block, this.name);
         } else if (!SymTable.containsSymbol(label, this.name) && mnemonic.equals("EQU")) {
@@ -568,7 +543,7 @@ public abstract class AbstractStatementBuilder {
                 // split the args by commas in order to get each
                 String[] defList = args.trim().split(",");
                 for (String def : defList) {
-                    def = lengthCheck(def, MAX_LABEL_LEN);
+                    def = SymTable.lengthCheck(def);
                     this.externalDefinitions.add(def);
                 }
             }
@@ -576,7 +551,7 @@ public abstract class AbstractStatementBuilder {
                 // split the args by commas in order to get each
                 String[] refList = args.trim().split(",");
                 for (String ref : refList) {
-                    ref = lengthCheck(ref, MAX_LABEL_LEN);
+                    ref = SymTable.lengthCheck(ref);
                     this.externalReferences.add(ref);
                 }
             }

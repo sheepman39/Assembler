@@ -6,9 +6,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+
+import javax.script.ScriptException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -18,7 +19,6 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ObjectWriterTest {
-    static final String SIC_FLAG = "!USE SIC";
     String assemblyFile;
     String objectFile;
 
@@ -32,14 +32,22 @@ public class ObjectWriterTest {
     public void testAsm() {
         // Create an instance of the StatementFactory
         // clear out the symtable since it is used in previous tests
-        SymTable.clear();
-        AbstractStatementBuilder builder = choseBuilder();
-        InputStream file = getClass().getResourceAsStream(assemblyFile);
-        Queue<AbstractStatementBuilder> queue = fileInput(file, builder);
-        String fileName = "test.obj";
+        try {
+            SymTable.clear();
+            InputStream file = getClass().getResourceAsStream(assemblyFile);
+            AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
+            builderBuilder.execute(file);
+            Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
 
-        ObjectWriterInterface writer = new ObjectWriter();
-        testAsm(writer, queue, fileName);
+            String fileName = "test.obj";
+
+            ObjectWriterInterface writer = new ObjectWriter();
+            testAsm(writer, queue, fileName);
+
+        } catch (InvalidAssemblyFileException | IOException | ScriptException e) {
+            fail(e.getMessage());
+        }
+
     }
 
     public void testAsm(ObjectWriterInterface writer, Queue<AbstractStatementBuilder> queue, String fileName) {
@@ -90,57 +98,6 @@ public class ObjectWriterTest {
         } catch (IOException e) {
             fail(e.getMessage());
         }
-    }
-
-    public AbstractStatementBuilder choseBuilder() {
-        AbstractStatementBuilder builder = new StatementBuildler();
-
-        InputStream file = getClass().getResourceAsStream(assemblyFile);
-
-        try (
-            Scanner sc = new Scanner(file);){
-
-            String firstLine = sc.nextLine();
-
-            // compare with the sicFlag defined above
-            if (firstLine.strip().equals(SIC_FLAG)) {
-                builder = new SicStatementBuilder();
-            }
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-        return builder;
-    }
-
-    public static Queue<AbstractStatementBuilder> fileInput(InputStream filename, AbstractStatementBuilder builder) {
-
-        Queue<AbstractStatementBuilder> queue = new LinkedList<>();
-
-        // since we want to be able to keep the type of builder consistent, check if the
-        // builder passed is an instance of the SIC builder
-        boolean isSIC = builder instanceof SicStatementBuilder;
-        try (Scanner sc = new Scanner(filename)) {
-            while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-
-                // check if we are at the beginning of a control section
-                // in order to create a new builder to handle it
-                if (line.contains("CSECT")) {
-                    queue.add(builder);
-                    builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
-
-                    // handle setting the new name of the builder
-                    String[] parts = line.split(" ");
-                    builder.setName(parts[0]);
-                    continue;
-                }
-                builder.processStatement(line);
-            }
-            queue.add(builder);
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-        return queue;
     }
 
     @Parameterized.Parameters()
