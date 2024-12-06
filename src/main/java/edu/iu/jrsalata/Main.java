@@ -3,7 +3,6 @@ package edu.iu.jrsalata;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Queue;
-import java.util.Scanner;
 import java.util.logging.Logger;
 
 import javax.script.ScriptException;
@@ -13,12 +12,8 @@ class Main {
 
     public static void main(String[] args) {
 
-        // open up the inputFile and look at the first line
-        // to determine which factory to use
-        Scanner sc = null;
         try {
             // Create an instance of the AbstractStatementBuilder
-
             String inputFile = "input.asm";
 
             // create a new builderBuilder to handle all file IO and building
@@ -67,9 +62,6 @@ class Main {
             logger.severe("Something went wrong...");
             logger.severe(e.getMessage());
         } finally {
-            if (sc != null) {
-                sc.close();
-            }
             logger.info("Shutting down...");
         }
     }

@@ -61,7 +61,7 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
 
     @Override
     public void execute(InputStream file)
-            throws InvalidAssemblyFileException, FileNotFoundException, ScriptException, IOException {
+            throws InvalidAssemblyFileException, ScriptException, IOException {
 
         // Since scanning consumes an InputStream, we will have to use a
         // BufferedInputStream
