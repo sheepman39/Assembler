@@ -1,7 +1,6 @@
 package edu.iu.jrsalata;
 
-import java.io.File;
-import java.util.LinkedList;
+import java.io.IOException;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -10,7 +9,6 @@ import javax.script.ScriptException;
 
 class Main {
     static final Logger logger = Logger.getLogger(Main.class.getName());
-    static final String SIC_FLAG = "!USE SIC";
 
     public static void main(String[] args) {
 
@@ -22,26 +20,24 @@ class Main {
 
             String inputFile = "input.asm";
 
-            // open up the input file and create a scanner to select the builder
-            // note that we have to create a new scanner since chooseBuilder will close
-            // the scanner given to it
-            // this also ensures that after we read the first line, we can reuse the entire
-            // file
-            File file = new File(inputFile);
-            sc = new Scanner(file);
-            AbstractStatementBuilder builder = choseBuilder(sc);
-            sc = new Scanner(file);
+            // create a new builderBuilder to handle all file IO and building
+            AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
+            builderBuilder.setInputFile(inputFile);
 
-            // to allow for files to be appended, we will create the writer out here and
-            // reset the queue each time
+            // execute the builderBuilder
+            builderBuilder.execute();
+
+            // grab each of the builder queues
+            Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
+
+            
+            // handle the writer here
             String fileName = "output.obj";
             ObjectWriterInterface writer = new ObjectWriter();
             writer.setFileName(fileName);
 
-            // Multiple control sections produces multiple Queues with statements
-            Queue<AbstractStatementBuilder> queue = fileInput(sc, builder);
-
             // go through the queue of builders and write the object files
+            AbstractStatementBuilder builder;
             while (!queue.isEmpty()) {
                 builder = queue.poll();
                 writer.setBuilder(builder);
@@ -65,7 +61,7 @@ class Main {
             logger.severe(e.getMessage());
             logger.severe("===========");
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.severe("Something went wrong...");
             logger.severe(e.getMessage());
         } finally {
@@ -74,51 +70,5 @@ class Main {
             }
             logger.info("Shutting down...");
         }
-    }
-
-    public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
-            throws InvalidAssemblyFileException, Exception {
-
-        Queue<AbstractStatementBuilder> queue = new LinkedList<>();
-
-        // since we want to be able to keep the type of builder consistent, check if the
-        // builder passed is an instance of the SIC builder
-        boolean isSIC = builder instanceof SicStatementBuilder;
-
-        while (sc.hasNextLine()) {
-            String line = sc.nextLine();
-
-            // check if we are at the beginning of a control section
-            // in order to create a new builder to handle it
-            if (line.contains("CSECT")) {
-                queue.add(builder);
-                builder = isSIC ? new SicStatementBuilder() : new StatementBuilder();
-
-                // handle setting the new name of the builder
-                String[] parts = line.split(" ");
-                builder.setName(parts[0]);
-                continue;
-            }
-            builder.processStatement(line);
-        }
-        queue.add(builder);
-        return queue;
-    }
-
-    public static AbstractStatementBuilder choseBuilder(Scanner sc) {
-        AbstractStatementBuilder builder = new StatementBuilder();
-
-        try (sc) {
-
-            String firstLine = sc.nextLine();
-
-            // compare with the sicFlag defined above
-            if (firstLine.strip().equals(SIC_FLAG)) {
-                builder = new SicStatementBuilder();
-            }
-        } catch (Exception e) {
-            logger.severe(e.getMessage());
-        }
-        return builder;
     }
 }
