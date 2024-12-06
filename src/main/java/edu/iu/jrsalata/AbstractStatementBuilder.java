@@ -20,7 +20,6 @@ import net.objecthunter.exp4j.ExpressionBuilder;
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
-    static final int MAX_LABEL_LEN = 6;
     static final Logger logger = Logger.getLogger(AbstractStatementBuilder.class.getName());
 
     protected String name;
