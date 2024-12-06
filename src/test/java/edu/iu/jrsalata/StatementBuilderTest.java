@@ -38,13 +38,14 @@ public class StatementBuilderTest {
         try {
             InputStream file = getClass().getResourceAsStream(assemblyFile);
 
-            // read the file
-            Scanner sc = new Scanner(file);
-            Queue<AbstractStatementBuilder> queue = fileInput(sc, statementFactory);
+            AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
+            builderBuilder.execute(file);
+
+            Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
 
             // read the object code file and compare assembled results
             file = getClass().getResourceAsStream(objectFile);
-            sc = new Scanner(file);
+            Scanner sc = new Scanner(file);
             while (!queue.isEmpty()) {
                 AbstractStatementBuilder builder = queue.poll();
                 statements = builder.getStatements();
@@ -74,34 +75,5 @@ public class StatementBuilderTest {
                 { "/testAsm4.asm", "/testAsm4.txt" },
                 { "/testAsm5.asm", "/testAsm5.txt" }
         });
-    }
-
-    public static Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
-            throws Exception {
-
-        Queue<AbstractStatementBuilder> queue = new LinkedList<>();
-
-        // since we want to be able to keep the type of builder consistent, check if the
-        // builder passed is an instance of the SIC builder
-        boolean isSIC = builder instanceof SicStatementBuilder;
-
-        while (sc.hasNextLine()) {
-            String line = sc.nextLine();
-
-            // check if we are at the beginning of a control section
-            // in order to create a new builder to handle it
-            if (line.contains("CSECT")) {
-                queue.add(builder);
-                builder = isSIC ? new SicStatementBuilder() : new StatementBuilder();
-
-                // handle setting the new name of the builder
-                String[] parts = line.split(" ");
-                builder.setName(parts[0]);
-                continue;
-            }
-            builder.processStatement(line);
-        }
-        queue.add(builder);
-        return queue;
     }
 }

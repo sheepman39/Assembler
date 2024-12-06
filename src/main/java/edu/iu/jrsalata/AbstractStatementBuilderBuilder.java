@@ -5,7 +5,10 @@
 package edu.iu.jrsalata;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -44,9 +47,16 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
 
     @Override
     public void execute() throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
-
         // Read the file and create a new scanner for it
         File file = new File(this.inputFile);
+        InputStream fileStream = new FileInputStream(file);
+        this.execute(fileStream);
+    }
+
+    @Override
+    public void execute(InputStream file) throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
+
+
         Scanner sc = new Scanner(file);
         AbstractStatementBuilder builder = choseBuilder(sc);
 
