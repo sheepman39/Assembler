@@ -5,10 +5,8 @@
 package edu.iu.jrsalata;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
@@ -49,23 +47,28 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
     public void execute() throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
         // Read the file and create a new scanner for it
         File file = new File(this.inputFile);
-        InputStream fileStream = new FileInputStream(file);
-        this.execute(fileStream);
+        Scanner sc1 = new Scanner(file);
+        Scanner sc2 = new Scanner(file);
+
+        this.executeScanner(sc1, sc2);
     }
 
     @Override
     public void execute(InputStream file) throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
 
+        Scanner sc1 = new Scanner(file);
+        Scanner sc2 = new Scanner(file);
 
-        Scanner sc = new Scanner(file);
-        AbstractStatementBuilder builder = choseBuilder(sc);
+        this.executeScanner(sc1, sc2);
 
-        // since choseBuilder reads one line, reset the scanner
-        sc = new Scanner(file);
+    }
+
+    protected void executeScanner(Scanner sc1, Scanner sc2) throws InvalidAssemblyFileException, ScriptException{
+
+        AbstractStatementBuilder builder = choseBuilder(sc1);
 
         // now read the entire input file
-        this.builderQueue = fileInput(sc, builder);
-
+        this.builderQueue = fileInput(sc2, builder);
     }
 
     protected Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)

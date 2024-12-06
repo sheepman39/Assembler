@@ -3,7 +3,6 @@ package edu.iu.jrsalata;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -42,7 +41,6 @@ public class StatementBuilderTest {
             builderBuilder.execute(file);
 
             Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
-            LOGGER.info(Integer.toString(queue.size()));
 
             // read the object code file and compare assembled results
             file = getClass().getResourceAsStream(objectFile);
