@@ -143,7 +143,7 @@ public abstract class AbstractStatementBuilder {
 
     public String getName() {
         // name needs to be exactly six characters long
-        return lengthCheck(this.name, MAX_LABEL_LEN, "OUTPUT");
+        return SymTable.lengthCheck(!this.name.isEmpty() ? this.name : "OUTPUT");
     }
 
     public void setName(String name) {
@@ -160,30 +160,6 @@ public abstract class AbstractStatementBuilder {
 
     public List<String> getReferenceModifications() {
         return this.referenceModifications;
-    }
-
-    protected String lengthCheck(String string, int max) {
-        return lengthCheck(string, max, "OUTPUT");
-    }
-
-    protected String lengthCheck(String string, int max, String defaultString) {
-        // since many different strings need to be exactly n characters long,
-        // this function will set them to be n chars long
-        string = string.trim();
-        string = string.replace("\t", " ");
-        if (string.equals("")) {
-            return defaultString;
-        } else if (string.length() > max) {
-            return string.substring(0, max).toUpperCase();
-        } else if (string.length() < max) {
-            StringBuilder sb = new StringBuilder(string);
-            for (int i = 0; i < max - string.length(); i++) {
-                sb.append(" ");
-            }
-            return sb.toString().toUpperCase();
-        } else {
-            return string.toUpperCase();
-        }
     }
 
     protected void setStart(String block, HexNum start) {
@@ -431,7 +407,7 @@ public abstract class AbstractStatementBuilder {
         // 2) args is "*"
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
-        label = lengthCheck(label, MAX_LABEL_LEN);
+        label = SymTable.lengthCheck(label);
         if (!SymTable.containsSymbol(label, this.name) && (!mnemonic.equals("EQU") || args.equals("*"))) {
             SymTable.addSymbol(label, this.getLocctr(this.block), this.block, this.name);
         } else if (!SymTable.containsSymbol(label, this.name) && mnemonic.equals("EQU")) {
@@ -568,7 +544,7 @@ public abstract class AbstractStatementBuilder {
                 // split the args by commas in order to get each
                 String[] defList = args.trim().split(",");
                 for (String def : defList) {
-                    def = lengthCheck(def, MAX_LABEL_LEN);
+                    def = SymTable.lengthCheck(def);
                     this.externalDefinitions.add(def);
                 }
             }
@@ -576,7 +552,7 @@ public abstract class AbstractStatementBuilder {
                 // split the args by commas in order to get each
                 String[] refList = args.trim().split(",");
                 for (String ref : refList) {
-                    ref = lengthCheck(ref, MAX_LABEL_LEN);
+                    ref = SymTable.lengthCheck(ref);
                     this.externalReferences.add(ref);
                 }
             }

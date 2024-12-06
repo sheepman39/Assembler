@@ -131,7 +131,7 @@ public class StatementBuilder extends AbstractStatementBuilder {
         }
 
         // check if the args is in an external reference
-        if (this.externalReferences.contains(lengthCheck(args, MAX_LABEL_LEN))) {
+        if (this.externalReferences.contains(SymTable.lengthCheck(args))) {
             returnVal.setExternalSymbol();
         }
 
