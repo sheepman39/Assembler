@@ -25,7 +25,6 @@ class Main {
             AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
             builderBuilder.setInputFile(inputFile);
 
-
             // test
             InputStream file = Main.class.getResourceAsStream("/testAsm5.asm");
             // execute the builderBuilder
@@ -34,7 +33,6 @@ class Main {
             // grab each of the builder queues
             Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
 
-            
             // handle the writer here
             String fileName = "output.obj";
             ObjectWriterInterface writer = new ObjectWriter();

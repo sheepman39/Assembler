@@ -316,28 +316,28 @@ public abstract class AbstractStatementBuilder {
         return new String[] { mnemonic, args };
     }
 
-    protected String handleModification(String copyArgs, String part){
+    protected String handleModification(String copyArgs, String part) {
         // if the part is an external reference, we need to set the value to 0 and add a
-                // modification record
-                // this is because the value is not known at assembly time
-                StringBuilder modification = new StringBuilder();
-                modification.append("M");
-                modification.append(this.getLocctr().toString(6));
-                // we are appending the length of the modification, which is an entire word or
-                // 06
-                modification.append("06");
+        // modification record
+        // this is because the value is not known at assembly time
+        StringBuilder modification = new StringBuilder();
+        modification.append("M");
+        modification.append(this.getLocctr().toString(6));
+        // we are appending the length of the modification, which is an entire word or
+        // 06
+        modification.append("06");
 
-                // then we add if we are adding or subtracting its value
-                char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
-                modification.append(sign);
-                copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
+        // then we add if we are adding or subtracting its value
+        char sign = copyArgs.charAt(0) == '-' ? '-' : '+';
+        modification.append(sign);
+        copyArgs = copyArgs.length() < 0 ? copyArgs.substring(1) : copyArgs;
 
-                // then append the external reference
-                modification.append(part);
+        // then append the external reference
+        modification.append(part);
 
-                // append it to the external reference
-                this.referenceModifications.add(modification.toString());
-                return copyArgs;
+        // append it to the external reference
+        this.referenceModifications.add(modification.toString());
+        return copyArgs;
     }
 
     protected String evaluateExpression(String args) {
@@ -355,7 +355,7 @@ public abstract class AbstractStatementBuilder {
             } else if (this.externalReferences.contains(part)) {
                 copyArgs = handleModification(copyArgs, part);
                 args = args.replace(part, "0");
-                
+
             }
 
             // now we remove the first word from our copy args in order

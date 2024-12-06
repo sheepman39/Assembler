@@ -38,9 +38,9 @@ public class ObjectWriterTest {
             AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
             builderBuilder.execute(file);
             Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
-            
+
             String fileName = "test.obj";
-    
+
             ObjectWriterInterface writer = new ObjectWriter();
             testAsm(writer, queue, fileName);
 

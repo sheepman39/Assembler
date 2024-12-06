@@ -64,7 +64,7 @@ public class StatementBuilderTest {
         } catch (InvalidAssemblyFileException e) {
             LOGGER.severe(e.getMessage());
             fail("FATAL ASSEMBLY FILE ERROR");
-        } catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             LOGGER.severe("FILE NOT FOUND ERROR");
             fail("FILE NOT FOUND");
         } catch (IOException | ScriptException e) {

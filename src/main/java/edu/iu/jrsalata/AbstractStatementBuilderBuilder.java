@@ -60,16 +60,18 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
     }
 
     @Override
-    public void execute(InputStream file) throws InvalidAssemblyFileException, FileNotFoundException, ScriptException, IOException {
+    public void execute(InputStream file)
+            throws InvalidAssemblyFileException, FileNotFoundException, ScriptException, IOException {
 
-        // Since scanning consumes an InputStream, we will have to use a BufferedInputStream
+        // Since scanning consumes an InputStream, we will have to use a
+        // BufferedInputStream
         BufferedInputStream bufferedFile = new BufferedInputStream(file);
 
         // mark the starting location of the bufferedFile
         bufferedFile.mark(Integer.MAX_VALUE);
 
         Scanner sc = new Scanner(bufferedFile);
-        
+
         AbstractStatementBuilder builder = choseBuilder(sc);
 
         // reset the buffer
