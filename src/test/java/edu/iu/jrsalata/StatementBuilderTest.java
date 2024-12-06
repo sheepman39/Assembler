@@ -48,18 +48,18 @@ public class StatementBuilderTest {
 
             // read the object code file and compare assembled results
             file = getClass().getResourceAsStream(objectFile);
-            Scanner sc = new Scanner(file);
-            while (!queue.isEmpty()) {
-                AbstractStatementBuilder builder = queue.poll();
-                statements = builder.getStatements();
-                for (Statement statement : statements) {
-                    if (sc.hasNextLine()) {
-                        String line = sc.nextLine();
-                        assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
+            try (Scanner sc = new Scanner(file)) {
+                while (!queue.isEmpty()) {
+                    AbstractStatementBuilder builder = queue.poll();
+                    statements = builder.getStatements();
+                    for (Statement statement : statements) {
+                        if (sc.hasNextLine()) {
+                            String line = sc.nextLine();
+                            assertEquals(line.toUpperCase(), statement.assemble().toUpperCase());
+                        }
                     }
                 }
             }
-            sc.close();
 
         } catch (InvalidAssemblyFileException e) {
             LOGGER.severe(e.getMessage());
