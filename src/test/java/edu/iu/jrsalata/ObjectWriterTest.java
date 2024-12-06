@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
@@ -20,7 +19,6 @@ import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
 public class ObjectWriterTest {
-    static final String SIC_FLAG = "!USE SIC";
     String assemblyFile;
     String objectFile;
 
@@ -45,7 +43,7 @@ public class ObjectWriterTest {
     
             ObjectWriterInterface writer = new ObjectWriter();
             testAsm(writer, queue, fileName);
-            
+
         } catch (InvalidAssemblyFileException | IOException | ScriptException e) {
             fail(e.getMessage());
         }
