@@ -15,23 +15,20 @@ class Main {
         try {
             // Create an instance of the AbstractStatementBuilder
             String inputFile = "input.asm";
-
+            String outputFile = "output.obj";
             // create a new builderBuilder to handle all file IO and building
             AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
             builderBuilder.setInputFile(inputFile);
 
-            // test
-            InputStream file = Main.class.getResourceAsStream("/testAsm5.asm");
             // execute the builderBuilder
-            builderBuilder.execute(file);
+            builderBuilder.execute();
 
             // grab each of the builder queues
             Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();
 
             // handle the writer here
-            String fileName = "output.obj";
             ObjectWriterInterface writer = new ObjectWriter();
-            writer.setFileName(fileName);
+            writer.setFileName(outputFile);
 
             // go through the queue of builders and write the object files
             AbstractStatementBuilder builder;
