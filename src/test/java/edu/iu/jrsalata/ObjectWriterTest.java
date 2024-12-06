@@ -93,7 +93,7 @@ public class ObjectWriterTest {
     }
 
     public AbstractStatementBuilder choseBuilder() {
-        AbstractStatementBuilder builder = new StatementBuildler();
+        AbstractStatementBuilder builder = new StatementBuilder();
 
         InputStream file = getClass().getResourceAsStream(assemblyFile);
 
@@ -127,7 +127,7 @@ public class ObjectWriterTest {
                 // in order to create a new builder to handle it
                 if (line.contains("CSECT")) {
                     queue.add(builder);
-                    builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+                    builder = isSIC ? new SicStatementBuilder() : new StatementBuilder();
 
                     // handle setting the new name of the builder
                     String[] parts = line.split(" ");

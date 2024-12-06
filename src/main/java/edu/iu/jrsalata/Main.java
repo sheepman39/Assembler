@@ -52,14 +52,14 @@ class Main {
             }
 
         } catch (InvalidAssemblyFileException e) {
-            // inforamtive error message from our StatementFactory
+            // informative error message from our StatementFactory
             logger.severe("===========");
             logger.severe("ASSEMBLY FAILURE!!! Shutting down....");
             logger.severe(e.getMessage());
             logger.severe("===========");
 
         } catch (ScriptException e) {
-            // inforamtive error message from our StatementFactory
+            // informative error message from our StatementFactory
             logger.severe("===========");
             logger.severe("EXPRESSION FAILURE!!! Shutting down....");
             logger.severe(e.getMessage());
@@ -92,7 +92,7 @@ class Main {
             // in order to create a new builder to handle it
             if (line.contains("CSECT")) {
                 queue.add(builder);
-                builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+                builder = isSIC ? new SicStatementBuilder() : new StatementBuilder();
 
                 // handle setting the new name of the builder
                 String[] parts = line.split(" ");
@@ -106,7 +106,7 @@ class Main {
     }
 
     public static AbstractStatementBuilder choseBuilder(Scanner sc) {
-        AbstractStatementBuilder builder = new StatementBuildler();
+        AbstractStatementBuilder builder = new StatementBuilder();
 
         try (sc) {
 

@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-// credit to this medium article for helping write paramterized tests:
+// credit to this medium article for helping write parametrized tests:
 // https://medium.com/bliblidotcom-techblog/junit-4-reducing-test-code-duplication-using-parameterized-4d20ecec6f8a
 @RunWith(Parameterized.class)
 public class StatementBuilderTest {
@@ -34,7 +34,7 @@ public class StatementBuilderTest {
         // clear the symtable
         SymTable.clear();
         Queue<Statement> statements;
-        StatementBuildler statementFactory = new StatementBuildler();
+        StatementBuilder statementFactory = new StatementBuilder();
         try {
             InputStream file = getClass().getResourceAsStream(assemblyFile);
 
@@ -92,7 +92,7 @@ public class StatementBuilderTest {
             // in order to create a new builder to handle it
             if (line.contains("CSECT")) {
                 queue.add(builder);
-                builder = isSIC ? new SicStatementBuilder() : new StatementBuildler();
+                builder = isSIC ? new SicStatementBuilder() : new StatementBuilder();
 
                 // handle setting the new name of the builder
                 String[] parts = line.split(" ");

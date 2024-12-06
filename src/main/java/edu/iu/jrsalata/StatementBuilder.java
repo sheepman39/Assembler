@@ -4,12 +4,12 @@
 
 package edu.iu.jrsalata;
 
-public class StatementBuildler extends AbstractStatementBuilder {
+public class StatementBuilder extends AbstractStatementBuilder {
 
     protected String base = "";
 
     // constructor
-    public StatementBuildler() {
+    public StatementBuilder() {
         super();
     }
 
