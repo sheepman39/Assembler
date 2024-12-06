@@ -4,8 +4,10 @@
 
 package edu.iu.jrsalata;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -47,28 +49,37 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
     public void execute() throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
         // Read the file and create a new scanner for it
         File file = new File(this.inputFile);
-        Scanner sc1 = new Scanner(file);
-        Scanner sc2 = new Scanner(file);
+        Scanner sc = new Scanner(file);
 
-        this.executeScanner(sc1, sc2);
+        AbstractStatementBuilder builder = choseBuilder(sc);
+
+        sc = new Scanner(file);
+        // now read the entire input file
+        this.builderQueue = fileInput(sc, builder);
+
     }
 
     @Override
-    public void execute(InputStream file) throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
+    public void execute(InputStream file) throws InvalidAssemblyFileException, FileNotFoundException, ScriptException, IOException {
 
-        Scanner sc1 = new Scanner(file);
-        Scanner sc2 = new Scanner(file);
+        // Since scanning consumes an InputStream, we will have to use a BufferedInputStream
+        BufferedInputStream bufferedFile = new BufferedInputStream(file);
 
-        this.executeScanner(sc1, sc2);
+        // mark the starting location of the bufferedFile
+        bufferedFile.mark(Integer.MAX_VALUE);
 
-    }
+        Scanner sc = new Scanner(bufferedFile);
+        
+        AbstractStatementBuilder builder = choseBuilder(sc);
 
-    protected void executeScanner(Scanner sc1, Scanner sc2) throws InvalidAssemblyFileException, ScriptException{
+        // reset the buffer
+        bufferedFile.reset();
+        sc = new Scanner(bufferedFile);
 
-        AbstractStatementBuilder builder = choseBuilder(sc1);
+        this.builderQueue = fileInput(sc, builder);
 
-        // now read the entire input file
-        this.builderQueue = fileInput(sc2, builder);
+        sc.close();
+
     }
 
     protected Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
@@ -103,7 +114,7 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
     protected AbstractStatementBuilder choseBuilder(Scanner sc) {
         AbstractStatementBuilder builder = new StatementBuilder();
 
-        try (sc) {
+        try {
 
             String firstLine = sc.nextLine();
 

@@ -1,6 +1,7 @@
 package edu.iu.jrsalata;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -24,8 +25,11 @@ class Main {
             AbstractStatementBuilderBuilderInterface builderBuilder = new AbstractStatementBuilderBuilder();
             builderBuilder.setInputFile(inputFile);
 
+
+            // test
+            InputStream file = Main.class.getResourceAsStream("/testAsm5.asm");
             // execute the builderBuilder
-            builderBuilder.execute();
+            builderBuilder.execute(file);
 
             // grab each of the builder queues
             Queue<AbstractStatementBuilder> queue = builderBuilder.getBuilders();

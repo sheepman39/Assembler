@@ -1,11 +1,15 @@
 package edu.iu.jrsalata;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.logging.Logger;
+
+import javax.script.ScriptException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -60,7 +64,10 @@ public class StatementBuilderTest {
         } catch (InvalidAssemblyFileException e) {
             LOGGER.severe(e.getMessage());
             fail("FATAL ASSEMBLY FILE ERROR");
-        } catch (Exception e) {
+        } catch (FileNotFoundException e){
+            LOGGER.severe("FILE NOT FOUND ERROR");
+            fail("FILE NOT FOUND");
+        } catch (IOException | ScriptException e) {
             LOGGER.severe(e.getMessage());
             fail("FATAL ERROR");
         }
