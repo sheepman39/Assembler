@@ -1,7 +1,6 @@
 package edu.iu.jrsalata;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Queue;
 import java.util.logging.Logger;
 
