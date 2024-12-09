@@ -21,13 +21,13 @@ public class Utility {
         }
     }
 
-    public static String[] splitLine(String line) {
+    public static String cleanLine(String line) {
         // First strip any unnecessary whitespace
         line = line.strip();
 
         // if the line is empty or is just a comment, return null
         if (line.equals("") || line.charAt(0) == '.') {
-            return new String[] { "", "" };
+            return "";
         }
 
         // find the comment character
@@ -35,7 +35,19 @@ public class Utility {
         // character exists
         // if not, then set it to the length of the string
         int period = line.indexOf('.') == -1 ? line.length() : line.indexOf('.');
-        line = line.substring(0, period).strip();
+        return line.substring(0, period).strip();
+
+    }
+
+    public static String[] splitLine(String line) {
+
+        // clean up the line with the above method
+        line = cleanLine(line);
+
+        // if the line is empty or is just a comment, return null
+        if (line.equals("") || line.charAt(0) == '.') {
+            return new String[] { "", "" };
+        }
 
         // now we are going to split the string up into the different parts based on
         // space or tabs

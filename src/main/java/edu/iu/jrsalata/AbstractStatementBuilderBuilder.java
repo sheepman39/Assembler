@@ -100,6 +100,7 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
 
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
+            line = Utility.cleanLine(line);
 
             // check if we are at the beginning of a control section
             // in order to create a new builder to handle it
@@ -147,7 +148,7 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
 
         // now create a processor with those params and store it for future use
         MacroProcessorInterface processor = new MacroProcessor(params);
-        SymTable.addMacro(params[0], processor);
+        SymTable.addMacro(parts[0], processor);
 
         return processor;
 

@@ -45,6 +45,28 @@ public class StatementBuilder extends AbstractStatementBuilder {
             eFlag = true;
             mnemonic = mnemonic.substring(1);
         }
+
+        // check if it is a macro before looking for a mnemonic
+        if (SymTable.getMacroKeys().contains(mnemonic)) {
+
+            // get the MP
+            MacroProcessorInterface processor = SymTable.getMacro(mnemonic);
+
+            // set the processor's label to the current label
+            processor.setLabel(label);
+
+            // split up each of the args
+            String[] argsArray = args.split(",");
+
+            Queue<String> queue = processor.getLines(argsArray);
+
+            while (!queue.isEmpty()) {
+                this.processStatement(queue.poll());
+            }
+
+            return;
+        }
+
         // generate a new statement based on its format
         switch (this.formatTable.get(mnemonic)) {
             case ONE -> newStatement = createStatement(mnemonic);
@@ -54,31 +76,10 @@ public class StatementBuilder extends AbstractStatementBuilder {
             case ASM -> newStatement = handleAsmStatement(mnemonic, args);
             default -> {
 
-                // check if it is a macro
-                if(SymTable.getMacroKeys().contains(label)){
-
-                    // get the MP
-                    MacroProcessorInterface processor = SymTable.getMacro(label);
-
-                    // set the processor's label to the current label
-                    processor.setLabel(label);
-
-                    // split up each of the args
-                    String[] argsArray = args.split(",");
-
-                    Queue<String> queue = processor.getLines(argsArray);
-
-                    while(!queue.isEmpty()){
-                        this.processStatement(queue.poll());
-                    }
-                    
-                    return;
-                } else {
-                    StringBuilder msg = new StringBuilder("Mnemonic '");
-                    msg.append(mnemonic);
-                    msg.append("' not found");
-                    throw new InvalidAssemblyFileException(lineNum, msg.toString());
-                }
+                StringBuilder msg = new StringBuilder("Mnemonic '");
+                msg.append(mnemonic);
+                msg.append("' not found");
+                throw new InvalidAssemblyFileException(lineNum, msg.toString());
 
             }
         }
