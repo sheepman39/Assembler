@@ -93,6 +93,11 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
         // builder passed is an instance of the SIC builder
         boolean isSIC = builder instanceof SicStatementBuilder;
 
+        // since we will handle macro definitions here, 
+        // we will use a boolean to control its definition
+        boolean processingMacro = false;
+        MacroProcessorInterface macroProcessor;
+
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
 
@@ -106,6 +111,8 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
                 String[] parts = line.split(" ");
                 builder.setName(parts[0]);
                 continue;
+            } else if(line.contains("MACRO")){
+                processingMacro = true;
             }
             builder.processStatement(line);
         }
