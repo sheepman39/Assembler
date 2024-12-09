@@ -11,6 +11,7 @@ public class SymTable {
     // static symbol table can be used across each instance of the class
     private static HashMap<String, HashMap<String, HexNum>> symbolTable;
     private static HashMap<String, HashMap<String, String>> blockTable;
+    private static HashMap<String, MacroProcessorInterface> macroTable;
 
     // constructor
     // private because we don't need to instantiate this class
@@ -28,6 +29,21 @@ public class SymTable {
         createIfNotExists(controlSection);
         symbol = Utility.lengthCheck(symbol);
         blockTable.get(controlSection).put(symbol, block);
+    }
+
+    public static void addMacro(String name, MacroProcessorInterface processor){
+        createIfNotExists();
+        macroTable.put(name, processor);
+    }
+
+    public static MacroProcessorInterface getMacro(String name){
+        createIfNotExists();
+        return macroTable.get(name);
+    }
+
+    public static Set<String> getMacroKeys(){
+        createIfNotExists();
+        return macroTable.keySet();
     }
 
     public static HexNum getSymbol(String symbol, String controlSection) {
@@ -63,6 +79,7 @@ public class SymTable {
         createIfNotExists();
         symbolTable.clear();
         blockTable.clear();
+        macroTable.clear();
     }
 
     private static void createIfNotExists() {
@@ -72,15 +89,13 @@ public class SymTable {
         if (blockTable == null) {
             blockTable = new HashMap<>();
         }
+        if (macroTable == null){
+            macroTable = new HashMap<>();
+        }
     }
 
     private static void createIfNotExists(String controlSection) {
-        if (symbolTable == null) {
-            symbolTable = new HashMap<>();
-        }
-        if (blockTable == null) {
-            blockTable = new HashMap<>();
-        }
+        createIfNotExists();
         symbolTable.putIfAbsent(controlSection, new HashMap<>());
         blockTable.putIfAbsent(controlSection, new HashMap<>());
     }

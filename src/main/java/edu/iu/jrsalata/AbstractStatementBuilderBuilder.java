@@ -108,16 +108,28 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
                 builder = isSIC ? new SicStatementBuilder() : new StatementBuilder();
 
                 // handle setting the new name of the builder
-                String[] parts = line.split(" ");
+                String[] parts = Utility.splitLine(line);
                 builder.setName(parts[0]);
                 continue;
             } else if(line.contains("MACRO")){
-                processingMacro = true;
+
+                
             }
             builder.processStatement(line);
         }
         queue.add(builder);
         return queue;
+    }
+
+    protected void handleMacroCreation(String line) throws InvalidAssemblyFileException {
+
+        // first split up the macro definition line into sections
+        String[] parts = Utility.splitLine(line);
+
+        // if the length != 3, then we have an invalid definition
+        if(parts.length != 3){
+            throw new InvalidAssemblyFileException(-1, "INVALID MACRO DEFINITION");
+        }
     }
 
     protected AbstractStatementBuilder choseBuilder(Scanner sc) {
