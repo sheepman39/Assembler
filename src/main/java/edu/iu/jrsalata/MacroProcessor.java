@@ -6,8 +6,8 @@ import java.util.Queue;
 
 public class MacroProcessor implements MacroProcessorInterface {
     
-    private String[] parameters;
-    private ArrayList<String> definition;
+    private final String[] parameters;
+    private final ArrayList<String> definition;
 
     // constructors
     public MacroProcessor(){
