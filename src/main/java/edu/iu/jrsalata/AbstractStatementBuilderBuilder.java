@@ -93,10 +93,10 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
         // builder passed is an instance of the SIC builder
         boolean isSIC = builder instanceof SicStatementBuilder;
 
-        // since we will handle macro definitions here, 
+        // since we will handle macro definitions here,
         // we will use a boolean to control its definition
         boolean processingMacro = false;
-        MacroProcessorInterface macroProcessor;
+        MacroProcessorInterface macroProcessor = new MacroProcessor();
 
         while (sc.hasNextLine()) {
             String line = sc.nextLine();
@@ -111,25 +111,46 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
                 String[] parts = Utility.splitLine(line);
                 builder.setName(parts[0]);
                 continue;
-            } else if(line.contains("MACRO")){
-
-                
+            } else if (line.contains("MACRO")) {
+                processingMacro = true;
+                macroProcessor = handleMacroCreation(line);
+                continue;
+            } else if (line.contains("MEND")) {
+                processingMacro = false;
+                continue;
             }
-            builder.processStatement(line);
+
+            // macro definitions goes to the macroProcessor
+            // everything else to the builder
+            if (processingMacro) {
+                macroProcessor.addLine(line);
+            } else {
+                builder.processStatement(line);
+            }
         }
         queue.add(builder);
         return queue;
     }
 
-    protected void handleMacroCreation(String line) throws InvalidAssemblyFileException {
+    protected MacroProcessorInterface handleMacroCreation(String line) throws InvalidAssemblyFileException {
 
         // first split up the macro definition line into sections
         String[] parts = Utility.splitLine(line);
 
         // if the length != 3, then we have an invalid definition
-        if(parts.length != 3){
+        if (parts.length != 3) {
             throw new InvalidAssemblyFileException(-1, "INVALID MACRO DEFINITION");
         }
+
+        // create an array of each parameter defined with the macro
+        String[] params = parts[2].split(",");
+
+        // now create a processor with those params and store it for future use
+        MacroProcessorInterface processor = new MacroProcessor(params);
+        SymTable.addMacro(params[0], processor);
+
+        return processor;
+
     }
 
     protected AbstractStatementBuilder choseBuilder(Scanner sc) {
