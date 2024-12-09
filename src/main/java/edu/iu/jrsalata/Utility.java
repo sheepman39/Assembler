@@ -25,7 +25,7 @@ public class Utility {
         // First strip any unnecessary whitespace
         line = line.strip();
 
-        // if the line is emtpy or is just a comment, return null
+        // if the line is empty or is just a comment, return null
         if (line.equals("") || line.charAt(0) == '.') {
             return new String[] { "", "" };
         }

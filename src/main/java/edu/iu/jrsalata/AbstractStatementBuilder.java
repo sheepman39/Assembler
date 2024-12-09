@@ -249,6 +249,7 @@ public abstract class AbstractStatementBuilder {
         // the number of arguments determines the position of each part
         String mnemonic = "";
         String args = "";
+        String label = "";
         switch (parts.length) {
             case 1 -> mnemonic = parts[0];
             case 2 -> {
@@ -257,7 +258,7 @@ public abstract class AbstractStatementBuilder {
             }
             case 3 -> {
                 // if there are 3 parts, the 0 index is the label
-                String label = parts[0];
+                label = parts[0];
                 mnemonic = parts[1];
                 args = parts[2];
                 handleLabels(label, mnemonic, args);
@@ -271,7 +272,7 @@ public abstract class AbstractStatementBuilder {
             args = args.substring(1);
             handleLiteral(args);
         }
-        return new String[] { mnemonic, args };
+        return new String[] { mnemonic, args, label };
     }
 
     protected String handleModification(String copyArgs, String part) {

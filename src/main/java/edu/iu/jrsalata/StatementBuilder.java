@@ -4,6 +4,8 @@
 
 package edu.iu.jrsalata;
 
+import java.util.Queue;
+
 public class StatementBuilder extends AbstractStatementBuilder {
 
     protected String base = "";
@@ -29,6 +31,7 @@ public class StatementBuilder extends AbstractStatementBuilder {
         String[] parts = splitStatement(statement);
         String mnemonic = parts[0];
         String args = parts[1];
+        String label = parts[2];
 
         // check if mnemonic is empty
         // if so, return null
@@ -50,10 +53,33 @@ public class StatementBuilder extends AbstractStatementBuilder {
             case SIC -> newStatement = createExtStatement(mnemonic, args, eFlag);
             case ASM -> newStatement = handleAsmStatement(mnemonic, args);
             default -> {
-                StringBuilder msg = new StringBuilder("Mnemonic '");
-                msg.append(mnemonic);
-                msg.append("' not found");
-                throw new InvalidAssemblyFileException(lineNum, msg.toString());
+
+                // check if it is a macro
+                if(SymTable.getMacroKeys().contains(label)){
+
+                    // get the MP
+                    MacroProcessorInterface processor = SymTable.getMacro(label);
+
+                    // set the processor's label to the current label
+                    processor.setLabel(label);
+
+                    // split up each of the args
+                    String[] argsArray = args.split(",");
+
+                    Queue<String> queue = processor.getLines(argsArray);
+
+                    while(!queue.isEmpty()){
+                        this.processStatement(queue.poll());
+                    }
+                    
+                    return;
+                } else {
+                    StringBuilder msg = new StringBuilder("Mnemonic '");
+                    msg.append(mnemonic);
+                    msg.append("' not found");
+                    throw new InvalidAssemblyFileException(lineNum, msg.toString());
+                }
+
             }
         }
         this.addLocctr(newStatement.getSize());

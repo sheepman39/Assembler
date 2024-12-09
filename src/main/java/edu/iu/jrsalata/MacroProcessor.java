@@ -8,14 +8,17 @@ public class MacroProcessor implements MacroProcessorInterface {
     
     private final String[] parameters;
     private final ArrayList<String> definition;
+    private String label;
 
     // constructors
     public MacroProcessor(){
+        this.label = "";
         this.parameters = new String[0];
         this.definition = new ArrayList<>();
     }
 
     public MacroProcessor(String[] parameters){
+        this.label = "";
         this.parameters = parameters;
         this.definition = new ArrayList<>();
     }
@@ -30,8 +33,25 @@ public class MacroProcessor implements MacroProcessorInterface {
             line = line.replace(this.parameters[i], "{" + Integer.toString(i) + "}");
         }
 
+        // if there is an available label, add it here
+        if(!this.label.isEmpty()){
+            StringBuilder builder = new StringBuilder();
+            builder.append(this.label);
+            builder.append("   ");
+            builder.append(line);
+            line = builder.toString();
+
+            // since we only want this to work once, reset it here
+            this.label = "";
+        }
         // once preprocessing is done, add it to this macro's definition
         this.definition.add(line);
+    }
+
+    @Override
+    public void setLabel(String label){
+        // NOTE: setLabel must be ran BEFORE you add any lines
+        this.label = label;
     }
 
     @Override
