@@ -8,10 +8,7 @@ import java.util.Queue;
 
 public interface MacroProcessorInterface {
     
-
-    public void defineArguments(String[] args);
-
     public void addLine(String line);
 
-    public Queue<String> getLines() throws InvalidAssemblyFileException;
+    public Queue<String> getLines(String[] args) throws InvalidAssemblyFileException;
 }
