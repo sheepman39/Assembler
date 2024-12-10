@@ -73,6 +73,10 @@ public class StatementBuilderTest {
         }
     }
 
+    
+    /** 
+     * @return Collection<String[]>
+     */
     @Parameterized.Parameters()
     public static Collection<String[]> files() {
         return Arrays.asList(new String[][] {

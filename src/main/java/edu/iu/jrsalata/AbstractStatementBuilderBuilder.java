@@ -1,7 +1,3 @@
-// Class: AbstractStatementBuilderBuilder
-// Implements: AbstractStatementBuilderBuilderInterface
-// This is a builder builder to handle more complex files and simplify the input process
-
 package edu.iu.jrsalata;
 
 import java.io.BufferedInputStream;
@@ -16,17 +12,55 @@ import java.util.logging.Logger;
 
 import javax.script.ScriptException;
 
+/**
+ * The AbstractStatementBuilderBuilder class is responsible for creating and managing
+ * a queue of AbstractStatementBuilder instances. It reads an input file or stream,
+ * determines the appropriate builder to use, and processes the file to populate the
+ * builder queue.
+ * 
+ * <p>This class implements the AbstractStatementBuilderBuilderInterface and provides
+ * methods to set the input file, retrieve the builder queue, and execute the file
+ * processing.</p>
+ * 
+ * <p>It supports both SIC and non-SIC builders, handles macro definitions, and manages
+ * control sections within the input file.</p>
+ * 
+ * @see AbstractStatementBuilderBuilderInterface
+ * @see AbstractStatementBuilder
+ * @see SicStatementBuilder
+ * @see StatementBuilder
+ * @see MacroProcessorInterface
+ * @see InvalidAssemblyFileException
+ * @see ScriptException
+ * @see FileNotFoundException
+ */
 public class AbstractStatementBuilderBuilder implements AbstractStatementBuilderBuilderInterface {
 
-    // SIC FLAG holds the flag for the SIC builder
+    /**
+     * In order to differentiate between SIC and SIC/XE, all SIC
+     * files must start with this flag
+     */
     public static final String SIC_FLAG = "!USE SIC";
     public static final Logger LOGGER = Logger.getLogger(AbstractStatementBuilderBuilder.class.getName());
 
-    // builderQueue will hold each of the created builders
+    /**
+     * stores each of the created builders
+     */ 
     protected Queue<AbstractStatementBuilder> builderQueue;
 
+    /**
+     * stores the name of the input file
+     */
     protected String inputFile;
 
+    /**
+     * Constructs a new AbstractStatementBuilderBuilder with default values.
+     * 
+     * <p>
+     * This constructor initializes the input file name to "input.asm" and 
+     * initializes the builder queue as an empty LinkedList.
+     * </p>
+     */
     public AbstractStatementBuilderBuilder() {
 
         // initialize file names to defaults
@@ -35,43 +69,72 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
 
     }
 
+    /**
+     * Sets the input file name.
+     *
+     * @param fileName the name of the input file to be set
+     */
     @Override
     public void setInputFile(String fileName) {
         this.inputFile = fileName;
     }
 
+    /**
+     * Retrieves the queue of AbstractStatementBuilder instances.
+     *
+     * @return a Queue containing AbstractStatementBuilder objects.
+     */
     @Override
     public Queue<AbstractStatementBuilder> getBuilders() {
         return this.builderQueue;
     }
 
+    /**
+     * Executes the process of reading an input file, selecting the appropriate
+     * builder, and processing the file to populate the builder queue.
+     *
+     * @throws InvalidAssemblyFileException if the assembly file is invalid.
+     * @throws FileNotFoundException if the input file is not found.
+     * @throws ScriptException if there is an error in the script execution.
+     */
     @Override
     public void execute() throws InvalidAssemblyFileException, FileNotFoundException, ScriptException {
+        
         // Read the file and create a new scanner for it
         File file = new File(this.inputFile);
         Scanner sc = new Scanner(file);
 
+        // grab the necessary builder from choseBuilder
         AbstractStatementBuilder builder = choseBuilder(sc);
-
         sc = new Scanner(file);
+
         // now read the entire input file
         this.builderQueue = fileInput(sc, builder);
 
+        // close the open Scanner
+        sc.close();
     }
 
+    /**
+     * Executes the process of reading and parsing an assembly file.
+     *
+     * @param file the InputStream of the assembly file to be processed
+     * @throws InvalidAssemblyFileException if the assembly file is invalid
+     * @throws ScriptException if there is an error in the script execution
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void execute(InputStream file)
             throws InvalidAssemblyFileException, ScriptException, IOException {
 
         // Since scanning consumes an InputStream, we will have to use a
-        // BufferedInputStream
+        // BufferedInputStream in order for it to be reusable
         BufferedInputStream bufferedFile = new BufferedInputStream(file);
 
         // mark the starting location of the bufferedFile
         bufferedFile.mark(Integer.MAX_VALUE);
 
         Scanner sc = new Scanner(bufferedFile);
-
         AbstractStatementBuilder builder = choseBuilder(sc);
 
         // reset the buffer
@@ -81,9 +144,21 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
         this.builderQueue = fileInput(sc, builder);
 
         sc.close();
-
     }
 
+    /**
+     * Processes the input from a Scanner and builds a queue of AbstractStatementBuilder objects.
+     * 
+     * This method reads lines from the provided Scanner, processes them, and constructs 
+     * AbstractStatementBuilder objects based on the input. It handles control sections (CSECT) 
+     * and macro definitions (MACRO, MEND) within the input.
+     * 
+     * @param sc the Scanner to read input from
+     * @param builder the initial AbstractStatementBuilder to use for processing
+     * @return a Queue of AbstractStatementBuilder objects representing the processed input
+     * @throws InvalidAssemblyFileException if the input file contains invalid assembly code
+     * @throws ScriptException if there is an error in processing a script
+     */
     protected Queue<AbstractStatementBuilder> fileInput(Scanner sc, AbstractStatementBuilder builder)
             throws InvalidAssemblyFileException, ScriptException {
 
@@ -98,8 +173,11 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
         boolean processingMacro = false;
         MacroProcessorInterface macroProcessor = new MacroProcessor();
 
+        // line holds the current line in the file
+        String line;
+
         while (sc.hasNextLine()) {
-            String line = sc.nextLine();
+            line = sc.nextLine();
             line = Utility.cleanLine(line);
 
             // check if we are at the beginning of a control section
@@ -129,10 +207,19 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
                 builder.processStatement(line);
             }
         }
+
+        // add the finished builder to the queue
         queue.add(builder);
         return queue;
     }
 
+    /**
+     * Handles the creation of a macro processor from a given line of macro definition.
+     *
+     * @param line The line containing the macro definition.
+     * @return A MacroProcessorInterface instance created from the macro definition.
+     * @throws InvalidAssemblyFileException If the macro definition is invalid.
+     */
     protected MacroProcessorInterface handleMacroCreation(String line) throws InvalidAssemblyFileException {
 
         // first split up the macro definition line into sections
@@ -154,6 +241,14 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
 
     }
 
+    /**
+     * Chooses the appropriate statement builder based on the input from the scanner.
+     * If the first line of the input matches the SIC_FLAG, a SicStatementBuilder is chosen.
+     * Otherwise, a default StatementBuilder is used.
+     *
+     * @param sc the Scanner object used to read the input
+     * @return an instance of AbstractStatementBuilder, either a StatementBuilder or SicStatementBuilder
+     */
     protected AbstractStatementBuilder choseBuilder(Scanner sc) {
         AbstractStatementBuilder builder = new StatementBuilder();
 
@@ -165,6 +260,7 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
             if (firstLine.strip().equals(SIC_FLAG)) {
                 builder = new SicStatementBuilder();
             }
+
         } catch (Exception e) {
             LOGGER.severe(e.getMessage());
         }

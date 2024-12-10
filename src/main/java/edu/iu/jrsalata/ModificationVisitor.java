@@ -26,8 +26,10 @@ public class ModificationVisitor implements VisitorInterface {
     public ModificationVisitor() {
         this.modifications = new LinkedList<>();
     }
-
-    // visit methods
+    
+    /** 
+     * @param statement
+     */
     @Override
     public void visit(Statement statement) {
         // do nothing

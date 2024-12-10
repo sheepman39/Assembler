@@ -50,6 +50,12 @@ public class ObjectWriterTest {
 
     }
 
+    
+    /** 
+     * @param writer
+     * @param queue
+     * @param fileName
+     */
     public void testAsm(ObjectWriterInterface writer, Queue<AbstractStatementBuilder> queue, String fileName) {
 
         // lets first write the object file
