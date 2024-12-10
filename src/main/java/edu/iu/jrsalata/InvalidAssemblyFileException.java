@@ -1,22 +1,34 @@
-// Class: InvalidAssemblyFileException
-// Extends: Exception
-// Provides more details for when there is an invalid line in 
-// a provided assembly program
-// Credit to link below for custom exceptions in java
-// https://medium.com/@nweligalla/creating-custom-exceptions-in-java-ea77a61fcaf4#:~:text=To%20make%20your%20own%20exception,your%20custom%20exceptions%20in%20Java.
 package edu.iu.jrsalata;
 
+/**
+ * Exception thrown to indicate that there is an error with the assembly file.
+ * This exception can be thrown with a default message, a specific line number,
+ * or a line number along with a custom message.
+ */
 public class InvalidAssemblyFileException extends Exception {
 
-    // constructors
+    /**
+     * Exception thrown when there is an error with the input assembly file.
+     */
     public InvalidAssemblyFileException() {
         super("Error with input file");
     }
 
+    /**
+     * Exception thrown when an invalid assembly file is encountered.
+     *
+     * @param lineNum the line number where the error occurred
+     */
     public InvalidAssemblyFileException(int lineNum) {
         super("Error on line " + lineNum);
     }
 
+    /**
+     * Exception thrown when an invalid assembly file is encountered.
+     *
+     * @param lineNum the line number where the error occurred
+     * @param msg the error message describing the issue
+     */
     public InvalidAssemblyFileException(int lineNum, String msg) {
         super("Error on line " + lineNum + ": " + msg);
     }

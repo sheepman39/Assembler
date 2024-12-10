@@ -4,31 +4,64 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
+/**
+ * The MacroProcessor class is responsible for processing macros in assembly language.
+ * It implements the MacroProcessorInterface and provides methods to add lines to a macro,
+ * set a label for a macro, and retrieve the processed lines with arguments.
+ */
 public class MacroProcessor implements MacroProcessorInterface {
 
+    /**
+     * Holds each of the defined parameters in an array for simplicity
+     */
     private final String[] parameters;
+
+    /**
+     * Holds each line of assembly in an ArrayList for flexibility
+     */
     private final ArrayList<String> definition;
+
+    /**
+     * Holds the name of the given macro
+     */
     private String label;
 
-    // constructors
+    /**
+     * Constructs a new MacroProcessor with default values.
+     * Initializes the label to an empty string, parameters to an empty array,
+     * and definition to an empty ArrayList.
+     */
     public MacroProcessor() {
         this.label = "";
         this.parameters = new String[0];
         this.definition = new ArrayList<>();
     }
 
+    /**
+     * Constructs a new MacroProcessor with the specified parameters.
+     *
+     * @param parameters an array of strings representing the parameters for the macro processor
+     */
     public MacroProcessor(String[] parameters) {
         this.label = "";
         this.parameters = parameters;
         this.definition = new ArrayList<>();
     }
 
+    /**
+     * Adds a line to the macro's definition after preprocessing it.
+     * 
+     * The preprocessing involves:
+     * 1. Replacing each parameter in the line with its respective position placeholder.
+     *    The placeholders are in the format of {i}, where i is the index of the parameter.
+     * 2. If a label is available, it is prepended to the line followed by three spaces.
+     *    The label is then reset to an empty string to ensure it is only used once.
+     * 
+     * @param line The line to be added to the macro's definition.
+     */
     @Override
     public void addLine(String line) {
 
-        // first we will find and replace each parameter with its respective position
-        // placeholders will be in the format of
-        // {i} where i is the index of the parameter
         for (int i = 0; i < this.parameters.length; i++) {
             line = line.replace(this.parameters[i], "{" + Integer.toString(i) + "}");
         }
@@ -40,28 +73,35 @@ public class MacroProcessor implements MacroProcessorInterface {
             builder.append("   ");
             builder.append(line);
             line = builder.toString();
-
-            // since we only want this to work once, reset it here
             this.label = "";
         }
+
         // once preprocessing is done, add it to this macro's definition
         this.definition.add(line);
     }
 
+    /**
+     * Sets the label for the macro processor.
+     * Note: This method must be called before adding any lines using addLine(String line).
+     * 
+     * @param label the label to set
+     */
     @Override
     public void setLabel(String label) {
-        // NOTE: setLabel must be ran BEFORE you add any lines
         this.label = label;
     }
 
+    /**
+     * Processes the macro definition by replacing placeholders with the provided arguments.
+     * 
+     * @param args An array of strings representing the arguments to replace the placeholders in the macro definition.
+     * @return A Queue of strings where each string is a line from the macro definition with placeholders replaced by the corresponding arguments.
+     * @throws InvalidAssemblyFileException If the number of provided arguments does not match the number of parameters in the macro definition.
+     */
     @Override
     public Queue<String> getLines(String[] args) throws InvalidAssemblyFileException {
-
         Queue<String> returnQueue = new LinkedList<>();
 
-        // ensure the number of args and parameters matches
-        // if not, return an InvalidAssemblyFileException to
-        // let the user know their input is bad
         if (this.parameters.length != args.length) {
             StringBuilder message = new StringBuilder();
             message.append("MACRO ERROR: Expected ");
@@ -71,8 +111,6 @@ public class MacroProcessor implements MacroProcessorInterface {
             throw new InvalidAssemblyFileException(-1, message.toString());
         }
 
-        // for every line in our definition,
-        // find and replace the placeholders with the appropriate args
         for (String line : this.definition) {
             for (int i = 0; i < this.parameters.length; i++) {
                 line = line.replace("{" + Integer.toString(i) + "}", args[i]);

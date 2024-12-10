@@ -1,29 +1,44 @@
-// Class: SicStatementBuilder
-// Extends: AbstractStatementBuilder
-// Uses sic specific instructions to assemble for SIC machines
-
 package edu.iu.jrsalata;
 
 import javax.script.ScriptException;
 
+/**
+ * The SicStatementBuilder class is responsible for processing and creating SIC statements
+ * from a given string. It extends the AbstractStatementBuilder class and provides
+ * specific implementations for handling SIC assembly language statements.
+ * 
+ * @see AbstractStatementBuilder
+ * @see SicStatement
+ */
 public class SicStatementBuilder extends AbstractStatementBuilder {
+    
+    /**
+     * For flexibility, any SIC program must start with this flag
+     * and will be removed for processing
+     */
     static final String SIC_FLAG = "!USE SIC";
 
-    // constructors
+    /**
+     * Constructs a new SicStatementBuilder object.
+     * This constructor calls the superclass constructor.
+     */
     public SicStatementBuilder() {
         super();
     }
 
-    // create a statement from a string
+    /**
+     * Processes a given assembly statement.
+     * 
+     * @param statement The assembly statement to process.
+     * @throws InvalidAssemblyFileException If the statement contains an invalid mnemonic or format.
+     * @throws ScriptException If there is an error in evaluating expressions within the statement.
+     */
     @Override
     public void processStatement(String statement) throws InvalidAssemblyFileException, ScriptException {
         if (statement.strip().equals(SIC_FLAG)) {
             return;
         }
-        // define return statement
         Statement newStatement;
-
-        // increment lineNum by 1
         lineNum++;
 
         // replace each * with the current locctr
@@ -56,12 +71,16 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
         this.addStatement(newStatement);
     }
 
-    private Statement createSicStatement(String mnemonic, String args) {
+    /**
+     * Creates a SIC statement using the provided mnemonic and arguments.
+     *
+     * @param mnemonic the mnemonic representing the operation code.
+     * @param args the arguments for the SIC statement.
+     * @return a new SicStatement object containing the location counter, opcode, and arguments.
+     */
+    private SicStatement createSicStatement(String mnemonic, String args) {
 
-        // find the opcode of the mnemonic
         HexNum opcode = this.instructionTable.get(mnemonic);
-
-        // create and return the SICStatement
         return new SicStatement(this.getLocctr(), opcode, args);
     }
 }
