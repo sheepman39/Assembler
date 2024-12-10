@@ -1,10 +1,20 @@
 package edu.iu.jrsalata;
 
+/**
+ * Utility class provides static methods for string manipulation and processing.
+ * This class is not meant to be instantiated.
+ */
 public class Utility {
 
+    /**
+     * Ensures the given symbol string is exactly SymTable.MAX_LEN characters long.
+     * If the symbol is longer, it is truncated. If it is shorter, it is padded with spaces.
+     * The resulting string is converted to uppercase.
+     *
+     * @param symbol the input string to be checked and adjusted
+     * @return the adjusted string of length SymTable.MAX_LEN in uppercase
+     */
     public static String lengthCheck(String symbol) {
-        // since many different strings need to be exactly n characters long,
-        // this function will set them to be n chars long
         symbol = symbol.replace("\t", " ").trim();
         if (symbol.equals("")) {
             return symbol;
@@ -21,6 +31,13 @@ public class Utility {
         }
     }
 
+    /**
+     * Cleans the given line by stripping unnecessary whitespace and removing comments.
+     * If the line is empty or is just a comment, an empty string is returned.
+     *
+     * @param line the input string to be cleaned
+     * @return the cleaned string without comments and unnecessary whitespace
+     */
     public static String cleanLine(String line) {
         // First strip any unnecessary whitespace
         line = line.strip();
@@ -29,7 +46,6 @@ public class Utility {
         if (line.equals("") || line.charAt(0) == '.') {
             return "";
         }
-
         // find the comment character
         // since there is the possibility of no comment existing, check if the comment
         // character exists
@@ -39,6 +55,13 @@ public class Utility {
 
     }
 
+    /**
+     * Splits the given line into parts based on spaces after cleaning it.
+     * If the line is empty or is just a comment, an array with two empty strings is returned.
+     *
+     * @param line the input string to be split
+     * @return an array of strings split by spaces or tabs
+     */
     public static String[] splitLine(String line) {
 
         // clean up the line with the above method

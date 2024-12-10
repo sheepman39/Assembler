@@ -6,10 +6,30 @@ package edu.iu.jrsalata;
 import java.util.HashMap;
 import java.util.Set;
 
+/**
+ * The SymTable class provides a static symbol table, block table, and macro table
+ * that can be used across other classes. It includes methods to add,
+ * retrieve, and check symbols, blocks, and macros, as well as to clear the tables.
+ * The symbol and block tables are organized by control sections.
+ */
 public class SymTable {
+
+    /**
+     * The maximum length allowed for labels and other constants
+     * For SIC/XE, that length is 6
+     */
     public static final int MAX_LEN = 6;
-    // static symbol table can be used across each instance of the class
+
+    /**
+     * Contains a separate symbolTable for each program block
+     * block maps to a hashmap, which is then mapped to the symbol and its location as a HexNum
+     */
     private static HashMap<String, HashMap<String, HexNum>> symbolTable;
+
+    /**
+     * Contains a separate blockTable for each program block
+     * block maps to a hashmap, which is then mapped to the block name and its location as a HexNum
+     */ 
     private static HashMap<String, HashMap<String, String>> blockTable;
     private static HashMap<String, MacroProcessorInterface> macroTable;
 
