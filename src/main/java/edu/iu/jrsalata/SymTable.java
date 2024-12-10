@@ -11,6 +11,7 @@ public class SymTable {
     // static symbol table can be used across each instance of the class
     private static HashMap<String, HashMap<String, HexNum>> symbolTable;
     private static HashMap<String, HashMap<String, String>> blockTable;
+    private static HashMap<String, MacroProcessorInterface> macroTable;
 
     // constructor
     // private because we don't need to instantiate this class
@@ -19,20 +20,35 @@ public class SymTable {
 
     public static void addSymbol(String symbol, HexNum location, String block, String controlSection) {
         createIfNotExists(controlSection);
-        symbol = lengthCheck(symbol);
+        symbol = Utility.lengthCheck(symbol);
         symbolTable.get(controlSection).put(symbol, location);
         SymTable.addBlock(symbol, block, controlSection);
     }
 
     public static void addBlock(String symbol, String block, String controlSection) {
         createIfNotExists(controlSection);
-        symbol = lengthCheck(symbol);
+        symbol = Utility.lengthCheck(symbol);
         blockTable.get(controlSection).put(symbol, block);
+    }
+
+    public static void addMacro(String name, MacroProcessorInterface processor) {
+        createIfNotExists();
+        macroTable.put(name, processor);
+    }
+
+    public static MacroProcessorInterface getMacro(String name) {
+        createIfNotExists();
+        return macroTable.get(name);
+    }
+
+    public static Set<String> getMacroKeys() {
+        createIfNotExists();
+        return macroTable.keySet();
     }
 
     public static HexNum getSymbol(String symbol, String controlSection) {
         createIfNotExists(controlSection);
-        symbol = lengthCheck(symbol);
+        symbol = Utility.lengthCheck(symbol);
         return symbolTable.get(controlSection).get(symbol);
     }
 
@@ -43,19 +59,19 @@ public class SymTable {
 
     public static String getBlock(String symbol, String controlSection) {
         createIfNotExists(controlSection);
-        symbol = lengthCheck(symbol);
+        symbol = Utility.lengthCheck(symbol);
         return blockTable.get(controlSection).get(symbol);
     }
 
     public static boolean containsSymbol(String symbol, String controlSection) {
         createIfNotExists(controlSection);
-        symbol = lengthCheck(symbol);
+        symbol = Utility.lengthCheck(symbol);
         return symbolTable.get(controlSection).containsKey(symbol);
     }
 
     public static boolean containsBlock(String symbol, String controlSection) {
         createIfNotExists(controlSection);
-        symbol = lengthCheck(symbol);
+        symbol = Utility.lengthCheck(symbol);
         return blockTable.get(controlSection).containsKey(symbol);
     }
 
@@ -63,6 +79,7 @@ public class SymTable {
         createIfNotExists();
         symbolTable.clear();
         blockTable.clear();
+        macroTable.clear();
     }
 
     private static void createIfNotExists() {
@@ -72,35 +89,14 @@ public class SymTable {
         if (blockTable == null) {
             blockTable = new HashMap<>();
         }
+        if (macroTable == null) {
+            macroTable = new HashMap<>();
+        }
     }
 
     private static void createIfNotExists(String controlSection) {
-        if (symbolTable == null) {
-            symbolTable = new HashMap<>();
-        }
-        if (blockTable == null) {
-            blockTable = new HashMap<>();
-        }
+        createIfNotExists();
         symbolTable.putIfAbsent(controlSection, new HashMap<>());
         blockTable.putIfAbsent(controlSection, new HashMap<>());
-    }
-
-    public static String lengthCheck(String symbol) {
-        // since many different strings need to be exactly n characters long,
-        // this function will set them to be n chars long
-        symbol = symbol.replace("\t", " ").trim();
-        if (symbol.equals("")) {
-            return symbol;
-        } else if (symbol.length() > MAX_LEN) {
-            return symbol.substring(0, MAX_LEN).toUpperCase();
-        } else if (symbol.length() < MAX_LEN) {
-            StringBuilder sb = new StringBuilder(symbol);
-            for (int i = 0; i < MAX_LEN - symbol.length(); i++) {
-                sb.append(" ");
-            }
-            return sb.toString().toUpperCase();
-        } else {
-            return symbol.toUpperCase();
-        }
     }
 }

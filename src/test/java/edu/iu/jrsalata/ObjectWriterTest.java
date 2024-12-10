@@ -108,6 +108,8 @@ public class ObjectWriterTest {
                 { "/testAsm3.asm", "/testAsm3.obj" },
                 { "/testAsm4.asm", "/testAsm4.obj" },
                 { "/testAsm5.asm", "/testAsm5.obj" },
+                { "/testAsm6.asm", "/testAsm6.obj" },
+
         });
     }
 }

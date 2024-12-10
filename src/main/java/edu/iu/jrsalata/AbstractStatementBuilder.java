@@ -17,6 +17,7 @@ import javax.script.ScriptException;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
+import net.objecthunter.exp4j.ValidationResult;
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
@@ -142,7 +143,7 @@ public abstract class AbstractStatementBuilder {
 
     public String getName() {
         // name needs to be exactly six characters long
-        return SymTable.lengthCheck(!this.name.isEmpty() ? this.name : "OUTPUT");
+        return Utility.lengthCheck(!this.name.isEmpty() ? this.name : "OUTPUT");
     }
 
     public void setName(String name) {
@@ -244,28 +245,12 @@ public abstract class AbstractStatementBuilder {
     }
 
     protected String[] splitStatement(String statement) throws InvalidAssemblyFileException {
-        // First strip any unnecessary whitespace
-        statement = statement.strip();
 
-        // if the line is emtpy or is just a comment, return null
-        if (statement.equals("") || statement.charAt(0) == '.') {
-            return new String[] { "", "" };
-        }
-
-        // find the comment character
-        // since there is the possibility of no comment existing, check if the comment
-        // character exists
-        // if not, then set it to the length of the string
-        int period = statement.indexOf('.') == -1 ? statement.length() : statement.indexOf('.');
-        statement = statement.substring(0, period).strip();
-
-        // now we are going to split the string up into the different parts based on
-        // space or tabs
-        String[] parts = statement.split("\\s+");
-
+        String[] parts = Utility.splitLine(statement);
         // the number of arguments determines the position of each part
         String mnemonic = "";
         String args = "";
+        String label = "";
         switch (parts.length) {
             case 1 -> mnemonic = parts[0];
             case 2 -> {
@@ -274,7 +259,7 @@ public abstract class AbstractStatementBuilder {
             }
             case 3 -> {
                 // if there are 3 parts, the 0 index is the label
-                String label = parts[0];
+                label = parts[0];
                 mnemonic = parts[1];
                 args = parts[2];
                 handleLabels(label, mnemonic, args);
@@ -288,7 +273,7 @@ public abstract class AbstractStatementBuilder {
             args = args.substring(1);
             handleLiteral(args);
         }
-        return new String[] { mnemonic, args };
+        return new String[] { mnemonic, args, label };
     }
 
     protected String handleModification(String copyArgs, String part) {
@@ -341,9 +326,15 @@ public abstract class AbstractStatementBuilder {
 
         Expression expression = new ExpressionBuilder(args).build();
 
-        // note that we are type casting as int because we require a whole number
-        int result = (int) expression.evaluate();
-        return Integer.toString(result);
+        ValidationResult expressionResults = expression.validate();
+
+        if (expressionResults.isValid()) {
+            // note that we are type casting as int because we require a whole number
+            int result = (int) expression.evaluate();
+            return Integer.toString(result);
+        }
+        return args;
+
     }
 
     protected HexNum handleExpression(String label, String args) {
@@ -406,7 +397,7 @@ public abstract class AbstractStatementBuilder {
         // 2) args is "*"
         // because other symbols require their location to be stored or the "*"
         // EQU requires the given value to be their stored value
-        label = SymTable.lengthCheck(label);
+        label = Utility.lengthCheck(label);
         if (!SymTable.containsSymbol(label, this.name) && (!mnemonic.equals("EQU") || args.equals("*"))) {
             SymTable.addSymbol(label, this.getLocctr(this.block), this.block, this.name);
         } else if (!SymTable.containsSymbol(label, this.name) && mnemonic.equals("EQU")) {
@@ -543,7 +534,7 @@ public abstract class AbstractStatementBuilder {
                 // split the args by commas in order to get each
                 String[] defList = args.trim().split(",");
                 for (String def : defList) {
-                    def = SymTable.lengthCheck(def);
+                    def = Utility.lengthCheck(def);
                     this.externalDefinitions.add(def);
                 }
             }
@@ -551,7 +542,7 @@ public abstract class AbstractStatementBuilder {
                 // split the args by commas in order to get each
                 String[] refList = args.trim().split(",");
                 for (String ref : refList) {
-                    ref = SymTable.lengthCheck(ref);
+                    ref = Utility.lengthCheck(ref);
                     this.externalReferences.add(ref);
                 }
             }

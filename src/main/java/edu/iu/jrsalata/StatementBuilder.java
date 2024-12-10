@@ -4,6 +4,8 @@
 
 package edu.iu.jrsalata;
 
+import java.util.Queue;
+
 public class StatementBuilder extends AbstractStatementBuilder {
 
     protected String base = "";
@@ -25,10 +27,18 @@ public class StatementBuilder extends AbstractStatementBuilder {
         // flag for format 4
         boolean eFlag = false;
 
+        // replace each * with the current locctr
+        // since this can be used anywhere
+        statement = statement.replace("*", Integer.toString(this.getLocctr(this.block).getDec()));
+
         // get the parts of the statement
         String[] parts = splitStatement(statement);
         String mnemonic = parts[0];
-        String args = parts[1];
+
+        // note that we are checking if there is a valid expression here
+        // since *-n is a valid expression
+        String args = evaluateExpression(parts[1]);
+        String label = parts[2];
 
         // check if mnemonic is empty
         // if so, return null
@@ -42,6 +52,28 @@ public class StatementBuilder extends AbstractStatementBuilder {
             eFlag = true;
             mnemonic = mnemonic.substring(1);
         }
+
+        // check if it is a macro before looking for a mnemonic
+        if (SymTable.getMacroKeys().contains(mnemonic)) {
+
+            // get the MP
+            MacroProcessorInterface processor = SymTable.getMacro(mnemonic);
+
+            // set the processor's label to the current label
+            processor.setLabel(label);
+
+            // split up each of the args
+            String[] argsArray = args.split(",");
+
+            Queue<String> queue = processor.getLines(argsArray);
+
+            while (!queue.isEmpty()) {
+                this.processStatement(queue.poll());
+            }
+
+            return;
+        }
+
         // generate a new statement based on its format
         switch (this.formatTable.get(mnemonic)) {
             case ONE -> newStatement = createStatement(mnemonic);
@@ -50,10 +82,12 @@ public class StatementBuilder extends AbstractStatementBuilder {
             case SIC -> newStatement = createExtStatement(mnemonic, args, eFlag);
             case ASM -> newStatement = handleAsmStatement(mnemonic, args);
             default -> {
+
                 StringBuilder msg = new StringBuilder("Mnemonic '");
                 msg.append(mnemonic);
                 msg.append("' not found");
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
+
             }
         }
         this.addLocctr(newStatement.getSize());
@@ -131,7 +165,7 @@ public class StatementBuilder extends AbstractStatementBuilder {
         }
 
         // check if the args is in an external reference
-        if (this.externalReferences.contains(SymTable.lengthCheck(args))) {
+        if (this.externalReferences.contains(Utility.lengthCheck(args))) {
             returnVal.setExternalSymbol();
         }
 
