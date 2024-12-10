@@ -784,7 +784,7 @@ public abstract class AbstractStatementBuilder {
      * @throws InvalidAssemblyFileException If the mnemonic is invalid or if there
      *                                      is an error in processing the statement.
      */
-    protected Statement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
+    protected DirectiveStatement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
 
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);

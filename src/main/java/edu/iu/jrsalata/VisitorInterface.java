@@ -1,5 +1,3 @@
-// Interface: Visitor Interface
-// Provides an interface for visitors to Statements
 package edu.iu.jrsalata;
 
 import java.util.Queue;

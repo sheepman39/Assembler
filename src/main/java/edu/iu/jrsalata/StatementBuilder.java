@@ -1,27 +1,39 @@
-// Class: StatementFactory
-// Extends: StatementFactoryBuilder
-// This class will handle all of the statement parsing and statement creation, including setting flags and defining labels
-
 package edu.iu.jrsalata;
 
 import java.util.Queue;
 
+/**
+ * The StatementBuilder class is responsible for processing SIC/XE assembly statements
+ * and generating corresponding Statement objects based on the mnemonic and arguments.
+ * It extends the AbstractStatementBuilder class and provides implementations for
+ * handling different formats of statements, including macros and assembler directives.
+ */
 public class StatementBuilder extends AbstractStatementBuilder {
 
+    /**
+     * The base address for the BASE directive, when it is set
+     */
     protected String base = "";
 
-    // constructor
+    /**
+     * Constructor for StatementBuilder.
+     * Initializes the StatementBuilder by calling the superclass constructor.
+     */
     public StatementBuilder() {
         super();
     }
 
-    // create a statement from a string
+    /**
+     * Processes an assembly statement and generates a corresponding Statement object.
+     * 
+     * @param statement The assembly statement to process.
+     * @throws InvalidAssemblyFileException If the statement is invalid or contains errors.
+     */
     @Override
     public void processStatement(String statement) throws InvalidAssemblyFileException {
-        // define return statement
         Statement newStatement;
 
-        // increment lineNum by 1
+        // to keep an accurate lineNum count, increment before any processing is done
         lineNum++;
 
         // flag for format 4
@@ -31,17 +43,15 @@ public class StatementBuilder extends AbstractStatementBuilder {
         // since this can be used anywhere
         statement = statement.replace("*", Integer.toString(this.getLocctr(this.block).getDec()));
 
-        // get the parts of the statement
+        // note that we are checking if there is a valid expression for args
+        // since *-n is a valid expression
         String[] parts = splitStatement(statement);
         String mnemonic = parts[0];
-
-        // note that we are checking if there is a valid expression here
-        // since *-n is a valid expression
         String args = evaluateExpression(parts[1]);
         String label = parts[2];
 
         // check if mnemonic is empty
-        // if so, return null
+        // if so, return null since there is nothing to do
         if (mnemonic.equals("")) {
             return;
         }
@@ -62,11 +72,11 @@ public class StatementBuilder extends AbstractStatementBuilder {
             // set the processor's label to the current label
             processor.setLabel(label);
 
-            // split up each of the args
+            // find each of the given arguments for the macro
             String[] argsArray = args.split(",");
-
             Queue<String> queue = processor.getLines(argsArray);
 
+            // recursively call this method so it is as if the statements are part of the file
             while (!queue.isEmpty()) {
                 this.processStatement(queue.poll());
             }
@@ -90,17 +100,30 @@ public class StatementBuilder extends AbstractStatementBuilder {
 
             }
         }
+
+        // add the size of the statement to the location counter
+        // and use the addStatement method to handle the other logic surrounding
+        // the statement
         this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }
 
+    /**
+     * Handles assembler directives and generates a corresponding DirectiveStatement object.
+     * 
+     * @param mnemonic The mnemonic of the assembler directive.
+     * @param args The arguments for the assembler directive.
+     * @return The generated Statement object.
+     * @throws InvalidAssemblyFileException If the directive is invalid or contains errors.
+     */
     @Override
-    protected Statement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
-
+    protected DirectiveStatement handleAsmStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
         DirectiveStatement returnVal = new DirectiveStatement();
         returnVal.setDirective(mnemonic);
 
         // check for BASE or NOBASE directive first
+        // if it is base, set the args to the base
+        // which can only be used for the SIC/XE machine
         if (mnemonic.equals("BASE")) {
             this.base = args;
             return returnVal;
@@ -109,20 +132,30 @@ public class StatementBuilder extends AbstractStatementBuilder {
             return returnVal;
         }
 
-        // then use the parent for the rest
+        // then use the parent for the rest of the logic
         return super.handleAsmStatement(mnemonic, args);
     }
 
+    /**
+     * Creates a Statement object for format 1 instructions.
+     * 
+     * @param mnemonic The mnemonic of the instruction.
+     * @return The generated Statement object.
+     */
     private Statement createStatement(String mnemonic) {
-
-        // check to make sure that there is only one element in parts
         HexNum opcode = this.instructionTable.get(mnemonic);
         return new SingleStatement(this.getLocctr(), opcode);
     }
 
-    private Statement createRegStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
-
-        // Statement to return
+    /**
+     * Creates a RegisterStatement object for format 2 instructions.
+     * 
+     * @param mnemonic The mnemonic of the instruction.
+     * @param args The arguments for the instruction.
+     * @return The generated RegisterStatement object.
+     * @throws InvalidAssemblyFileException If the instruction is invalid or contains errors.
+     */
+    private RegisterStatement createRegStatement(String mnemonic, String args) throws InvalidAssemblyFileException {
         RegisterStatement returnVal = new RegisterStatement();
         returnVal.setLocation(this.getLocctr());
 
@@ -151,8 +184,15 @@ public class StatementBuilder extends AbstractStatementBuilder {
         return returnVal;
     }
 
-    private Statement createExtStatement(String mnemonic, String args, boolean eFlag) {
-
+    /**
+     * Creates an ExtendedStatement object for format 3 and 4 instructions.
+     * 
+     * @param mnemonic The mnemonic of the instruction.
+     * @param args The arguments for the instruction.
+     * @param eFlag A flag indicating if the instruction is format 4.
+     * @return The generated ExtendedStatement object.
+     */
+    private ExtendedStatement createExtStatement(String mnemonic, String args, boolean eFlag) {
         // find the opcode of the mnemonic
         HexNum opcode = this.instructionTable.get(mnemonic);
 

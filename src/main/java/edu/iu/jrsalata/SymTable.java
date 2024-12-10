@@ -1,6 +1,3 @@
-// Class: OpTable
-// This class handles the Symbol Table across the entire program
-
 package edu.iu.jrsalata;
 
 import java.util.HashMap;
