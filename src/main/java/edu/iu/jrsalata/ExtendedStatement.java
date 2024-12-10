@@ -28,18 +28,61 @@ package edu.iu.jrsalata;
  */
 public class ExtendedStatement extends BaseStatement {
 
+    /**
+     * stores each of the originally provided args
+     */
     protected String args;
+
+    /**
+     * contains the name of the base used in displacement calculations
+     */
     protected String base = "";
+
+    /**
+     * Stores the needed modification record, if any
+     */
     protected String modification = "";
+
+    /**
+     * true if an external symbol is referenced, false if otherwise
+     */
     protected boolean hasExternalSymbol = false;
+
+    /**
+     * stores the n flag
+     */
     protected boolean nFlag = false;
+
+    /**
+     * stores the i flag
+     */
     protected boolean iFlag = false;
+
+    /**
+     * stores the x flag
+     */
     protected boolean xFlag = false;
+
+    /**
+     * stores the b flag
+     */
     protected boolean bFlag = false;
+
+    /**
+     * stores the p flag
+     */
     protected boolean pFlag = false;
+
+    /**
+     * stores the e flag
+     */
     protected boolean eFlag = false;
 
-    // constructors
+    /**
+     * Constructs an ExtendedStatement object with default values.
+     * Initializes the arguments to "000", format to 3, and base to an empty string.
+     * Sets the size based on the format.
+     */
     public ExtendedStatement() {
         super();
         this.args = "000";
@@ -48,6 +91,13 @@ public class ExtendedStatement extends BaseStatement {
         this.base = "";
     }
 
+    /**
+     * Constructs an ExtendedStatement with the specified location, opcode, and arguments.
+     *
+     * @param location the memory location of the statement
+     * @param opcode the operation code of the statement
+     * @param args the arguments for the statement
+     */
     public ExtendedStatement(HexNum location, HexNum opcode, String args) {
         super(location, opcode);
         this.args = args;
@@ -56,34 +106,52 @@ public class ExtendedStatement extends BaseStatement {
         this.base = "";
     }
 
-    // flag managers
+
+    /**
+     * Sets the N flag to true.
+     */
     private void setNFlag() {
         this.nFlag = true;
     }
 
+    /**
+     * Sets the iFlag to true.
+     */
     private void setIFlag() {
         this.iFlag = true;
     }
 
+    /**
+     * Sets the xFlag to true.
+     */
     private void setXFlag() {
         this.xFlag = true;
     }
 
+    /**
+     * Sets the B flag to true.
+     */
     public void setBFlag() {
         this.bFlag = true;
     }
 
+    /**
+     * Sets the pFlag to true.
+     */
     public void setPFlag() {
         this.pFlag = true;
     }
 
+    /**
+     * Sets the eFlag to true.
+     */
     public void setEFlag() {
         this.eFlag = true;
     }
 
     
     /** 
-     * @param base
+     * @param base name of the base to be set
      */
     public void setBase(String base) {
         this.base = base;

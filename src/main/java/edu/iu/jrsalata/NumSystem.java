@@ -10,5 +10,19 @@ package edu.iu.jrsalata;
  * </ul>
  */
 public enum NumSystem {
-    HEX, DEC, BIN
+
+    /**
+     * Represents hexadecimal (base 16)
+     */
+    HEX, 
+    
+    /**
+     * Represents decimal (base 10)
+     */
+    DEC, 
+    
+    /**
+     * Represents binary (base 2)
+     */
+    BIN
 }

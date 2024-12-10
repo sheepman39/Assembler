@@ -41,6 +41,10 @@ public class AbstractStatementBuilderBuilder implements AbstractStatementBuilder
      * files must start with this flag
      */
     public static final String SIC_FLAG = "!USE SIC";
+
+    /**
+     * Standard logger for this class
+     */
     public static final Logger LOGGER = Logger.getLogger(AbstractStatementBuilderBuilder.class.getName());
 
     /**

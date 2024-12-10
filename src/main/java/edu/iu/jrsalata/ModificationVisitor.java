@@ -28,23 +28,31 @@ public class ModificationVisitor implements VisitorInterface {
     }
     
     /** 
-     * @param statement
+     * @param statement a given statement to visit
      */
     @Override
     public void visit(Statement statement) {
         // do nothing
     }
 
+    /** 
+     * @param statement a given statement to visit
+     */
     @Override
     public void visit(BaseStatement statement) {
         // do nothing
     }
 
+    /** 
+     * @param statement a given statement to visit
+     */
     @Override
     public void visit(SicStatement statement) {
         // do nothing
     }
-
+    /** 
+     * @param statement a given statement to visit
+     */
     @Override
     public void visit(SingleStatement statement) {
         // do nothing
@@ -64,11 +72,17 @@ public class ModificationVisitor implements VisitorInterface {
         }
     }
 
+    /** 
+     * @param statement a given statement to visit
+     */
     @Override
     public void visit(DirectiveStatement statement) {
         // do nothing
     }
-
+    
+    /** 
+     * @param statement a given statement to visit
+     */
     @Override
     public void visit(RegisterStatement statement) {
         // do nothing
