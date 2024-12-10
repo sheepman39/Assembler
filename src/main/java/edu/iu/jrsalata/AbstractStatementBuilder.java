@@ -735,10 +735,10 @@ public abstract class AbstractStatementBuilder {
             case 'X' -> {
                 // remove the X and the ' at the end for easier processing
                 args = args.substring(2, args.length() - 1);
-                // set the size to the ceil of the length of args / 2
+                // set the size to the length of args / 2
                 // since each section is 4 bits
-                HexNum length = new HexNum((int)Math.ceil(args.length() / 2));
-                statement.setSize(length);
+                int newLength = (int) args.length() / 2;
+                statement.setSize(new HexNum(newLength));
                 // set the object code to the arg
                 statement.setObjCode(args);
             }
