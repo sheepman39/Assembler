@@ -7,7 +7,7 @@ package edu.iu.jrsalata;
 import java.util.Queue;
 
 public interface MacroProcessorInterface {
-    
+
     public void addLine(String line);
 
     public void setLabel(String label);

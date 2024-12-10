@@ -26,7 +26,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
         // increment lineNum by 1
         lineNum++;
 
-                // replace each * with the current locctr
+        // replace each * with the current locctr
         // since this can be used anywhere
         statement = statement.replace("*", Integer.toString(this.getLocctr(this.block).getDec()));
 

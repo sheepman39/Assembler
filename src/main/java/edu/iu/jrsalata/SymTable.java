@@ -31,17 +31,17 @@ public class SymTable {
         blockTable.get(controlSection).put(symbol, block);
     }
 
-    public static void addMacro(String name, MacroProcessorInterface processor){
+    public static void addMacro(String name, MacroProcessorInterface processor) {
         createIfNotExists();
         macroTable.put(name, processor);
     }
 
-    public static MacroProcessorInterface getMacro(String name){
+    public static MacroProcessorInterface getMacro(String name) {
         createIfNotExists();
         return macroTable.get(name);
     }
 
-    public static Set<String> getMacroKeys(){
+    public static Set<String> getMacroKeys() {
         createIfNotExists();
         return macroTable.keySet();
     }
@@ -89,7 +89,7 @@ public class SymTable {
         if (blockTable == null) {
             blockTable = new HashMap<>();
         }
-        if (macroTable == null){
+        if (macroTable == null) {
             macroTable = new HashMap<>();
         }
     }
