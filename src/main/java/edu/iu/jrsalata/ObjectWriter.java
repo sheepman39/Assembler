@@ -138,7 +138,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         headerRecord.append(builder.getName());
         headerRecord.append(builder.getStart().toString(6));
         headerRecord.append(builder.getTotalLength().toString(6));
-        fileWriter.write(headerRecord.toString());
+        fileWriter.write(headerRecord.toString().toUpperCase());
         fileWriter.write('\n');
     }
 
@@ -172,7 +172,7 @@ public class ObjectWriter implements ObjectWriterInterface {
                 defineRecord.append(SymTable.getSymbol(symbolName, builder.getName()).toString(6));
             }
 
-            fileWriter.write(defineRecord.toString());
+            fileWriter.write(defineRecord.toString().toUpperCase());
             fileWriter.write('\n');
 
             // clear the StringBuilder to reset it for the next record
@@ -206,7 +206,7 @@ public class ObjectWriter implements ObjectWriterInterface {
                 referRecord.append(symbolName);
             }
 
-            fileWriter.write(referRecord.toString());
+            fileWriter.write(referRecord.toString().toUpperCase());
             fileWriter.write('\n');
 
             // clear the StringBuilder to reset it for the next record
@@ -332,7 +332,7 @@ public class ObjectWriter implements ObjectWriterInterface {
             textRecord.replace(7, 9, size.toString(2));
 
             // Add the text record to the file
-            fileWriter.write(textRecord.toString());
+            fileWriter.write(textRecord.toString().toUpperCase());
             fileWriter.write('\n');
 
         }
@@ -362,7 +362,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         // loop through each modification and write it
         while (!modifications.isEmpty()) {
 
-            fileWriter.write(modifications.poll());
+            fileWriter.write(modifications.poll().toUpperCase());
             fileWriter.write('\n');
 
         }
@@ -370,7 +370,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         // write any modification records that were stored in the builder
         List<String> modificationRecords = builder.getReferenceModifications();
         for (String records : modificationRecords) {
-            fileWriter.write(records);
+            fileWriter.write(records.toUpperCase());
             fileWriter.write('\n');
         }
     }
@@ -399,7 +399,7 @@ public class ObjectWriter implements ObjectWriterInterface {
         }
 
         // write the final string to the header file
-        fileWriter.write(endRecord.toString());
+        fileWriter.write(endRecord.toString().toUpperCase());
         fileWriter.write('\n');
     }
 
