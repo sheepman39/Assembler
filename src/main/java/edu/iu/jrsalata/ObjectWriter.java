@@ -1,7 +1,3 @@
-// Class: ObjectWriter
-// Implements: ObjectWriterInterface
-// Provides a concrete way to generate object files
-
 package edu.iu.jrsalata;
 
 import java.io.FileWriter;
@@ -11,13 +7,41 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * The ObjectWriter class is responsible for writing object files based on the
+ * provided statements and builder. It implements the ObjectWriterInterface.
+ * This class supports writing various records such as header, define, refer,
+ * text, and end records to the object file.
+ */
 public class ObjectWriter implements ObjectWriterInterface {
+
+    /**
+     * stores the name of the output file
+     */
     protected String fileName;
+
+    /**
+     * holds the current builder to write its output
+     */
     protected AbstractStatementBuilder builder;
+
+    /**
+     * queue stores the current queue of statements
+     * Possibly unnecessary?
+     */
     protected Queue<Statement> queue;
+
+    /**
+     * previouslyUsed is a boolean that indicates if the writer was used before
+     * If so, output needs to be appended
+     */
     protected boolean previouslyUsed;
 
-    // constructors
+    /**
+     * Constructs an ObjectWriter with default settings.
+     * Initializes the fileName to "output.obj", creates a new StatementBuilder,
+     * initializes the queue as a LinkedList, and sets previouslyUsed to false.
+     */
     public ObjectWriter() {
         this.fileName = "output.obj";
         this.builder = new StatementBuilder();
@@ -25,6 +49,13 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.previouslyUsed = false;
     }
 
+    /**
+     * Constructs an ObjectWriter with the specified file name, statement builder, and queue of statements.
+     *
+     * @param fileName the name of the file to write to
+     * @param builder the builder used to create statements
+     * @param queue the queue of statements to be written
+     */
     public ObjectWriter(String fileName, AbstractStatementBuilder builder, Queue<Statement> queue) {
         this.fileName = fileName;
         this.builder = builder;
@@ -32,30 +63,49 @@ public class ObjectWriter implements ObjectWriterInterface {
         this.previouslyUsed = false;
     }
 
-    // setters
+    /**
+     * Sets the name of the file.
+     *
+     * @param fileName the name of the file to be set
+     */
     @Override
     public void setFileName(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * Sets the builder for this ObjectWriter.
+     *
+     * @param builder the AbstractStatementBuilder to be used by this ObjectWriter
+     */
     @Override
     public void setBuilder(AbstractStatementBuilder builder) {
         this.builder = builder;
     }
 
+    /**
+     * Sets the queue of statements to be processed.
+     *
+     * @param queue the queue of statements to set
+     */
     @Override
     public void setQueue(Queue<Statement> queue) {
         this.queue = queue;
     }
 
-    // execute the writing of the object file
+    /**
+     * Executes the process of writing an object file. This method writes various
+     * sections of the object file including the header, define, refer, text, and
+     * end records. It uses a FileWriter to write to the specified file.
+     *
+     * @throws InvalidAssemblyFileException if the assembly file is invalid.
+     * @throws IOException if an I/O error occurs while writing to the file.
+     */
     @Override
     public void execute() throws InvalidAssemblyFileException, IOException {
 
-        try (
-                // Create a file writer to be passed around to write each section of the obj
-                // file
-                FileWriter fileWriter = new FileWriter(this.fileName, this.previouslyUsed)) {
+        try (FileWriter fileWriter = new FileWriter(this.fileName, this.previouslyUsed)) {
+
             writeHeaderRecord(fileWriter, this.builder);
             writeDefineRecord(fileWriter, this.builder);
             writeReferRecords(fileWriter, this.builder);
@@ -66,59 +116,62 @@ public class ObjectWriter implements ObjectWriterInterface {
             this.previouslyUsed = true;
 
         } catch (IOException e) {
-            // Caller will have to handle exceptions to ensure that the user knows
-            // an error has happened
             throw new IOException("Error writing to file: " + this.fileName);
         }
     }
 
-    // Write the Header Record to the given obj file
+    /**
+     * Writes a header record to the specified FileWriter.
+     * The header record consists of:
+     * - 'H' character at the beginning
+     * - Program name (columns 2-7)
+     * - Starting address (columns 8-13)
+     * - Length of the program (columns 14-19)
+     *
+     * @param fileWriter the FileWriter to write the header record to
+     * @param builder the AbstractStatementBuilder containing the program details
+     * @throws IOException if an I/O error occurs
+     */
     public void writeHeaderRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
-        // Create the StringBuilder that will add each component
-        // Start with the 'H'
         StringBuilder headerRecord = new StringBuilder();
         headerRecord.append("H");
-
-        // Col 2-7 is program name
         headerRecord.append(builder.getName());
-
-        // Col 8-13 is the starting address
         headerRecord.append(builder.getStart().toString(6));
-
-        // Col 14-19 is the length of the program
         headerRecord.append(builder.getTotalLength().toString(6));
-
-        // write the final string to the header file
         fileWriter.write(headerRecord.toString());
         fileWriter.write('\n');
-
     }
 
+    /**
+     * Writes a define record to the specified FileWriter using the provided AbstractStatementBuilder.
+     * A define record starts with 'D' and contains pairs of external symbol names and their addresses.
+     * Each name/address pair occupies 12 columns, and the total length of the define record is limited to 73 columns.
+     * The define record consists of:
+     * - 'D' character at the beginning
+     * - Symbol name (columns 2-7)
+     * - Symbol address (columns 8-13)
+     * - repeat name and address until we reach column 73
+     * 
+     * @param fileWriter the FileWriter to write the define record to
+     * @param builder the AbstractStatementBuilder that provides the external definitions
+     * @throws IOException if an I/O error occurs
+     */
     public void writeDefineRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
 
         Queue<String> builderQueue = builder.getExternalDefinitions();
-        String symbol;
+        StringBuilder defineRecord;
+        String symbolName;
+
         while (!builderQueue.isEmpty()) {
-            // Create the StringBuilder that will add each component
-            // Start with the 'D'
-            StringBuilder defineRecord = new StringBuilder();
+            
+            defineRecord = new StringBuilder();
             defineRecord.append("D");
-
-            // define records has a max length of 73 columns
-            // each name/address pair is always 12 columns
-            // so we can can continue the loop while the length is less than or equal to
-            // 60 (73 -12[per pair] -1[for D])
             while (!builderQueue.isEmpty() && defineRecord.length() <= 60) {
-
-                // Col 2-7 is the name of the external symbol
-                symbol = builderQueue.poll();
-                defineRecord.append(symbol);
-
-                // Col 8-13 is the address of the external symbol
-                defineRecord.append(SymTable.getSymbol(symbol, builder.getName()).toString(6));
+                symbolName = builderQueue.poll();
+                defineRecord.append(symbolName);
+                defineRecord.append(SymTable.getSymbol(symbolName, builder.getName()).toString(6));
             }
 
-            // write the final string to the object file
             fileWriter.write(defineRecord.toString());
             fileWriter.write('\n');
 
@@ -127,29 +180,32 @@ public class ObjectWriter implements ObjectWriterInterface {
         }
     }
 
+    /**
+     * Writes the reference records to the specified file using the provided FileWriter.
+     * The refer record consists of:
+     * - 'R' character at the beginning
+     * - Symbol name (columns 2-7)
+     * - repeat names of symbols until we reach column 73
+     *
+     * @param fileWriter the FileWriter to write the reference records to
+     * @param builder the AbstractStatementBuilder that provides the external references
+     * @throws IOException if an I/O error occurs
+     */
     public void writeReferRecords(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
 
         Queue<String> builderQueue = builder.getExternalReferences();
-        String symbol;
+        StringBuilder referRecord;
+        String symbolName;
+
         while (!builderQueue.isEmpty()) {
-            // Create the StringBuilder that will add each component
-            // Start with the 'R'
-            StringBuilder referRecord = new StringBuilder();
+
+            referRecord = new StringBuilder();
             referRecord.append("R");
-
-            // refer records has a max length of 73 columns
-            // each name is always 6 columns
-            // so we can can continue the loop while the length is less than or equal to
-            // 66 (73 -6[per name] -1[for R])
             while (!builderQueue.isEmpty() && referRecord.length() < 66) {
-
-                // Col 2-7 is the name of the external symbol
-                symbol = builderQueue.poll();
-                referRecord.append(symbol);
-
+                symbolName = builderQueue.poll();
+                referRecord.append(symbolName);
             }
 
-            // write the final string to the object file
             fileWriter.write(referRecord.toString());
             fileWriter.write('\n');
 
@@ -158,12 +214,37 @@ public class ObjectWriter implements ObjectWriterInterface {
         }
     }
 
-    // Write the Text Record to the given obj file
+    /**
+     * Writes text records to the provided FileWriter based on the given queue of Statements.
+     * Each text record is constructed by assembling the statements and appending their byte code.
+     * The method also handles different program blocks and ensures that text records are correctly
+     * formatted and written to the file.
+     * The text record consists of:
+     * - 'T' character at the beginning
+     * - Starting address (columns 2-7)
+     * - Length (in bytes) (columns 8-9)
+     * - Object code (10-69)
+     *
+     * @param fileWriter the FileWriter to write the text records to
+     * @param queue the queue of Statements to be assembled and written
+     * @param builder the AbstractStatementBuilder used to get starting addresses and other information
+     * @throws InvalidAssemblyFileException if there is an error in the assembly file
+     * @throws IOException if an I/O error occurs
+     */
     public void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
             AbstractStatementBuilder builder) throws InvalidAssemblyFileException, IOException {
 
         // hold the length of the current assembled text record
         int tempRecordLength;
+
+        // holds the length of an entire text record
+        int length;
+        
+        // Used to convert length to hex
+        HexNum size;
+
+        // Used to store the current program block
+        String currentBlock;
 
         // Create the StringBuilder that will add each component
         StringBuilder textRecord = new StringBuilder();
@@ -195,10 +276,7 @@ public class ObjectWriter implements ObjectWriterInterface {
 
         while (!queue.isEmpty()) {
 
-            // Get the current block
-            String currentBlock = queue.peek().getBlock();
-
-            // reset blankSpace
+            currentBlock = queue.peek().getBlock();
             blankSpace = false;
 
             // If the block is not in the start table, add it
@@ -211,18 +289,16 @@ public class ObjectWriter implements ObjectWriterInterface {
             textRecord.setLength(0);
             assembledTextRecord.setLength(0);
 
-            // Col 1 is "T"
             textRecord.append("T");
-
-            // Col 2-7 is the starting address
             textRecord.append(currentStartLocctr.toString(6));
-
-            // Col 8-9 is the length of the record
-            // We will put a placeholder here for now
             textRecord.append("--");
-
-            // Col 10-69 is the text record
             tempRecordLength = textRecord.length();
+            
+            // loop while
+            // 1) we have items left in the queue
+            // 2) there is room for the next assembled record
+            // 3) we are in the same program block
+            // 4) the previously assembled item was not a blank space
             while (!queue.isEmpty() && (tempRecordLength + queue.peek().assemble().length() < 70)
                     && queue.peek().getBlock().equals(currentBlock)
                     && !blankSpace) {
@@ -246,30 +322,41 @@ public class ObjectWriter implements ObjectWriterInterface {
                 continue;
             }
 
-            // append the assembled text record to the text record
             textRecord.append(assembledTextRecord);
 
             // Update the length of the record
             // since it is needed in bytes, we need to divide by 2 and round up
-            int length = textRecord.length() - 9;
+            length = textRecord.length() - 9;
             length = (int) Math.ceil(length / 2.0);
-            HexNum size = new HexNum(length);
+            size = new HexNum(length);
             textRecord.replace(7, 9, size.toString(2));
 
             // Add the text record to the file
-
             fileWriter.write(textRecord.toString());
             fileWriter.write('\n');
 
         }
 
         // after we are done writing the text records,
-        // we need to write the modification records
-        // since the visitor is local here, we are going to simply pass it
-        // instead of making copies
+        // we need to write the modification records with our visitor here
         writeModificationRecords(fileWriter, visitor.getStrings(), builder);
     }
 
+    /**
+     * Writes modification records to the provided FileWriter.
+     * 
+     * This method processes a queue of modification strings and writes each one to the
+     * FileWriter, followed by a newline character. After processing the queue, it writes
+     * any additional modification records stored in the provided AbstractStatementBuilder.
+     * 
+     * The definition of modification records can vary and is defined in the other methods that
+     * define them
+     * 
+     * @param fileWriter the FileWriter to write the modification records to
+     * @param modifications a queue of modification strings to be written
+     * @param builder an AbstractStatementBuilder containing additional modification records
+     * @throws IOException if an I/O error occurs
+     */
     public void writeModificationRecords(FileWriter fileWriter, Queue<String> modifications,
             AbstractStatementBuilder builder) throws IOException {
         // loop through each modification and write it
@@ -288,20 +375,25 @@ public class ObjectWriter implements ObjectWriterInterface {
         }
     }
 
-    // Write the End Record to the given obj file
+    /**
+     * Writes the end record to the specified FileWriter.
+     * The end record consists of the character 'E' followed by the starting address
+     * if this is the first output. All other outputs are just 'E'
+     *
+     * @param fileWriter the FileWriter to write the end record to
+     * @param builder the AbstractStatementBuilder containing the starting address
+     * @throws IOException if an I/O error occurs
+     */
     public void writeEndRecord(FileWriter fileWriter, AbstractStatementBuilder builder) throws IOException {
 
         // Create the StringBuilder that will add each component
         StringBuilder endRecord = new StringBuilder();
-
-        // Col 1 is "E"
         endRecord.append("E");
 
         // only write starting address if this is the first output
         // since everything else depends on the first
         if (!this.previouslyUsed) {
 
-            // Col 2-7 is the starting address
             endRecord.append(builder.getStart().toString(6));
 
         }
