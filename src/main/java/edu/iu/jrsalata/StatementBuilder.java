@@ -27,10 +27,17 @@ public class StatementBuilder extends AbstractStatementBuilder {
         // flag for format 4
         boolean eFlag = false;
 
+        // replace each * with the current locctr
+        // since this can be used anywhere
+        statement = statement.replace("*", Integer.toString(this.getLocctr(this.block).getDec()));
+
         // get the parts of the statement
         String[] parts = splitStatement(statement);
         String mnemonic = parts[0];
-        String args = parts[1];
+
+        // note that we are checking if there is a valid expression here
+        // since *-n is a valid expression
+        String args = evaluateExpression(parts[1]);
         String label = parts[2];
 
         // check if mnemonic is empty

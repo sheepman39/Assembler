@@ -17,6 +17,7 @@ import javax.script.ScriptException;
 
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
+import net.objecthunter.exp4j.ValidationResult;
 
 public abstract class AbstractStatementBuilder {
     static final String DEFAULT_BLOCK = "DEFAULT";
@@ -325,9 +326,15 @@ public abstract class AbstractStatementBuilder {
 
         Expression expression = new ExpressionBuilder(args).build();
 
-        // note that we are type casting as int because we require a whole number
-        int result = (int) expression.evaluate();
-        return Integer.toString(result);
+        ValidationResult expressionResults = expression.validate();
+
+        if (expressionResults.isValid()) {
+            // note that we are type casting as int because we require a whole number
+            int result = (int) expression.evaluate();
+            return Integer.toString(result);
+        }
+        return args;
+
     }
 
     protected HexNum handleExpression(String label, String args) {

@@ -26,10 +26,14 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
         // increment lineNum by 1
         lineNum++;
 
+                // replace each * with the current locctr
+        // since this can be used anywhere
+        statement = statement.replace("*", Integer.toString(this.getLocctr(this.block).getDec()));
+
         // get the parts of the statement
         String[] parts = splitStatement(statement);
         String mnemonic = parts[0];
-        String args = parts[1];
+        String args = evaluateExpression(parts[1]);
 
         // check if mnemonic is empty
         // if so, return null
