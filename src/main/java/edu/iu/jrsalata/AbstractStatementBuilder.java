@@ -49,6 +49,11 @@ public abstract class AbstractStatementBuilder {
     protected String block;
 
     /**
+     * Current line the builder is processing
+     */
+    protected String line;
+
+    /**
      * Current line number based on given input
      * May be inaccurate due to how comments are handled
      */
@@ -382,8 +387,8 @@ public abstract class AbstractStatementBuilder {
             try ( 
                     Scanner sc = new Scanner(file)) {
                 while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    String[] parts = line.split("\\s+");
+                    String currentLine = sc.nextLine();
+                    String[] parts = currentLine.split("\\s+");
 
                     // add the opcode and format to their respective tables
                     this.instructionTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
@@ -432,8 +437,8 @@ public abstract class AbstractStatementBuilder {
         try ( 
                 Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\s+");
+                String currentLine = sc.nextLine();
+                String[] parts = currentLine.split("\\s+");
                 HexNum reg = new HexNum(parts[1], NumSystem.HEX);
                 this.registerTable.put(parts[0], reg);
             }
@@ -764,6 +769,7 @@ public abstract class AbstractStatementBuilder {
         while (!this.literals.isEmpty()) {
             tmpLiteral = this.literals.poll();
             if (!SymTable.containsSymbol(tmpLiteral.getDirective(), this.name)) {
+                this.line = tmpLiteral.getDirective();
                 SymTable.addSymbol(tmpLiteral.getDirective(), this.getLocctr(), this.block, this.name);
                 this.addStatement(tmpLiteral);
                 this.addLocctr(this.block, tmpLiteral.getSize());
@@ -866,6 +872,7 @@ public abstract class AbstractStatementBuilder {
         if (statement != null) {
             statement.setBlock(this.block);
             statement.setControlSection(this.name);
+            statement.setLine(this.line);
             this.statements.add(statement);
         }
     }

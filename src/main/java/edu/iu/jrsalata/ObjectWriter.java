@@ -105,16 +105,16 @@ public class ObjectWriter implements ObjectWriterInterface {
     public void execute() throws InvalidAssemblyFileException, IOException {
 
         try (FileWriter fileWriter = new FileWriter(this.fileName, this.previouslyUsed)) {
+            try (FileWriter debugWriter = new FileWriter(this.fileName + ".txt", this.previouslyUsed)) {
+                writeHeaderRecord(fileWriter, this.builder);
+                writeDefineRecord(fileWriter, this.builder);
+                writeReferRecords(fileWriter, this.builder);
+                writeTextRecords(fileWriter, this.queue, this.builder, debugWriter);
+                writeEndRecord(fileWriter, this.builder);
 
-            writeHeaderRecord(fileWriter, this.builder);
-            writeDefineRecord(fileWriter, this.builder);
-            writeReferRecords(fileWriter, this.builder);
-            writeTextRecords(fileWriter, this.queue, this.builder);
-            writeEndRecord(fileWriter, this.builder);
-
-            // set previously used to true to indicate we want to append in the future
-            this.previouslyUsed = true;
-
+                // set previously used to true to indicate we want to append in the future
+                this.previouslyUsed = true;
+            }
         } catch (IOException e) {
             throw new IOException("Error writing to file: " + this.fileName);
         }
@@ -228,11 +228,12 @@ public class ObjectWriter implements ObjectWriterInterface {
      * @param fileWriter the FileWriter to write the text records to
      * @param queue the queue of Statements to be assembled and written
      * @param builder the AbstractStatementBuilder used to get starting addresses and other information
+     * @param debugWriter the FileWriter used to write the generated object code with the original line
      * @throws InvalidAssemblyFileException if there is an error in the assembly file
      * @throws IOException if an I/O error occurs
      */
     public void writeTextRecords(FileWriter fileWriter, Queue<Statement> queue,
-            AbstractStatementBuilder builder) throws InvalidAssemblyFileException, IOException {
+            AbstractStatementBuilder builder, FileWriter debugWriter) throws InvalidAssemblyFileException, IOException {
 
         // hold the length of the current assembled text record
         int tempRecordLength;
@@ -311,6 +312,12 @@ public class ObjectWriter implements ObjectWriterInterface {
                 // if the assembled value is a blank space and it generates some space, then we
                 // need to set the blankSpace flag to true
                 blankSpace = statement.assemble().equals("") && statement.getSize().getDec() > 0;
+
+                // we also need to write out every statement
+                debugWriter.write(statement.assemble());
+                debugWriter.write('\t');
+                debugWriter.write(statement.getLine());
+                debugWriter.write('\n');
             }
 
             // update the currentStartLocctr

@@ -51,11 +51,6 @@ public class ObjectWriterTest {
     }
 
     
-    /** 
-     * @param writer
-     * @param queue
-     * @param fileName
-     */
     public void testAsm(ObjectWriterInterface writer, Queue<AbstractStatementBuilder> queue, String fileName) {
 
         // lets first write the object file
@@ -99,8 +94,9 @@ public class ObjectWriterTest {
             }
             scTest.close();
 
-            // delete the generated test file
+            // delete the generated test files
             new File(fileName).delete();
+            new File(fileName + ".txt").delete();
         } catch (IOException e) {
             fail(e.getMessage());
         }

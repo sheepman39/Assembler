@@ -20,6 +20,11 @@ public abstract class Statement {
      */
     protected String controlSection;
 
+    /**
+     * line represents the line of assembly this statement represents
+     */
+    protected String line;
+
     
     /**
      * Protected constructor for the Statement class.
@@ -30,6 +35,7 @@ public abstract class Statement {
     protected Statement() {
         this.size = new HexNum(0);
         this.block = "";
+        this.line = "";
     }
 
     /**
@@ -78,6 +84,24 @@ public abstract class Statement {
      */
     public String getControlSection() {
         return this.controlSection;
+    }
+
+    /**
+     * Retrieves the line of the statement
+     * 
+     * @return the human-readable line
+     */
+    public String getLine(){
+        return this.line;
+    }
+
+    /**
+     * Sets the line of the statement.
+     *
+     * @param line the line to set
+     */
+    public void setLine(String line){
+        this.line = line;
     }
 
     /**
