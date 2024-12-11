@@ -1,6 +1,3 @@
-// Class: ExtendedStatement
-// Extends: Statement
-// Handles statements in Format 3 and 4, which has significantly more complexity compared to F1 and F2
 package edu.iu.jrsalata;
 
 /**
@@ -151,12 +148,16 @@ public class ExtendedStatement extends BaseStatement {
 
     
     /** 
+     * Sets the base of the statement
      * @param base name of the base to be set
      */
     public void setBase(String base) {
         this.base = base;
     }
 
+    /**
+     * Marks this statement as having an external symbol.
+     */
     public void setExternalSymbol() {
         this.hasExternalSymbol = true;
     }
@@ -167,16 +168,31 @@ public class ExtendedStatement extends BaseStatement {
         this.args = args;
     }
 
-    // since the size can be 3 or 4, we will add 1 to the size if the e flag is set
+    /**
+     * Returns the size of the statement. If the eFlag is set, the size is incremented by 1.
+     *
+     * @return the size of the statement as a HexNum object. If eFlag is true, the size is incremented by 1.
+     */
     @Override
     public HexNum getSize() {
         return this.eFlag ? this.size.add(1) : this.size;
     }
 
+    /**
+     * Retrieves the modification string.
+     *
+     * @return the modification string.
+     */
     public String getModification() {
         return this.modification;
     }
 
+    /**
+     * Accepts a visitor object and allows it to visit this instance of ExtendedStatement.
+     * This method is part of the Visitor design pattern.
+     *
+     * @param visitor the visitor object that will visit this instance
+     */
     @Override
     public void accept(VisitorInterface visitor) {
         visitor.visit(this);
