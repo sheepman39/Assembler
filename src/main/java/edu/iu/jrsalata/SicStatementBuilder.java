@@ -67,6 +67,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
             }
         }
+        this.line = statement;
         this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }

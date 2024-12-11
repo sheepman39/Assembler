@@ -104,6 +104,7 @@ public class StatementBuilder extends AbstractStatementBuilder {
         // add the size of the statement to the location counter
         // and use the addStatement method to handle the other logic surrounding
         // the statement
+        this.line = statement;
         this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }
