@@ -1,0 +1,260 @@
+classDiagram
+direction BT
+class AbstractStatementBuilder {
+  # AbstractStatementBuilder() 
+  # handleByte(String, DirectiveStatement) void
+  # assembleLiterals() void
+  # addLocctr(HexNum) void
+  # handleLabels(String, String, String) void
+  # addLocctr(String, HexNum) void
+  # handleModification(String, String) String
+  # handleLiteral(String) void
+  # addStatement(Statement) void
+  # handleAsmStatement(String, String) DirectiveStatement
+  # evaluateExpression(String) String
+  # handleExpression(String, String) HexNum
+  + processStatement(String) void
+  # setStart(String, HexNum) void
+  # loadRegisters(String) void
+  + getLocctr(String) HexNum
+  + getStart(String) HexNum
+  # splitStatement(String) String[]
+  # loadInstructions(String) void
+   String name
+   Queue~Statement~ statements
+   HexNum totalLength
+   List~String~ referenceModifications
+   Queue~String~ externalDefinitions
+   HexNum start
+   Queue~String~ externalReferences
+   HexNum locctr
+}
+class AbstractStatementBuilderBuilder {
+  + AbstractStatementBuilderBuilder() 
+  # choseBuilder(Scanner) AbstractStatementBuilder
+  # handleMacroCreation(String) MacroProcessorInterface
+  # fileInput(Scanner, AbstractStatementBuilder) Queue~AbstractStatementBuilder~
+  + execute() void
+  + execute(InputStream) void
+   String inputFile
+   Queue~AbstractStatementBuilder~ builders
+}
+class AbstractStatementBuilderBuilderInterface {
+<<Interface>>
+  + execute() void
+  + execute(InputStream) void
+   String inputFile
+   Queue~AbstractStatementBuilder~ builders
+}
+class BaseStatement {
+  # BaseStatement() 
+  # BaseStatement(HexNum, HexNum) 
+   HexNum location
+}
+class DirectiveStatement {
+  + DirectiveStatement(String) 
+  + DirectiveStatement() 
+  + DirectiveStatement(HexNum, String) 
+  + assemble() String
+  + accept(VisitorInterface) void
+   String objCode
+   HexNum size
+   String directive
+}
+class ExtendedStatement {
+  + ExtendedStatement() 
+  + ExtendedStatement(HexNum, HexNum, String) 
+  + accept(VisitorInterface) void
+  - setIFlag() void
+  + setPFlag() void
+  - handleModificationRecords(String, HexNum) void
+  + setBFlag() void
+  - setNFlag() void
+  + setExternalSymbol() void
+  - calculateDisp(HexNum) HexNum
+  + assemble() String
+  - setXFlag() void
+  + setEFlag() void
+   HexNum size
+   String args
+   String base
+   String modification
+}
+class Format {
+<<enumeration>>
+  + Format() 
+  + values() Format[]
+  + valueOf(String) Format
+}
+class HexNum {
+  + HexNum() 
+  + HexNum(String, NumSystem) 
+  + HexNum(int) 
+  + toString() String
+  - convertToHex(String, NumSystem) String
+  + add(int) HexNum
+  + toString(int) String
+  + set(int) void
+  + subtract(int) HexNum
+  + add(HexNum) HexNum
+  + set(String, NumSystem) void
+  + getBin(int) String
+  + subtract(HexNum) HexNum
+  - convertToDec(String, NumSystem) int
+   String bin
+   int dec
+}
+class InvalidAssemblyFileException {
+  + InvalidAssemblyFileException(int) 
+  + InvalidAssemblyFileException(int, String) 
+  + InvalidAssemblyFileException() 
+}
+class MacroProcessor {
+  + MacroProcessor() 
+  + MacroProcessor(String[]) 
+  + addLine(String) void
+  + getLines(String[]) Queue~String~
+   String label
+}
+class MacroProcessorInterface {
+<<Interface>>
+  + addLine(String) void
+  + getLines(String[]) Queue~String~
+   String label
+}
+class Main {
+  + Main() 
+  + main(String[]) void
+}
+class ModificationVisitor {
+  + ModificationVisitor() 
+  + visit(BaseStatement) void
+  + visit(Statement) void
+  + visit(SicStatement) void
+  + visit(ExtendedStatement) void
+  + visit(DirectiveStatement) void
+  + visit(SingleStatement) void
+  + visit(RegisterStatement) void
+   Queue~String~ strings
+}
+class NumSystem {
+<<enumeration>>
+  + NumSystem() 
+  + values() NumSystem[]
+  + valueOf(String) NumSystem
+}
+class ObjectWriter {
+  + ObjectWriter() 
+  + ObjectWriter(String, AbstractStatementBuilder, Queue~Statement~) 
+  + writeModificationRecords(FileWriter, Queue~String~, AbstractStatementBuilder) void
+  + writeReferRecords(FileWriter, AbstractStatementBuilder) void
+  + writeEndRecord(FileWriter, AbstractStatementBuilder) void
+  + execute() void
+  + writeTextRecords(FileWriter, Queue~Statement~, AbstractStatementBuilder, FileWriter) void
+  + writeDefineRecord(FileWriter, AbstractStatementBuilder) void
+  + writeHeaderRecord(FileWriter, AbstractStatementBuilder) void
+   Queue~Statement~ queue
+   AbstractStatementBuilder builder
+   String fileName
+}
+class ObjectWriterInterface {
+<<Interface>>
+  + execute() void
+   Queue~Statement~ queue
+   AbstractStatementBuilder builder
+   String fileName
+}
+class RegisterStatement {
+  + RegisterStatement(HexNum, HexNum, HexNum, HexNum) 
+  + RegisterStatement() 
+  + RegisterStatement(HexNum, HexNum, HexNum) 
+  + accept(VisitorInterface) void
+  + assemble() String
+   HexNum reg2
+   HexNum opcode
+   HexNum reg1
+}
+class SicStatement {
+  + SicStatement() 
+  + SicStatement(HexNum, HexNum, String) 
+  - setXFlag() void
+  + assemble() String
+  + accept(VisitorInterface) void
+   String args
+}
+class SicStatementBuilder {
+  + SicStatementBuilder() 
+  - createSicStatement(String, String) SicStatement
+  + processStatement(String) void
+}
+class SingleStatement {
+  + SingleStatement() 
+  + SingleStatement(HexNum, HexNum) 
+  + accept(VisitorInterface) void
+  + assemble() String
+}
+class Statement {
+  # Statement(HexNum, String) 
+  # Statement(HexNum) 
+  # Statement() 
+  + accept(VisitorInterface) void
+  + assemble() String
+   HexNum size
+   String line
+   String controlSection
+   String block
+}
+class StatementBuilder {
+  + StatementBuilder() 
+  + processStatement(String) void
+  # handleAsmStatement(String, String) DirectiveStatement
+  - createRegStatement(String, String) RegisterStatement
+  - createExtStatement(String, String, boolean) ExtendedStatement
+  - createStatement(String) Statement
+}
+class SymTable {
+  - SymTable() 
+  - createIfNotExists(String) void
+  + containsBlock(String, String) boolean
+  + addBlock(String, String, String) void
+  + addSymbol(String, HexNum, String, String) void
+  + getBlock(String, String) String
+  - createIfNotExists() void
+  + addMacro(String, MacroProcessorInterface) void
+  + getKeys(String) Set~String~
+  + getMacro(String) MacroProcessorInterface
+  + containsSymbol(String, String) boolean
+  + clear() void
+  + getSymbol(String, String) HexNum
+   Set~String~ macroKeys
+}
+class Utility {
+  + Utility() 
+  + cleanLine(String) String
+  + lengthCheck(String) String
+  + splitLine(String) String[]
+}
+class VisitorInterface {
+<<Interface>>
+  + visit(RegisterStatement) void
+  + visit(SingleStatement) void
+  + visit(BaseStatement) void
+  + visit(Statement) void
+  + visit(DirectiveStatement) void
+  + visit(SicStatement) void
+  + visit(ExtendedStatement) void
+   Queue~String~ strings
+}
+
+AbstractStatementBuilderBuilder  ..>  AbstractStatementBuilderBuilderInterface 
+BaseStatement  -->  Statement 
+DirectiveStatement  -->  Statement 
+ExtendedStatement  -->  BaseStatement 
+MacroProcessor  ..>  MacroProcessorInterface 
+ModificationVisitor  ..>  VisitorInterface 
+ObjectWriter  ..>  ObjectWriterInterface 
+RegisterStatement  -->  BaseStatement 
+SicStatement  -->  BaseStatement 
+SicStatementBuilder  -->  AbstractStatementBuilder 
+SingleStatement  -->  BaseStatement 
+StatementBuilder  -->  AbstractStatementBuilder
