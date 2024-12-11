@@ -387,8 +387,8 @@ public abstract class AbstractStatementBuilder {
             try ( 
                     Scanner sc = new Scanner(file)) {
                 while (sc.hasNextLine()) {
-                    String line = sc.nextLine();
-                    String[] parts = line.split("\\s+");
+                    String currentLine = sc.nextLine();
+                    String[] parts = currentLine.split("\\s+");
 
                     // add the opcode and format to their respective tables
                     this.instructionTable.put(parts[0], new HexNum(parts[2], NumSystem.HEX));
@@ -437,8 +437,8 @@ public abstract class AbstractStatementBuilder {
         try ( 
                 Scanner sc = new Scanner(file)) {
             while (sc.hasNextLine()) {
-                String line = sc.nextLine();
-                String[] parts = line.split("\\s+");
+                String currentLine = sc.nextLine();
+                String[] parts = currentLine.split("\\s+");
                 HexNum reg = new HexNum(parts[1], NumSystem.HEX);
                 this.registerTable.put(parts[0], reg);
             }
