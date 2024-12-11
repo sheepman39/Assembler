@@ -162,8 +162,10 @@ public class ExtendedStatement extends BaseStatement {
         this.hasExternalSymbol = true;
     }
 
-    // this will be used by the factory to clean up the args. It will also handle
-    // setting the flags
+    /**
+     * Sets the string of args for this statement
+     * @param args string of arguments the extended statement needs
+     */
     public void setArgs(String args) {
         this.args = args;
     }
