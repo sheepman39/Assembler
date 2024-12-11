@@ -40,6 +40,7 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
         }
         Statement newStatement;
         lineNum++;
+        this.line = statement;
 
         // replace each * with the current locctr
         // since this can be used anywhere
@@ -67,7 +68,6 @@ public class SicStatementBuilder extends AbstractStatementBuilder {
                 throw new InvalidAssemblyFileException(lineNum, msg.toString());
             }
         }
-        this.line = statement;
         this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }

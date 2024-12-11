@@ -36,6 +36,9 @@ public class StatementBuilder extends AbstractStatementBuilder {
         // to keep an accurate lineNum count, increment before any processing is done
         lineNum++;
 
+        // ensure that we have the most up to date line
+        this.line = statement;
+
         // flag for format 4
         boolean eFlag = false;
 
@@ -104,7 +107,6 @@ public class StatementBuilder extends AbstractStatementBuilder {
         // add the size of the statement to the location counter
         // and use the addStatement method to handle the other logic surrounding
         // the statement
-        this.line = statement;
         this.addLocctr(newStatement.getSize());
         this.addStatement(newStatement);
     }

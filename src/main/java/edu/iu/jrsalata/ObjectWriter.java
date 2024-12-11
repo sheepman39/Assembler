@@ -228,6 +228,7 @@ public class ObjectWriter implements ObjectWriterInterface {
      * @param fileWriter the FileWriter to write the text records to
      * @param queue the queue of Statements to be assembled and written
      * @param builder the AbstractStatementBuilder used to get starting addresses and other information
+     * @param debugWriter the FileWriter used to write the generated object code with the original line
      * @throws InvalidAssemblyFileException if there is an error in the assembly file
      * @throws IOException if an I/O error occurs
      */
