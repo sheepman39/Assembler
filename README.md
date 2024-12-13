@@ -10,6 +10,10 @@ All documentation and implementation information can be found on [my website](ht
 This project is built with Java version 17.0.7 and managed using [Maven](https://maven.apache.org/index.html). Please check their [downloads](https://maven.apache.org/download.cgi) page for installation steps.
 
 ## Building and Running
+For simplicity, it is recommended to use a [dev container](https://code.visualstudio.com/docs/devcontainers/containers) using your tool of choice. GitHub Codespaces were used for this project, but you can host your own containers with the provided configuration in `.devcontainer`. The image includes Java 17 and maven so nothing else is needed to be installed.
+
+To install and run locally without a dev container, ensure Java 17 and Maven is installed.
+
 To run tests, run
 ```
 mvn test
@@ -20,7 +24,8 @@ To build a jar file to execute, run
 mvn package
 ```
 
-The jar file will be in `target/`. There will be two files. Please run the file that ends with `jar-with-dependencies.jar`. Ex) `java -jar target/assembler-1.2-SNAPSHOT-jar-with-dependencies.jar`
+The jar file will be in `target/`. There will be two files. Please run the file that ends with `jar-with-dependencies.jar`. 
+Ex) `java -jar target/assembler-1.2-SNAPSHOT-jar-with-dependencies.jar`
 
 The expected file name for any input is `input.asm` in your current directory. There will be two output files generated.
 1) output.obj - which contains the object file
