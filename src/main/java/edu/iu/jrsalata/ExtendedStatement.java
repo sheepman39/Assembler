@@ -10,18 +10,21 @@ package edu.iu.jrsalata;
  * It also supports handling external symbols and creating modification records
  * when necessary.
  * 
- * <p>Flags supported by this class include:</p>
+ * <p>
+ * Flags supported by this class include:
+ * </p>
  * <ul>
- *   <li>nFlag: Indicates indirect addressing mode.</li>
- *   <li>iFlag: Indicates immediate addressing mode.</li>
- *   <li>xFlag: Indicates indexed addressing mode.</li>
- *   <li>bFlag: Indicates base relative addressing mode.</li>
- *   <li>pFlag: Indicates program counter relative addressing mode.</li>
- *   <li>eFlag: Indicates extended format (format 4) instruction.</li>
+ * <li>nFlag: Indicates indirect addressing mode.</li>
+ * <li>iFlag: Indicates immediate addressing mode.</li>
+ * <li>xFlag: Indicates indexed addressing mode.</li>
+ * <li>bFlag: Indicates base relative addressing mode.</li>
+ * <li>pFlag: Indicates program counter relative addressing mode.</li>
+ * <li>eFlag: Indicates extended format (format 4) instruction.</li>
  * </ul>
  * 
  * 
- * Note: This class relies on the SymTable class for symbol table lookups and the HexNum class for handling hexadecimal numbers.
+ * Note: This class relies on the SymTable class for symbol table lookups and
+ * the HexNum class for handling hexadecimal numbers.
  */
 public class ExtendedStatement extends BaseStatement {
 
@@ -89,11 +92,12 @@ public class ExtendedStatement extends BaseStatement {
     }
 
     /**
-     * Constructs an ExtendedStatement with the specified location, opcode, and arguments.
+     * Constructs an ExtendedStatement with the specified location, opcode, and
+     * arguments.
      *
      * @param location the memory location of the statement
-     * @param opcode the operation code of the statement
-     * @param args the arguments for the statement
+     * @param opcode   the operation code of the statement
+     * @param args     the arguments for the statement
      */
     public ExtendedStatement(HexNum location, HexNum opcode, String args) {
         super(location, opcode);
@@ -102,7 +106,6 @@ public class ExtendedStatement extends BaseStatement {
         this.size.set(this.format);
         this.base = "";
     }
-
 
     /**
      * Sets the N flag to true.
@@ -146,9 +149,9 @@ public class ExtendedStatement extends BaseStatement {
         this.eFlag = true;
     }
 
-    
-    /** 
+    /**
      * Sets the base of the statement
+     * 
      * @param base name of the base to be set
      */
     public void setBase(String base) {
@@ -164,6 +167,7 @@ public class ExtendedStatement extends BaseStatement {
 
     /**
      * Sets the string of args for this statement
+     * 
      * @param args string of arguments the extended statement needs
      */
     public void setArgs(String args) {
@@ -171,9 +175,11 @@ public class ExtendedStatement extends BaseStatement {
     }
 
     /**
-     * Returns the size of the statement. If the eFlag is set, the size is incremented by 1.
+     * Returns the size of the statement. If the eFlag is set, the size is
+     * incremented by 1.
      *
-     * @return the size of the statement as a HexNum object. If eFlag is true, the size is incremented by 1.
+     * @return the size of the statement as a HexNum object. If eFlag is true, the
+     *         size is incremented by 1.
      */
     @Override
     public HexNum getSize() {
@@ -190,7 +196,8 @@ public class ExtendedStatement extends BaseStatement {
     }
 
     /**
-     * Accepts a visitor object and allows it to visit this instance of ExtendedStatement.
+     * Accepts a visitor object and allows it to visit this instance of
+     * ExtendedStatement.
      * This method is part of the Visitor design pattern.
      *
      * @param visitor the visitor object that will visit this instance
@@ -204,11 +211,12 @@ public class ExtendedStatement extends BaseStatement {
      * Assembles the statement into its object code representation.
      *
      * @return The assembled object code as a string.
-     * @throws InvalidAssemblyFileException If there is an error in the assembly process.
+     * @throws InvalidAssemblyFileException If there is an error in the assembly
+     *                                      process.
      */
     @Override
     public String assemble() throws InvalidAssemblyFileException {
-        
+
         /**
          * creates a copy of the args to handle easier
          */
@@ -314,14 +322,17 @@ public class ExtendedStatement extends BaseStatement {
                 this.setPFlag();
                 disp = new HexNum(pcRelative);
             } else {
+
+                if(this.base.isEmpty()){
+                    throw new InvalidAssemblyFileException(-1, "MISSING BASE REGISTER");
+                }
+                
                 // if pc relative is not possible, try base relative
                 int baseInt = SymTable.getSymbol(this.base, this.controlSection).getDec();
                 int baseRelative = targetAddress.getDec() - baseInt;
-                if (!this.base.isEmpty() && baseRelative >= 0 && baseRelative <= 4095) {
+                if (baseRelative >= 0 && baseRelative <= 4095) {
                     this.setBFlag();
                     disp = new HexNum(baseRelative);
-                } else if (this.base.isEmpty()) {
-                    throw new InvalidAssemblyFileException(-1, "MISSING BASE REGISTER");
                 }
             }
         }
@@ -335,16 +346,18 @@ public class ExtendedStatement extends BaseStatement {
      * which means it is not using base or PC-relative addressing. The modification
      * record is formatted according to the following rules:
      * - 'M' (column 1)
-     * - Starting address of the field to be modified, relative to beginning of control section (columns 2-7)
+     * - Starting address of the field to be modified, relative to beginning of
+     * control section (columns 2-7)
      * - Length of field to be modified in half-bytes (columns 8-9)
      * - If the argument is defined in an external symbol, a '+' followed by the
-     *   processed argument is appended. (column 10)
-     * - If the argument is defined in an external symbol, include the name of said symbol (columns 11-16)
+     * processed argument is appended. (column 10)
+     * - If the argument is defined in an external symbol, include the name of said
+     * symbol (columns 11-16)
      * 
      * @param processedArgs The processed arguments for the instruction.
-     * @param argSize The size of the argument.
+     * @param argSize       The size of the argument.
      */
-    private void handleModificationRecords(String processedArgs, HexNum argSize){
+    private void handleModificationRecords(String processedArgs, HexNum argSize) {
         // check if we need to create a modification record
         // we need to create a modification record if it is using direct addressing
         // meaning that we are not using base or pc relative addressing
