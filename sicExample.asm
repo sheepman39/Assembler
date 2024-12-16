@@ -1,4 +1,5 @@
 !USE SIC
+. NOTE: this program can't be converted to SIC/XE without adding a base because of how much space the various buffers take up
 COPY START 1000
 FIRST STL RETADR
 CLOOP JSUB RDREC
